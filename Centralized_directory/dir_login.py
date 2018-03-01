@@ -3,7 +3,7 @@ import socket
 class Peer:
 
 	def __init__(self):
-		self.ip_dir = '192.168.1.106' #edit for presentation
+		self.ip_dir = '192.168.1.107' #edit for presentation
 		self.dir_port = 3000
 		self.dir_addr = (self.ip_dir, self.dir_port)
 
@@ -22,13 +22,13 @@ class Peer:
 
 			#self.s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 			#self.s.connect(self.dir_addr)
-		except IOError, expt: #l'eccezione ha una sotto eccez. per la socket
+		except IOError as expt: #l'eccezione ha una sotto eccez. per la socket
 			print ("Errore nella connessione alla directory --> " + expt)
 
 	def deconnection(self):
 		try:
 			self.s.close()
-		except IOError, expt: #l'eccezione ha una sotto eccez. per la socket
+		except IOError as expt: #l'eccezione ha una sotto eccez. per la socket
 			print ("Errore nella connessione alla directory --> " + expt)
 
 	def login(self):
@@ -56,15 +56,19 @@ class Peer:
 		self.s.send(data_login.encode('ascii'))
 
 		self.ack_login = self.s.recv(20) #4B di ALGI + 16B di SID
-		#self.ack.decode('ascii')
 
-		if (self.ack_login[:4] == "ALGI"):
+		print("Ip peer ---> " + str(self.ipp2p))
+		print("Port peer ---> " + str(self.pp2p))
+		print("First 4 byte from dir----> " + str(self.ack_login[:4].decode()))
+
+		if (self.ack_login[:4].decode() == "ALGI"):
 			self.sid = self.ack_login[4:20]
+
 			if (self.sid == '0000000000000000'):
 				print("Errore durante il login\n")
 				exit()
 			else:	
-				print("Session ID ---> " + self.sid + "\n")
+				print("Session ID ---> " + str(self.sid.decode()) + "\n")
 		else:
 			print("Errore del pacchetto, string 'ALGI' non trovata")
 			exit()
@@ -76,15 +80,23 @@ class Peer:
 
 		self.connection()
 
-		data_logout = "LOGO" + self.sid
+		data_logout = "LOGO" + self.sid.decode()
 
 		self.s.send(data_logout.encode('ascii'))
 
 		self.ack_logout = self.s.recv(7)
+		print("First 4 byte from dir----> " + str(self.ack_logout[:4].decode()))
 
-		if(self.ack_logout[:4] == "ALGO"):
-			print("Numero di file eliminati ---> " + str(self.ack_logout[4:7]))
+		if(self.ack_logout[:4].decode() == "ALGO"):
+			print("Numero di file eliminati ---> " + str(self.ack_logout[4:7].decode()))
 
 		self.deconnection()
 
 	#---------------------------------------------
+
+if __name__ == "__main__":
+	peer = Peer()
+	op = input("LI for login: ")
+	peer.login()
+	op = input("LO for logout: ")
+	peer.logout()
