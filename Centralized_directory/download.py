@@ -9,11 +9,11 @@ class Download:
     def __init__(self):
         # mio ip e porta
         self.ipp2p_A = '10.14.92.226'
-        self.pp2p_A = 54321
+        self.pp2p_A = 12345
 
         # ip e porta che ricavo dalla funzione di 'search'
-        self.ipp2p_B = '10.14.76.72'
-        self.pp2p_B = 12345
+        self.ipp2p_B = '10.14.65.162'
+        self.pp2p_B = 54321
 
         # md5 del file che mi restituisce la 'search'
 
@@ -58,14 +58,18 @@ class Download:
         self.first_packet = self.s.recv(50)
 
         if (self.first_packet[:4].decode() == "ARET"):
-            i = self.first_packet[4:10]  # n di chunk o indice del ciclo for
-            l = self.first_packet[10:15]  # lunghezza del primo chunk
-            end_pack = 15 + l.decode()
+            i = self.first_packet[4:10].decode()  # n di chunk o indice del ciclo for
+            l = self.first_packet[10:14].decode()  # lunghezza del primo chunk
+            print(i)
+            print("\n")
+            print(l)
+            end_pack = 15 + int(l)
+            print(end_pack)
             self.data_recv.append(self.first_packet[15:end_pack])  # dati
 
-            for j in range(i):
+            for j in range(int(i)-1):
                 self.packet = self.s.recv(end_pack)
-                self.data_recv.append(self.packet[end_pack])
+                self.data_recv.append(self.packet[15:end_pack])
 
         self.deconnection()
 
@@ -98,7 +102,7 @@ class Download:
         peersocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         peersocket.bind((self.ipp2p_A, self.pp2p_A))
 
-        peersocket.listen()
+        peersocket.listen(1)
 
         while True:
             other_peersocket, addr = peersocket.accept()
@@ -120,17 +124,18 @@ class Download:
                         print(peer_response)
                         other_peersocket.send(peer_response.encode('ascii'))
 
-                except IOError:
-                    print("Errore, file non trovato!\n")
+                except IOError as io:
+                    print("Errore, file non trovato! errore ----> " + io)
 
 
 if __name__ == "__main__":
     l = []
     down = Download()
-    p1 = mp.Process(target=down.upload)
-    p1.start()  # processo con l'upload dei dati quando vengo contattato da un alto peer
+    #p1 = mp.Process(target=down.upload)
+    #p1.start()  # processo con l'upload dei dati quando vengo contattato da un alto peer
+    op = input("'D' for download or 'U' for upload: ")
+    if(op == "U"):
+        down.upload()
 
-    op = input("'D' for download: ")
-    if (op == "D"):
-        p2 = mp.Process(target=down.download)
-        p2.start()  # processo con la funzione di download
+    elif (op == "D"):
+        down.download()
