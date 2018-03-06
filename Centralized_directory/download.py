@@ -29,6 +29,7 @@ class Download:
 		# lista con chunk
 		self.data_recv = []
 		self.data_to_send = []
+		self.chunk_size = 1024
 
 	def connection(self):
 		try:
@@ -49,7 +50,7 @@ class Download:
 	def download(self):
 		print("\n--- DOWNLOAD ---\n")
 
-		self.connection()
+		self.connection()	
 
 		self.md5 = self.file_signature #md5 from search
 		print(self.md5)
@@ -73,13 +74,12 @@ class Download:
 
 		return self.data_recv
 
-	def chunking(self, file_obj, file_name):
-		chunk_size = 1024
+	def chunking(self, file_obj, file_name, chunk_size):
 		list_of_chunk = []
 		info = os.stat(file_name)
 		dim_file = info.st_size
 
-		div = math.modf(dim_file / chunk_size)[1]+1 # numero di chunk
+		nchunk = math.modf(dim_file / chunk_size)[1]+1 # numero di chunk
 		for i in range(int(div)):
 			d = bytearray(file_obj.read(chunk_size))
 			if(len(d) == chunk_size):
@@ -90,7 +90,7 @@ class Download:
 					d.append(32)
 				list_of_chunk.append(d)
 		
-		return list_of_chunk
+		return list_of_chunk, int(nchunk)
 
 	def upload(self):
 		# dizionario simulato da creare nell'add file
@@ -116,10 +116,12 @@ class Download:
 					file_to_send = dict[self.from_peer[4:36].decode()]
 					print("file to send ---> " + str(file_to_send))
 					f = open(file_to_send, "rb")
-					self.data_to_send = self.chunking(f, file_to_send)
+					self.data_to_send, self.nchunk = self.chunking(f, file_to_send, self.chunk_size)
 					#first_sending = "ARET"
 					for i in self.data_to_send:
-						other_peersocket.send(i)
+						nchunk = int(self.nchunk)
+						peer_response = "ARET"+str(nchunk).zfill(6)+self.chunk_size+i
+						other_peersocket.send(peer_response)
 
 				except IOError:
 					print("Errore, file non trovato!\n")
