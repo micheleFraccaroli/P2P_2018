@@ -117,12 +117,14 @@ class Download:
                     print("file to send ---> " + str(file_to_send))
                     f = open(file_to_send, "rb")
                     self.data_to_send, self.nchunk = self.chunking(f, file_to_send, self.chunk_size)
-                    
+
+                    nchunk = int(self.nchunk)
+                    peer_response = "ARET" + str(nchunk).zfill(6)
                     for i in self.data_to_send:
-                        nchunk = int(self.nchunk)
-                        peer_response = "ARET" + str(nchunk).zfill(6) + str(self.chunk_size) + str(bytes(i))
-                        print(peer_response)
-                        other_peersocket.send(peer_response.encode('ascii'))
+                        peer_response = peer_response + str(self.chunk_size) + str(bytes(i))
+
+                    print(peer_response)
+                    other_peersocket.send(peer_response.encode('ascii'))
 
                 except IOError as io:
                     print("Errore, file non trovato! errore ----> " + io)
