@@ -1,6 +1,7 @@
 import socket
 import os
 import math
+import binascii as bhash
 import multiprocessing as mp
 import hashlib as hl
 
@@ -8,12 +9,12 @@ import hashlib as hl
 class Download:
     def __init__(self):
         # mio ip e porta
-        self.ipp2p_A = '10.14.92.226'
-        self.pp2p_A = 12345
+        self.ipp2p_A = '192.168.43.69'
+        self.pp2p_A = 54322
 
         # ip e porta che ricavo dalla funzione di 'search'
-        self.ipp2p_B = '10.14.65.162'
-        self.pp2p_B = 54321
+        self.ipp2p_B = '192.168.43.154'
+        self.pp2p_B = 12345
 
         # md5 del file che mi restituisce la 'search'
 
@@ -55,21 +56,18 @@ class Download:
 
         self.s.send(to_peer.encode('ascii'))
 
-        self.first_packet = self.s.recv(50)
+        self.first_packet = self.s.recv(2048)
 
         if (self.first_packet[:4].decode() == "ARET"):
             i = self.first_packet[4:10].decode()  # n di chunk o indice del ciclo for
             l = self.first_packet[10:14].decode()  # lunghezza del primo chunk
-            print(i)
-            print("\n")
-            print(l)
             end_pack = 15 + int(l)
-            print(end_pack)
-            self.data_recv.append(self.first_packet[15:end_pack])  # dati
+
+            self.data_recv.append(self.first_packet[15:end_pack].decode())  # dati
 
             for j in range(int(i)-1):
                 self.packet = self.s.recv(end_pack)
-                self.data_recv.append(self.packet[15:end_pack])
+                self.data_recv.append(self.packet[15:end_pack].decode())
 
         self.deconnection()
 
@@ -82,13 +80,14 @@ class Download:
 
         nchunk = math.modf(dim_file / chunk_size)[1] + 1  # numero di chunk
         for i in range(int(nchunk)):
-            d = bytearray(file_obj.read(chunk_size))
+            d = file_obj.read(chunk_size)
+            #d = bytearray(f)
             if (len(d) == chunk_size):
                 list_of_chunk.append(d)
             elif (len(d) < chunk_size):
                 dif = chunk_size - len(d)
                 for i in range(dif):  # aggiungo gli spazi mancanti per colmare l'ultimo chunk
-                    d.append(32)
+                    d = d + bytes(' '.encode())
                 list_of_chunk.append(d)
 
         return list_of_chunk, int(nchunk)
@@ -119,9 +118,9 @@ class Download:
                     self.data_to_send, self.nchunk = self.chunking(f, file_to_send, self.chunk_size)
 
                     nchunk = int(self.nchunk)
-                    peer_response = "ARET" + str(nchunk).zfill(6)
                     for i in self.data_to_send:
-                        peer_response = peer_response + str(self.chunk_size) + str(bytes(i))
+                        peer_response = "ARET" + str(nchunk).zfill(6) + str(self.chunk_size) + bhash.hexlify(i).decode('ascii')
+                        other_peersocket.send(peer_response)
 
                     print(peer_response)
                     other_peersocket.send(peer_response.encode('ascii'))
@@ -140,4 +139,5 @@ if __name__ == "__main__":
         down.upload()
 
     elif (op == "D"):
-        down.download()
+        l = down.download()
+        print("CIAO")
