@@ -10,7 +10,7 @@ class Peer:
         self.dir_port = 3000
         self.dir_addr = (self.ip_dir, self.dir_port)
 
-        self.my_ipv4 = '192.168.1.102'
+        self.my_ipv4 = '192.168.43.33'
         self.my_ipv6 = 'fe80::ac89:c3f8:ea1a:ca4b'
         self.pPort = 50001  # peer port for receaving connection from other peer
 
@@ -166,4 +166,4 @@ if __name__ == "__main__":
         if(op == "LO"):
             peer.logout()
         elif(op == "AG"):
-            peer.aggiunta("lion.jpg")
+            peer.aggiunta("LEONE.jpg")
