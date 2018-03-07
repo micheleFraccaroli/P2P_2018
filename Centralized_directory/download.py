@@ -118,6 +118,7 @@ class Download:
                     self.data_to_send, self.nchunk = self.chunking(f, file_to_send, self.chunk_size)
 
                     nchunk = int(self.nchunk)
+                    info_packet =
                     for i in self.data_to_send:
                         peer_response = "ARET" + str(nchunk).zfill(6) + str(self.chunk_size) + bhash.hexlify(i).decode('ascii')
                         other_peersocket.send(peer_response)

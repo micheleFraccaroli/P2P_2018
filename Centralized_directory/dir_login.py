@@ -113,8 +113,8 @@ class Peer:
             FileHash.update(self.contenuto)
             FileHash.hexdigest()
 
-            if (len(self.filename) < 32):
-                self.filename = self.filename.ljust(32, ' ')
+            if (len(self.filename) < 100):
+                self.filename = self.filename.ljust(100, ' ')
 
             self.connection()
 
@@ -131,7 +131,8 @@ class Peer:
             self.pp2p_bf = self.s.getsockname()[1]  # porta peer bad formatted
             self.pp2p = '%(#)03d' % {"#": int(self.pp2p_bf)}
 
-            data_add_file = "ADDF" + FileHash.hexdigest() + self.filename
+            data_add_file = "ADDF" + str(self.sid.decode()) + FileHash.hexdigest() + self.filename
+            print(data_add_file)
 
             self.s.send(data_add_file.encode())
 
@@ -157,11 +158,12 @@ class Peer:
 
 if __name__ == "__main__":
     peer = Peer()
-    op = input("LI for login or AG: ")
+    op = input("LI for login: ")
 
     if(op == "LI"):
         peer.login()
-        op = input("LO for logout: ")
-        peer.logout()
-    elif(op == "AG"):
-        peer.aggiunta("lion.jpg")
+        op = input("LO for logout or AG for add: ")
+        if(op == "LO"):
+            peer.logout()
+        elif(op == "AG"):
+            peer.aggiunta("lion.jpg")
