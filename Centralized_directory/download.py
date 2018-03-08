@@ -17,10 +17,11 @@ class Download:
         self.pp2p_B = 12345
 
         # md5 del file che mi restituisce la 'search'
-
+        '''
         file = open("lion.jpg", "rb")
         img = file.read()
         # self.file_signature = hl.md5(img).hexdigest()
+        '''
         self.file_signature = 'd054890aa6a20fe5273d24feff7acc79'
 
         # lista con chunk
@@ -56,18 +57,16 @@ class Download:
 
         self.s.send(to_peer.encode('ascii'))
 
-        self.first_packet = self.s.recv(2048)
-
+        self.first_packet = self.s.recv(10)
+        print(self.first_packet)
         if (self.first_packet[:4].decode() == "ARET"):
             i = self.first_packet[4:10].decode()  # n di chunk o indice del ciclo for
-            l = self.first_packet[10:14].decode()  # lunghezza del primo chunk
-            end_pack = 15 + int(l)
-
-            self.data_recv.append(self.first_packet[15:end_pack].decode())  # dati
-
+            print(i)
             for j in range(int(i)-1):
-                self.packet = self.s.recv(end_pack)
-                self.data_recv.append(self.packet[15:end_pack].decode())
+                self.chunk_length = self.s.recv(5)  # lunghezza del primo chunk
+                print(self.chunk_length)
+                self.chunk = self.s.recv(int(self.chunk_length.decode()))  # dati
+                self.data_recv.append(self.chunk.decode())
 
         self.deconnection()
 
@@ -85,9 +84,11 @@ class Download:
             if (len(d) == chunk_size):
                 list_of_chunk.append(d)
             elif (len(d) < chunk_size):
+                '''
                 dif = chunk_size - len(d)
                 for i in range(dif):  # aggiungo gli spazi mancanti per colmare l'ultimo chunk
                     d = d + bytes(' '.encode())
+                '''
                 list_of_chunk.append(d)
 
         return list_of_chunk, int(nchunk)
@@ -118,13 +119,13 @@ class Download:
                     self.data_to_send, self.nchunk = self.chunking(f, file_to_send, self.chunk_size)
 
                     nchunk = int(self.nchunk)
-                    ''' Manda prima ARET e num chunk, poi in un ciclo manda dim chunk e dati in due send diverse '''
-                    for i in self.data_to_send:
-                        peer_response = "ARET" + str(nchunk).zfill(6) + str(self.chunk_size) + bhash.hexlify(i).decode('ascii')
-                        other_peersocket.send(peer_response)
 
-                    print(peer_response)
-                    other_peersocket.send(peer_response.encode('ascii'))
+                    first_response = "ARET" + str(nchunk).zfill(6)
+                    other_peersocket.send(first_response.encode('ascii'))
+                    for i in self.data_to_send:
+                        length = len(i)
+                        other_peersocket.send(length.encode('ascii'))
+                        other_peersocket.send(i.encode('ascii'))
 
                 except IOError as io:
                     print("Errore, file non trovato! errore ----> " + io)
@@ -141,4 +142,4 @@ if __name__ == "__main__":
 
     elif (op == "D"):
         l = down.download()
-        print("CIAO")
+        print("END")
