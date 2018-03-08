@@ -9,7 +9,7 @@ import hashlib as hl
 class Download:
     def __init__(self):
         # mio ip e porta
-        self.ipp2p_A = '192.168.43.69'
+        self.ipp2p_A = '192.168.43.69' #put your ip here!
         self.pp2p_A = 54322
 
         # ip e porta che ricavo dalla funzione di 'search'
