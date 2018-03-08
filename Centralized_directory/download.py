@@ -1,20 +1,22 @@
+import time
 import socket
 import os
 import math
 import binascii as bhash
 import multiprocessing as mp
 import hashlib as hl
+from threading import Timer
 
 
 class Download:
     def __init__(self):
         # mio ip e porta
         self.ipp2p_A = '192.168.43.69' #put your ip here!
-        self.pp2p_A = 54321
+        self.pp2p_A = 54322
 
         # ip e porta che ricavo dalla funzione di 'search'
         self.ipp2p_B = '192.168.43.225'
-        self.pp2p_B = 12345
+        self.pp2p_B = 12347
 
         # md5 del file che mi restituisce la 'search'
         '''
@@ -59,14 +61,31 @@ class Download:
 
         self.first_packet = self.s.recv(10)
         print(self.first_packet)
+        bytes_read = 0
+        bytes_read_l = 0
         if (self.first_packet[:4].decode() == "ARET"):
             i = self.first_packet[4:10].decode()  # n di chunk o indice del ciclo for
             print(i)
-            for j in range(int(i)-1):
+            for j in range(int(i)):
                 self.chunk_length = self.s.recv(5)  # lunghezza del primo chunk
-                print(self.chunk_length)
-                self.chunk = self.s.recv(int(self.chunk_length.decode()))  # dati
-                self.data_recv.append(self.chunk.decode())
+
+                bytes_read_l = len(self.chunk_length)
+                while (bytes_read_l < 5):
+                    self.chunk_length = self.s.recv(5 - bytes_read_l)
+                    bytes_read_l = bytes_read_l + len(self.chunk_length)
+
+                print(len(self.chunk_length))
+                self.chunk = self.s.recv(int(self.chunk_length))  # dati
+
+                bytes_read = len(self.chunk)
+                while (bytes_read < int(self.chunk_length)):
+                    self.chunk = self.s.recv(int(self.chunk_length) - bytes_read)
+                    bytes_read = bytes_read + len(self.chunk)
+
+                print(bytes_read)
+                print(self.chunk)
+                self.data_recv.append(self.chunk)
+                print(self.data_recv[j])
 
         self.deconnection()
 
@@ -123,12 +142,15 @@ class Download:
                     first_response = "ARET" + str(nchunk).zfill(6)
                     other_peersocket.send(first_response.encode('ascii'))
                     for i in self.data_to_send:
-                        length = len(i)
+                        length = str(len(i)).zfill(5)
                         other_peersocket.send(length.encode('ascii'))
-                        other_peersocket.send(i.encode('ascii'))
+                        print(length)
+                        other_peersocket.send(i)
+                        print(len(i))
+                        print(i)
 
-                except IOError as io:
-                    print("Errore, file non trovato! errore ----> " + io)
+                except IOError:
+                    print("Errore, file non trovato! errore")
 
 
 if __name__ == "__main__":
