@@ -10,10 +10,10 @@ class Download:
     def __init__(self):
         # mio ip e porta
         self.ipp2p_A = '192.168.43.69' #put your ip here!
-        self.pp2p_A = 54322
+        self.pp2p_A = 54321
 
         # ip e porta che ricavo dalla funzione di 'search'
-        self.ipp2p_B = '192.168.43.154'
+        self.ipp2p_B = '192.168.43.225'
         self.pp2p_B = 12345
 
         # md5 del file che mi restituisce la 'search'
