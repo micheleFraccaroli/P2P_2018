@@ -82,7 +82,7 @@ class Download:
                 self.bytes_read_l = len(self.chunk_length)
                 while (self.bytes_read_l < 5):       # controllo che siano stati realmente letti i bytes richiesti
                     self.chunk_length += self.s.recv(5 - self.bytes_read_l)
-                    self.bytes_read_l = self.bytes_read_l + len(self.chunk_length)
+                    self.bytes_read_l += len(self.chunk_length)
 
                 self.chunk = self.s.recv(int(self.chunk_length))  # dati
                 #self.data_recv.append(self.chunk)
