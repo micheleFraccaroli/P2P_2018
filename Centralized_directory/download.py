@@ -80,7 +80,7 @@ class Download:
                 self.chunk_length = self.s.recv(5)  # lunghezza del primo chunk
 
                 self.bytes_read_l = len(self.chunk_length)
-                while (self.bytes_read_l < 5):       # controllo che siano stati realmente letti i byte richiesti
+                while (self.bytes_read_l < 5):       # controllo che siano stati realmente letti i bytes richiesti
                     self.chunk_length += self.s.recv(5 - self.bytes_read_l)
                     self.bytes_read_l = self.bytes_read_l + len(self.chunk_length)
 
@@ -88,7 +88,7 @@ class Download:
                 #self.data_recv.append(self.chunk)
                 self.bytes_read = len(self.chunk)
 
-                while (self.bytes_read < int(self.chunk_length)):        # controllo che siano stati realmente letti i byte richiesti
+                while (self.bytes_read < int(self.chunk_length)):        # controllo che siano stati realmente letti i bytes richiesti
                     self.chunk += self.s.recv(int(self.chunk_length) - self.bytes_read)
                     self.bytes_read = self.bytes_read + len(self.chunk)
                     #self.data_recv.append(buffer)
