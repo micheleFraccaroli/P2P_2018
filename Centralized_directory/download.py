@@ -17,6 +17,10 @@ class Download:
         self.ipp2p_B = '192.168.43.225'
         self.pp2p_B = 12346
 
+        # ip e porta della directory
+        self.ipp2p_dir = ''
+        self.pp2p_dir = 3000
+
         # md5 del file che mi restituisce la 'search'
         '''
         file = open("lion.jpg", "rb")
@@ -34,13 +38,17 @@ class Download:
 
         # variabili per controllo byte in ricezione
         self.bytes_read_f = 0
-        self.bytes_read = 0
         self.bytes_read_l = 0
+        self.bytes_read = 0
+        self.bytes_read_i = 0
 
-    def connection(self):
+        # sessionID for numero di download
+        self.sid = 'ALGIqwert12345yuiop5'
+
+    def connection(self, ip, port):
         try:
             # this is for ipv4 and ipv6
-            self.infoS = socket.getaddrinfo(self.ipp2p_B, self.pp2p_B)
+            self.infoS = socket.getaddrinfo(ip, port)
             self.s = socket.socket(*self.infoS[0][:3])
             self.s.connect(self.infoS[0][4])
 
@@ -56,7 +64,7 @@ class Download:
     def download(self):
         print("\n--- DOWNLOAD ---\n")
 
-        self.connection()
+        self.connection(self.ipp2p_A, self.pp2p_A)
 
         self.md5 = self.file_signature  # md5 from search
         print(self.md5)
@@ -70,7 +78,7 @@ class Download:
         self.bytes_read_f = len(self.first_packet)
         while (self.bytes_read_f < 10):
             self.first_packet += self.s.recv(10 - self.bytes_read_f)
-            self.bytes_read_f = self.bytes_read_f + len(self.first_packet)
+            self.bytes_read_f += len(self.first_packet)
 
 
         if (self.first_packet[:4].decode() == "ARET"):
@@ -82,7 +90,7 @@ class Download:
                 self.bytes_read_l = len(self.chunk_length)
                 while (self.bytes_read_l < 5):       # controllo che siano stati realmente letti i bytes richiesti
                     self.chunk_length += self.s.recv(5 - self.bytes_read_l)
-                    self.bytes_read_l = self.bytes_read_l + len(self.chunk_length)
+                    self.bytes_read_l += len(self.chunk_length)
 
                 self.chunk = self.s.recv(int(self.chunk_length))  # dati
                 #self.data_recv.append(self.chunk)
@@ -90,7 +98,7 @@ class Download:
 
                 while (self.bytes_read < int(self.chunk_length)):        # controllo che siano stati realmente letti i bytes richiesti
                     self.chunk += self.s.recv(int(self.chunk_length) - self.bytes_read)
-                    self.bytes_read = self.bytes_read + len(self.chunk)
+                    self.bytes_read += len(self.chunk)
                     #self.data_recv.append(buffer)
                 self.data_recv.append(self.chunk)
         self.deconnection()
@@ -115,6 +123,22 @@ class Download:
         f = open(self.filename,"rb")
         r = f.read()
         print("\n--- FILE DOWNLOADED ---\n")
+
+        self.connection(self.ipp2p_dir, self.pp2p_dir)
+
+        self.info_packet = "DREG" + self.sid + self.md5
+        self.s.send(self.info_packet.encode('ascii'))
+
+        self.info_recv = self.s.recv(9)
+        self.bytes_read_i = len(self.info_recv)
+        while (self.bytes_read_i < 9):
+            self.info_recv += self.s.recv(9 - self.bytes_read_i)
+            self.bytes_read_i += len(self.info_recv)
+        if(self.info_recv[:4].decode() == "ADRE"):
+            self.num_download = self.info_recv[4:9]
+
+        print(self.num_download)
+        self.deconnection()
 
     def chunking(self, file_obj, file_name, chunk_size):
         list_of_chunk = []
