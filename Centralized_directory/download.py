@@ -1,11 +1,10 @@
-import time
 import socket
 import os
 import math
+from pathlib import Path
 import binascii as bhash
 import multiprocessing as mp
 import hashlib as hl
-from threading import Timer
 
 
 class Download:
@@ -16,7 +15,7 @@ class Download:
 
         # ip e porta che ricavo dalla funzione di 'search'
         self.ipp2p_B = '192.168.43.225'
-        self.pp2p_B = 12345
+        self.pp2p_B = 12346
 
         # md5 del file che mi restituisce la 'search'
         '''
@@ -26,7 +25,7 @@ class Download:
         '''
         #variabili provenienti dalla ricerca
         self.file_signature = 'd054890aa6a20fe5273d24feff7acc79'
-        self.filename = 'lion_recv.jpg'
+        self.filename = 'inge.jpg'
 
         # lista con chunk
         self.data_recv = []
@@ -76,7 +75,7 @@ class Download:
 
         if (self.first_packet[:4].decode() == "ARET"):
             i = self.first_packet[4:10].decode()  # n di chunk o indice del ciclo for
-            print(i)
+
             for j in range(int(i)):
                 self.chunk_length = self.s.recv(5)  # lunghezza del primo chunk
 
@@ -85,28 +84,37 @@ class Download:
                     self.chunk_length = self.s.recv(5 - self.bytes_read_l)
                     self.bytes_read_l = self.bytes_read_l + len(self.chunk_length)
 
-                print(len(self.chunk_length))
                 self.chunk = self.s.recv(int(self.chunk_length))  # dati
-
-                self.bytes_read = len(self.chunk)
-                while (self.bytes_read < int(self.chunk_length)):        # controllo che siano stati realmente letti i byte richiesti
-                    self.chunk = self.s.recv(int(self.chunk_length) - self.bytes_read)
-                    self.bytes_read = self.bytes_read + len(self.chunk)
-
-                print(self.bytes_read)
-                print(self.chunk)
                 self.data_recv.append(self.chunk)
-                print(self.data_recv[j])
+                self.bytes_read = len(self.chunk)
+
+                while (self.bytes_read < int(self.chunk_length)):        # controllo che siano stati realmente letti i byte richiesti
+                    buffer = self.s.recv(int(self.chunk_length) - self.bytes_read)
+                    self.bytes_read = self.bytes_read + len(buffer)
+                    self.data_recv.append(buffer)
 
         self.deconnection()
 
-        file_recv = open(self.filename,"ab") # rigenerazione immagine
-        for i in self.data_recv:
-            file_recv.write(i)
+        check_file = Path(self.filename)
+        print(check_file)
+
+        if (check_file.is_file()):
+            choice = input("\nIl file esiste già nel tuo file system, vuoi sovrascriverlo? (Y,n): ")
+            if(choice == "Y"):
+                os.remove(self.filename)
+                file_recv = open(self.filename, "ab")
+                for i in self.data_recv:
+                    file_recv.write(i)
+            else:
+                exit()
+        else:
+            file_recv = open(self.filename,"ab")
+            for i in self.data_recv:
+                file_recv.write(i)
 
         f = open(self.filename,"rb")
         r = f.read()
-        print(r)
+        print("\n--- FILE DOWNLOADED ---\n")
 
     def chunking(self, file_obj, file_name, chunk_size):
         list_of_chunk = []
@@ -131,7 +139,7 @@ class Download:
 
     def upload(self):
         # dizionario simulato da creare nell'add file
-        dict = {self.file_signature: 'lion.jpg'}
+        dict = {self.file_signature: 'reddit_recv.png'}
         print(self.file_signature)
         print(dict[self.file_signature])
 
@@ -145,8 +153,6 @@ class Download:
             print("Connesso al peer " + str(addr))
 
             self.from_peer = other_peersocket.recv(36)
-            print("Primi 4 byte ----> " + str(self.from_peer[:4].decode()))
-            print("\ne successivo md5 ---------> " + str(self.from_peer[4:36].decode()))
             if (self.from_peer[:4].decode() == "RETR"):
                 try:
                     file_to_send = dict[self.from_peer[4:36].decode()]
