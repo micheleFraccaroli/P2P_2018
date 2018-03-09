@@ -25,7 +25,7 @@ class Download:
         '''
         #variabili provenienti dalla ricerca
         self.file_signature = 'd054890aa6a20fe5273d24feff7acc79'
-        self.filename = 'inge.jpg'
+        self.filename = 'Profile.jpg'
 
         # lista con chunk
         self.data_recv = []
@@ -69,7 +69,7 @@ class Download:
         self.first_packet = self.s.recv(10)
         self.bytes_read_f = len(self.first_packet)
         while (self.bytes_read_f < 10):
-            self.first_packet = self.s.recv(10 - self.bytes_read_f)
+            self.first_packet += self.s.recv(10 - self.bytes_read_f)
             self.bytes_read_f = self.bytes_read_f + len(self.first_packet)
 
 
@@ -80,19 +80,19 @@ class Download:
                 self.chunk_length = self.s.recv(5)  # lunghezza del primo chunk
 
                 self.bytes_read_l = len(self.chunk_length)
-                while (self.bytes_read_l < 5):       # controllo che siano stati realmente letti i byte richiesti
-                    self.chunk_length = self.s.recv(5 - self.bytes_read_l)
+                while (self.bytes_read_l < 5):       # controllo che siano stati realmente letti i bytes richiesti
+                    self.chunk_length += self.s.recv(5 - self.bytes_read_l)
                     self.bytes_read_l = self.bytes_read_l + len(self.chunk_length)
 
                 self.chunk = self.s.recv(int(self.chunk_length))  # dati
-                self.data_recv.append(self.chunk)
+                #self.data_recv.append(self.chunk)
                 self.bytes_read = len(self.chunk)
 
-                while (self.bytes_read < int(self.chunk_length)):        # controllo che siano stati realmente letti i byte richiesti
-                    buffer = self.s.recv(int(self.chunk_length) - self.bytes_read)
-                    self.bytes_read = self.bytes_read + len(buffer)
-                    self.data_recv.append(buffer)
-
+                while (self.bytes_read < int(self.chunk_length)):        # controllo che siano stati realmente letti i bytes richiesti
+                    self.chunk += self.s.recv(int(self.chunk_length) - self.bytes_read)
+                    self.bytes_read = self.bytes_read + len(self.chunk)
+                    #self.data_recv.append(buffer)
+                self.data_recv.append(self.chunk)
         self.deconnection()
 
         check_file = Path(self.filename)
