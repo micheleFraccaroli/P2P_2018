@@ -16,7 +16,7 @@ class Download:
 
         # ip e porta che ricavo dalla funzione di 'search'
         self.ipp2p_B = '192.168.43.225'
-        self.pp2p_B = 12347
+        self.pp2p_B = 12345
 
         # md5 del file che mi restituisce la 'search'
         '''
@@ -24,12 +24,19 @@ class Download:
         img = file.read()
         # self.file_signature = hl.md5(img).hexdigest()
         '''
+        #variabili provenienti dalla ricerca
         self.file_signature = 'd054890aa6a20fe5273d24feff7acc79'
+        self.filename = 'lion_recv.jpg'
 
         # lista con chunk
         self.data_recv = []
         self.data_to_send = []
         self.chunk_size = 1024
+
+        # variabili per controllo byte in ricezione
+        self.bytes_read_f = 0
+        self.bytes_read = 0
+        self.bytes_read_l = 0
 
     def connection(self):
         try:
@@ -59,37 +66,47 @@ class Download:
 
         self.s.send(to_peer.encode('ascii'))
 
+
         self.first_packet = self.s.recv(10)
-        print(self.first_packet)
-        bytes_read = 0
-        bytes_read_l = 0
+        self.bytes_read_f = len(self.first_packet)
+        while (self.bytes_read_f < 10):
+            self.first_packet = self.s.recv(10 - self.bytes_read_f)
+            self.bytes_read_f = self.bytes_read_f + len(self.first_packet)
+
+
         if (self.first_packet[:4].decode() == "ARET"):
             i = self.first_packet[4:10].decode()  # n di chunk o indice del ciclo for
             print(i)
             for j in range(int(i)):
                 self.chunk_length = self.s.recv(5)  # lunghezza del primo chunk
 
-                bytes_read_l = len(self.chunk_length)
-                while (bytes_read_l < 5):
-                    self.chunk_length = self.s.recv(5 - bytes_read_l)
-                    bytes_read_l = bytes_read_l + len(self.chunk_length)
+                self.bytes_read_l = len(self.chunk_length)
+                while (self.bytes_read_l < 5):       # controllo che siano stati realmente letti i byte richiesti
+                    self.chunk_length = self.s.recv(5 - self.bytes_read_l)
+                    self.bytes_read_l = self.bytes_read_l + len(self.chunk_length)
 
                 print(len(self.chunk_length))
                 self.chunk = self.s.recv(int(self.chunk_length))  # dati
 
-                bytes_read = len(self.chunk)
-                while (bytes_read < int(self.chunk_length)):
-                    self.chunk = self.s.recv(int(self.chunk_length) - bytes_read)
-                    bytes_read = bytes_read + len(self.chunk)
+                self.bytes_read = len(self.chunk)
+                while (self.bytes_read < int(self.chunk_length)):        # controllo che siano stati realmente letti i byte richiesti
+                    self.chunk = self.s.recv(int(self.chunk_length) - self.bytes_read)
+                    self.bytes_read = self.bytes_read + len(self.chunk)
 
-                print(bytes_read)
+                print(self.bytes_read)
                 print(self.chunk)
                 self.data_recv.append(self.chunk)
                 print(self.data_recv[j])
 
         self.deconnection()
 
-        return self.data_recv
+        file_recv = open(self.filename,"ab") # rigenerazione immagine
+        for i in self.data_recv:
+            file_recv.write(i)
+
+        f = open(self.filename,"rb")
+        r = f.read()
+        print(r)
 
     def chunking(self, file_obj, file_name, chunk_size):
         list_of_chunk = []
@@ -163,5 +180,5 @@ if __name__ == "__main__":
         down.upload()
 
     elif (op == "D"):
-        l = down.download()
-        print("END")
+        down.download()
+        print("\n--- END ---")
