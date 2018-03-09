@@ -6,7 +6,7 @@ from pathlib import Path
 class Peer:
 
     def __init__(self):
-        self.ip_dir = '192.168.43.135'  # edit for presentation
+        self.ip_dir = '192.168.43.57'  # edit for presentation
         self.dir_port = 3000
         self.dir_addr = (self.ip_dir, self.dir_port)
 
@@ -60,6 +60,12 @@ class Peer:
 
         self.ack_login = self.s.recv(20)  # 4B di ALGI + 16B di SID
 
+        bytes_read = len(self.ack_login)
+
+        while(bytes_read < 20):
+            butes_read_remain = self.s.recv(20 - bytes_read)
+            bytes_read = bytes_read + butes_read_remain
+
         print("Ip peer ---> " + str(self.ipp2p))
         print("Port peer ---> " + str(self.pp2p))
         print("First 4 byte from dir----> " + str(self.ack_login[:4].decode()))
@@ -88,6 +94,13 @@ class Peer:
         self.s.send(data_logout.encode('ascii'))
 
         self.ack_logout = self.s.recv(7)
+
+        bytes_read = len(self.ack_logout)
+
+        while(bytes_read < 7):
+            butes_read_remain = self.s.recv(7 - bytes_read)
+            bytes_read = bytes_read + butes_read_remain
+
         print("First 4 byte from dir----> " + str(self.ack_logout[:4].decode()))
 
         if (self.ack_logout[:4].decode() == "ALGO"):
@@ -140,10 +153,15 @@ class Peer:
             print("Port peer ---> " + str(self.pp2p))
             print(data_add_file)
 
-            self.ack_login = self.s.recv(7)  # 4B di AADD + 3B di copia del file
+            self.ack_add = self.s.recv(7)  # 4B di AADD + 3B di copia del file
+            bytes_read = len(self.ack_add)
 
-            if (self.ack_login[:4].decode() == "AADD"):
-                self.sid = self.ack_login[0:7]
+            while(bytes_read < 7):
+                butes_read_remain = self.s.recv(7 - bytes_read)
+                bytes_read = bytes_read + butes_read_remain
+
+            if (self.ack_add[:4].decode() == "AADD"):
+                self.sid = self.ack_add[0:7]
                 print(str(self.sid.decode()), "\n")
             else:
                 print("Errore del pacchetto, stringa 'AADD' non trovata")
@@ -166,4 +184,4 @@ if __name__ == "__main__":
         if(op == "LO"):
             peer.logout()
         elif(op == "AG"):
-            peer.aggiunta("LEONE.jpg")
+            peer.aggiunta("lion.jpg")
