@@ -2,7 +2,11 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="0e08a76f-d2d3-40da-ae41-7696f93e8ae6" name="Default" comment="">
-      <change beforePath="$PROJECT_DIR$/Centralized_directory/download.py" afterPath="$PROJECT_DIR$/Centralized_directory/download.py" />
+      <change beforePath="$PROJECT_DIR$/.idea/P2P.iml" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/.idea/modules.xml" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="" />
     </list>
     <ignored path="venv/" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
