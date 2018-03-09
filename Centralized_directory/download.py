@@ -10,12 +10,12 @@ import hashlib as hl
 class Download:
     def __init__(self):
         # mio ip e porta
-        self.ipp2p_A = '192.168.43.69' #put your ip here!
-        self.pp2p_A = 54322
+        self.ipp2p_A = '192.168.43.225' #put your ip here!
+        self.pp2p_A = 12346
 
         # ip e porta che ricavo dalla funzione di 'search'
-        self.ipp2p_B = '192.168.43.225'
-        self.pp2p_B = 12346
+        self.ipp2p_B = '192.168.43.69'
+        self.pp2p_B = 54322
 
         # md5 del file che mi restituisce la 'search'
         '''
@@ -139,7 +139,7 @@ class Download:
 
     def upload(self):
         # dizionario simulato da creare nell'add file
-        dict = {self.file_signature: 'reddit_recv.png'}
+        dict = {self.file_signature: 'profile.jpg'}
         print(self.file_signature)
         print(dict[self.file_signature])
 

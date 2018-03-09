@@ -157,8 +157,8 @@ class Peer:
             bytes_read = len(self.ack_add)
 
             while(bytes_read < 7):
-                butes_read_remain = self.s.recv(7 - bytes_read)
-                bytes_read = bytes_read + butes_read_remain
+                bytes_read_remain = self.s.recv(7 - bytes_read)
+                bytes_read = bytes_read + bytes_read_remain
 
             if (self.ack_add[:4].decode() == "AADD"):
                 self.sid = self.ack_add[0:7]
