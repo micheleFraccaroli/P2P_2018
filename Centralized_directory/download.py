@@ -100,7 +100,7 @@ class Download:
 
         self.deconnection()
 
-        file_recv = open(self.filename,"ab")
+        file_recv = open(self.filename,"ab") # rigenerazione immagine
         for i in self.data_recv:
             file_recv.write(i)
 
