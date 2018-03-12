@@ -6,11 +6,11 @@ from pathlib import Path
 class Peer:
 
     def __init__(self):
-        self.ip_dir = '192.168.43.57'  # edit for presentation
+        self.ip_dir = '10.13.242.125'  # edit for presentation
         self.dir_port = 3000
         self.dir_addr = (self.ip_dir, self.dir_port)
 
-        self.my_ipv4 = '192.168.43.33'
+        self.my_ipv4 = '10.13.245.97'
         self.my_ipv6 = 'fe80::ac89:c3f8:ea1a:ca4b'
         self.pPort = 50001  # peer port for receaving connection from other peer
 
@@ -60,11 +60,11 @@ class Peer:
 
         self.ack_login = self.s.recv(20)  # 4B di ALGI + 16B di SID
 
-        bytes_read = len(self.ack_login)
+        self.bytes_read = len(self.ack_login)
 
-        while(bytes_read < 20):
+        while(self.bytes_read < 20):
             self.ack_login += self.s.recv(20 - self.bytes_read)
-            self.bytes_read += len(self.ack_login)
+            self.bytes_read = len(self.ack_login)
 
         print("Ip peer ---> " + str(self.ipp2p))
         print("Port peer ---> " + str(self.pp2p))
@@ -176,11 +176,11 @@ class Peer:
 
         self.rm_file = input("Inserisci il nome del file che desideri eliminare dalla directory:\n")
 
-        self.check_file = Path(rm_file)
+        self.check_file = Path(self.rm_file)
 
         if (self.check_file.is_file()):
 
-            self.f = open(self.file, 'rb')
+            self.f = open(self.rm_file, 'rb')
             self.contenuto = self.f.read()
 
             self.FileHash = hashlib.md5()
@@ -218,12 +218,15 @@ class Peer:
 
 if __name__ == "__main__":
     peer = Peer()
-    op = input("LI for login: ")
+    op = input("Login:\n")
 
     if(op == "LI"):
         peer.login()
-        op = input("LO for logout or AG for add: ")
-        if(op == "LO"):
-            peer.logout()
-        elif(op == "AG"):
-            peer.aggiunta("lion.jpg")
+        while True:
+            op = input("LO, ADD, RM: ")
+            if(op == "LO"):
+                peer.logout()
+            elif(op == "AG"):
+                peer.aggiunta("lion.jpg")
+            elif(op == "RM"):
+                peer.rimuovi()
