@@ -7,7 +7,9 @@ import hashlib as hl
 import multiprocessing as mp
 
 class Download:
-    def __init__(self):
+    def __init__(self, ipp2p_A, pp2p_A, ipp2p_B, pp2p_B, md5, filename, ipp2p_dir):
+
+        '''
         # mio ip e porta
         self.ipp2p_A = '192.168.43.69' #put your ip here!
         self.pp2p_A = 12345
@@ -16,34 +18,49 @@ class Download:
         self.ipp2p_B = '192.168.43.192' # ip of other peer
         self.pp2p_B = 54321
 
-        '''
         # ip e porta della directory
         self.ipp2p_dir = ''
         self.pp2p_dir = 3000
-        '''
 
         # md5 del file che mi restituisce la 'search'
-        '''
+
         file = open("lion.jpg", "rb")
         img = file.read()
         # self.file_signature = hl.md5(img).hexdigest()
-        '''
+
         #variabili provenienti dalla ricerca
         self.file_signature = 'd054890aa6a20fe5273d24feff7acc79'
         self.filename = 'CesOS.png'
+        '''
 
-        # lista con chunk
+        #your ip
+        self.ipp2p_A = ipp2p_A
+        self.pp2p_A = pp2p_A
+
+        #ip other peer
+        self.ipp2p_B = ipp2p_B
+        self.pp2p_B = pp2p_B
+
+        #ip directory
+        self.ipp2p_dir = ipp2p_dir
+        self.pp2p_dir = 3000
+
+        #file
+        self.file_signature = md5
+        self.filename = filename
+
+        #chunk veriables
         self.data_recv = []
         self.data_to_send = []
         self.chunk_size = 1024
 
-        # variabili per controllo byte in ricezione
+        #var for bytes controller
         self.bytes_read_f = 0
         self.bytes_read_l = 0
         self.bytes_read = 0
         self.bytes_read_i = 0
 
-        # sessionID for numero di download
+        #sessionID for download number
         self.sid = 'ALGIqwert12345yuiop5'
 
         mutex = mp.Lock()
@@ -69,20 +86,18 @@ class Download:
 
         self.connection(self.ipp2p_B, self.pp2p_B)
 
-        self.md5 = self.file_signature  # md5 from search
+        self.md5 = self.file_signature
         print(self.md5)
 
         to_peer = "RETR" + self.md5
 
         self.s.send(to_peer.encode('ascii'))
 
-
         self.first_packet = self.s.recv(10)
         self.bytes_read_f = len(self.first_packet)
         while (self.bytes_read_f < 10):
             self.first_packet += self.s.recv(10 - self.bytes_read_f)
-            self.bytes_read_f += len(self.first_packet)
-
+            self.bytes_read_f = len(self.first_packet)
 
         if (self.first_packet[:4].decode() == "ARET"):
             i = self.first_packet[4:10].decode()  # n di chunk o indice del ciclo for
@@ -93,7 +108,7 @@ class Download:
                 self.bytes_read_l = len(self.chunk_length)
                 while (self.bytes_read_l < 5):       # controllo che siano stati realmente letti i bytes richiesti
                     self.chunk_length += self.s.recv(5 - self.bytes_read_l)
-                    self.bytes_read_l += len(self.chunk_length)
+                    self.bytes_read_l = len(self.chunk_length)
 
                 self.chunk = self.s.recv(int(self.chunk_length))  # dati
                 #self.data_recv.append(self.chunk)
@@ -101,7 +116,7 @@ class Download:
 
                 while (self.bytes_read < int(self.chunk_length)):        # controllo che siano stati realmente letti i bytes richiesti
                     self.chunk += self.s.recv(int(self.chunk_length) - self.bytes_read)
-                    self.bytes_read += len(self.chunk)
+                    self.bytes_read = len(self.chunk)
                     #self.data_recv.append(buffer)
                 self.data_recv.append(self.chunk)
         self.deconnection()
@@ -126,7 +141,7 @@ class Download:
         f = open(self.filename,"rb")
         r = f.read()
         print("\n--- FILE DOWNLOADED ---\n")
-        '''
+
         self.connection(self.ipp2p_dir, self.pp2p_dir)
 
         self.info_packet = "DREG" + self.sid + self.md5
@@ -136,13 +151,13 @@ class Download:
         self.bytes_read_i = len(self.info_recv)
         while (self.bytes_read_i < 9):
             self.info_recv += self.s.recv(9 - self.bytes_read_i)
-            self.bytes_read_i += len(self.info_recv)
+            self.bytes_read_i = len(self.info_recv)
         if(self.info_recv[:4].decode() == "ADRE"):
             self.num_download = self.info_recv[4:9]
 
         print(self.num_download)
         self.deconnection()
-        '''
+
     def chunking(self, file_obj, file_name, chunk_size):
         list_of_chunk = []
         info = os.stat(file_name)
@@ -167,8 +182,6 @@ class Download:
     def upload(self):
         # dizionario simulato da creare nell'add file
         dict = {self.file_signature: 'reddit_recv.png'}
-        #print(self.file_signature)
-        #print(dict[self.file_signature])
 
         peersocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         peersocket.bind((self.ipp2p_A, self.pp2p_A))
