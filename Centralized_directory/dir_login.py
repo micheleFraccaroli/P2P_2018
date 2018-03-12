@@ -63,8 +63,8 @@ class Peer:
         bytes_read = len(self.ack_login)
 
         while(bytes_read < 20):
-            butes_read_remain = self.s.recv(20 - bytes_read)
-            bytes_read = bytes_read + butes_read_remain
+            self.ack_login += self.s.recv(20 - self.bytes_read)
+            self.bytes_read += len(self.ack_login)
 
         print("Ip peer ---> " + str(self.ipp2p))
         print("Port peer ---> " + str(self.pp2p))
@@ -98,8 +98,8 @@ class Peer:
         bytes_read = len(self.ack_logout)
 
         while(bytes_read < 7):
-            butes_read_remain = self.s.recv(7 - bytes_read)
-            bytes_read = bytes_read + butes_read_remain
+            self.ack_logout += self.s.recv(7 - self.bytes_read)
+            self.bytes_read += len(self.ack_logout)
 
         print("First 4 byte from dir----> " + str(self.ack_logout[:4].decode()))
 
@@ -157,8 +157,8 @@ class Peer:
             bytes_read = len(self.ack_add)
 
             while(bytes_read < 7):
-                butes_read_remain = self.s.recv(7 - bytes_read)
-                bytes_read = bytes_read + butes_read_remain
+                self.ack_add += self.s.recv(7 - self.bytes_read)
+                self.bytes_read += len(self.ack_add)
 
             if (self.ack_add[:4].decode() == "AADD"):
                 self.sid = self.ack_add[0:7]
