@@ -22,12 +22,6 @@ class Download:
         self.pp2p_dir = 3000
         '''
 
-        # md5 del file che mi restituisce la 'search'
-        '''
-        file = open("lion.jpg", "rb")
-        img = file.read()
-        # self.file_signature = hl.md5(img).hexdigest()
-        '''
         #variabili provenienti dalla ricerca
         self.file_signature = 'd054890aa6a20fe5273d24feff7acc79'
         self.filename = 'CesOS.png'
