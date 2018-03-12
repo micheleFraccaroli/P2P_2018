@@ -9,12 +9,12 @@ import multiprocessing as mp
 class Download:
     def __init__(self):
         # mio ip e porta
-        self.ipp2p_A = '192.168.43.69' #put your ip here!
-        self.pp2p_A = 12345
+        self.ipp2p_A = '192.168.43.192' #put your ip here!
+        self.pp2p_A = 54321
 
         # ip e porta che ricavo dalla funzione di 'search'
-        self.ipp2p_B = '192.168.43.192' # ip of other peer
-        self.pp2p_B = 54321
+        self.ipp2p_B = '192.168.43.69' # ip of other peer
+        self.pp2p_B = 12345
 
         '''
         # ip e porta della directory
@@ -81,7 +81,7 @@ class Download:
         self.bytes_read_f = len(self.first_packet)
         while (self.bytes_read_f < 10):
             self.first_packet += self.s.recv(10 - self.bytes_read_f)
-            self.bytes_read_f += len(self.first_packet)
+            self.bytes_read_f = len(self.first_packet)
 
 
         if (self.first_packet[:4].decode() == "ARET"):
@@ -93,7 +93,7 @@ class Download:
                 self.bytes_read_l = len(self.chunk_length)
                 while (self.bytes_read_l < 5):       # controllo che siano stati realmente letti i bytes richiesti
                     self.chunk_length += self.s.recv(5 - self.bytes_read_l)
-                    self.bytes_read_l += len(self.chunk_length)
+                    self.bytes_read_l = len(self.chunk_length)
 
                 self.chunk = self.s.recv(int(self.chunk_length))  # dati
                 #self.data_recv.append(self.chunk)
@@ -101,7 +101,7 @@ class Download:
 
                 while (self.bytes_read < int(self.chunk_length)):        # controllo che siano stati realmente letti i bytes richiesti
                     self.chunk += self.s.recv(int(self.chunk_length) - self.bytes_read)
-                    self.bytes_read += len(self.chunk)
+                    self.bytes_read = len(self.chunk)
                     #self.data_recv.append(buffer)
                 self.data_recv.append(self.chunk)
         self.deconnection()
@@ -166,7 +166,7 @@ class Download:
 
     def upload(self):
         # dizionario simulato da creare nell'add file
-        dict = {self.file_signature: 'reddit_recv.png'}
+        dict = {self.file_signature: 'think big.png'}
         #print(self.file_signature)
         #print(dict[self.file_signature])
 
