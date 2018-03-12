@@ -2,12 +2,13 @@ import socket
 import os
 import math
 from pathlib import Path
-import binascii as bhash
-import hashlib as hl
+from Centralized_directory.Add_Remove import AddRm
+from Centralized_directory.Conn import Conn
+from Centralized_directory.dir_login import Peer
 import multiprocessing as mp
 
 class Download:
-    def __init__(self, ipp2p_A, pp2p_A, ipp2p_B, pp2p_B, md5, filename, ipp2p_dir):
+    def __init__(self, sid, ipp2p_A, pp2p_A, ipp2p_B, pp2p_B, md5, filename, ipp2p_dir, dict):
 
         '''
         # mio ip e porta
@@ -61,10 +62,13 @@ class Download:
         self.bytes_read_i = 0
 
         #sessionID for download number
-        self.sid = 'ALGIqwert12345yuiop5'
+        self.sid = sid
+        #self.sid = 'ALGIqwert12345yuiop5'
 
-        mutex = mp.Lock()
+        self.dict = dict
 
+        self.mutex = mp.Lock()
+    '''
     def connection(self, ip, port):
         try:
             # this is for ipv4 and ipv6
@@ -80,11 +84,12 @@ class Download:
             self.s.close()
         except IOError as expt:
             print ("Errore nella connessione alla directory --> " + expt)
-
+    '''
     def download(self):
         print("\n--- DOWNLOAD ---\n")
 
-        self.connection(self.ipp2p_B, self.pp2p_B)
+        self.con = Conn(self.ipp2p_B, self.pp2p_B)
+        self.con.connection()
 
         self.md5 = self.file_signature
         print(self.md5)
@@ -119,7 +124,7 @@ class Download:
                     self.bytes_read = len(self.chunk)
                     #self.data_recv.append(buffer)
                 self.data_recv.append(self.chunk)
-        self.deconnection()
+        self.con.deconnection()
 
         check_file = Path(self.filename)
         print(check_file)
@@ -142,7 +147,8 @@ class Download:
         r = f.read()
         print("\n--- FILE DOWNLOADED ---\n")
 
-        self.connection(self.ipp2p_dir, self.pp2p_dir)
+        self.con = Conn(self.ipp2p_dir, self.pp2p_dir)
+        self.con.connection()
 
         self.info_packet = "DREG" + self.sid + self.md5
         self.s.send(self.info_packet.encode('ascii'))
@@ -156,7 +162,7 @@ class Download:
             self.num_download = self.info_recv[4:9]
 
         print(self.num_download)
-        self.deconnection()
+        self.con.deconnection()
 
     def chunking(self, file_obj, file_name, chunk_size):
         list_of_chunk = []
@@ -181,7 +187,7 @@ class Download:
 
     def upload(self):
         # dizionario simulato da creare nell'add file
-        dict = {self.file_signature: 'reddit_recv.png'}
+        dict = {self.file_signature: 'lion.jpg'}
 
         peersocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         peersocket.bind((self.ipp2p_A, self.pp2p_A))
@@ -195,7 +201,7 @@ class Download:
             self.from_peer = other_peersocket.recv(36)
             if (self.from_peer[:4].decode() == "RETR"):
                 try:
-                    file_to_send = dict[self.from_peer[4:36].decode()]
+                    file_to_send = dict[self.from_peer[4:36].decode()] # usare self.dict
                     #print("file to send ---> " + str(file_to_send))
                     f = open(file_to_send, "rb")
                     self.data_to_send, self.nchunk = self.chunking(f, file_to_send, self.chunk_size)
@@ -215,7 +221,7 @@ class Download:
 
 if __name__ == "__main__":
     l = []
-    down = Download()
+    down = Download('192.168.43.69', 12345, '192.168.43.225', 54321, 'd054890aa6a20fe5273d24feff7acc79', 'other.jpg', '127.0.0.1')
     uploading = mp.Process(target=down.upload)
     uploading.start()
     #down.upload()

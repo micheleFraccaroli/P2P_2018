@@ -1,21 +1,23 @@
 import socket
-import hashlib
-from pathlib import Path
+from Centralized_directory.Conn import Conn
+#import hashlib
+#from pathlib import Path
 
 
 class Peer:
 
-    def __init__(self):
-        self.ip_dir = '192.168.43.57'  # edit for presentation
-        self.dir_port = 3000
-        self.dir_addr = (self.ip_dir, self.dir_port)
+    def __init__(self, ipp2p_dir, pp2p_dir):
+        self.ip_dir = ipp2p_dir
+        self.dir_port = pp2p_dir
 
         self.my_ipv4 = '192.168.43.33'
         self.my_ipv6 = 'fe80::ac89:c3f8:ea1a:ca4b'
         self.pPort = 50001  # peer port for receaving connection from other peer
 
-    # -------- fase di login e logout con la directory --------
+        self.con = Conn(self.ip_dir, self.dir_port)
 
+    # -------- fase di login e logout con la directory --------
+    '''
     def connection(self):
         try:
             # this is for ipv4 and ipv6
@@ -33,11 +35,11 @@ class Peer:
             self.s.close()
         except IOError as expt:  # l'eccezione ha una sotto eccez. per la socket
             print("Errore nella connessione alla directory --> " + expt)
-
+    '''
     def login(self):
         print("\n--- LOGIN ---\n")
 
-        self.connection()
+        self.con.connection()
 
         # self.ipp2p_bf = self.s.getsockname()[0] #ip peer bad formatted
 
@@ -82,12 +84,14 @@ class Peer:
             print("Errore del pacchetto, string 'ALGI' non trovata")
             exit()
 
-        self.deconnection()
+        self.con.deconnection()
+
+        return self.sid
 
     def logout(self):
         print("\n--- LOGOUT ---\n")
 
-        self.connection()
+        self.con.connection()
 
         data_logout = "LOGO" + self.sid.decode()
 
@@ -106,112 +110,7 @@ class Peer:
         if (self.ack_logout[:4].decode() == "ALGO"):
             print("Numero di file eliminati ---> " + str(self.ack_logout[4:7].decode()))
 
-        self.deconnection()
-
-    def aggiunta(self, file):
-
-        print("\n--- AGGIUNTA ---\n")
-
-        # verifico l'esistenza del file
-
-        self.check_file = Path(file)
-
-        if (self.check_file.is_file()):
-
-            self.f = open(file, 'rb')
-            self.contenuto = self.f.read()
-            self.filename = self.f.name
-
-            self.FileHash = hashlib.md5()
-            self.FileHash.update(self.contenuto)
-            self.FileHash.hexdigest()
-
-            if (len(self.filename) < 100):
-                self.filename = self.filename.ljust(100, ' ')
-
-            self.connection()
-
-            # formattazione ip
-            self.split_ip = self.my_ipv4.split(".")
-            ip1 = self.split_ip[0].zfill(3)
-            ip2 = self.split_ip[1].zfill(3)
-            ip3 = self.split_ip[2].zfill(3)
-            ip4 = self.split_ip[3].zfill(3)
-
-            self.ipp2p = ip1 + '.' + ip2 + '.' + ip3 + '.' + ip4
-
-            # formattazione porta
-            self.pp2p_bf = self.s.getsockname()[1]  # porta peer bad formatted
-            self.pp2p = '%(#)03d' % {"#": int(self.pp2p_bf)}
-
-            data_add_file = "ADDF" + str(self.sid.decode()) + self.FileHash.hexdigest() + self.filename
-
-            self.s.send(data_add_file.encode())
-
-            print("Ip peer ---> " + str(self.ipp2p))
-            print("Port peer ---> " + str(self.pp2p))
-            print(data_add_file)
-
-            self.ack_add = self.s.recv(7)  # 4B di AADD + 3B di copia del file
-            self.bytes_read = len(self.ack_add)
-
-            while(self.bytes_read < 7):
-                self.ack_add += self.s.recv(7 - self.bytes_read)
-                self.bytes_read = len(self.ack_add)
-
-            if (self.ack_add[:4].decode() == "AADD"):
-                print(str(self.ack_add[0:7].decode()), "\n")
-            else:
-                print("Errore del pacchetto, stringa 'AADD' non trovata")
-                exit()
-
-            self.deconnection()
-
-        else:
-            print("Controllare l'esistenza del file o il percorso indicato in fase di input")
-
-    def rimuovi(self):
-
-        print("\n--- RIMUOVI FILE ---\n")
-
-        self.rm_file = input("Inserisci il nome del file che desideri eliminare dalla directory:\n")
-
-        self.check_file = Path(rm_file)
-
-        if (self.check_file.is_file()):
-
-            self.f = open(self.file, 'rb')
-            self.contenuto = self.f.read()
-
-            self.FileHash = hashlib.md5()
-            self.FileHash.update(self.contenuto)
-            self.FileHash.hexdigest()
-
-            self.connection()
-
-            data_remove_file = "DELF" + str(self.sid.decode()) + self.FileHash.hexdigest()
-            print(data_remove_file)
-
-            self.s.send(data_remove_file.encode())
-
-            self.ack_rm = self.s.recv(7)  # 4B di DELF + 3B di copia del file
-            self.bytes_read = len(self.ack_rm)
-
-            while(self.bytes_read < 7):
-                self.ack_rm += self.s.recv(7 - self.bytes_read)
-                self.bytes_read = len(self.ack_rm)
-
-            if (self.ack_rm[:4].decode() == "ADEL"):
-                print(str(self.ack_rm.decode()), "\n")
-            else:
-                print("Errore del pacchetto, stringa 'ADEL' non trovata")
-                exit()
-
-            self.deconnection()
-
-        else:
-            print("Controllare l'esistenza del file o che il percorso indicato in fase di input sia corretto")    
-
+        self.con.deconnection()
 
 # ---------------------------------------------
 
