@@ -3,23 +3,24 @@ import os
 import math
 from pathlib import Path
 import binascii as bhash
-import multiprocessing as mp
 import hashlib as hl
-
+import multiprocessing as mp
 
 class Download:
     def __init__(self):
         # mio ip e porta
-        self.ipp2p_A = '192.168.43.225' #put your ip here!
-        self.pp2p_A = 12346
+        self.ipp2p_A = '192.168.43.69' #put your ip here!
+        self.pp2p_A = 12345
 
         # ip e porta che ricavo dalla funzione di 'search'
-        self.ipp2p_B = '192.168.43.69' # ip of other peer
-        self.pp2p_B = 54322
+        self.ipp2p_B = '192.168.43.192' # ip of other peer
+        self.pp2p_B = 54321
 
+        '''
         # ip e porta della directory
         self.ipp2p_dir = ''
         self.pp2p_dir = 3000
+        '''
 
         # md5 del file che mi restituisce la 'search'
         '''
@@ -29,7 +30,7 @@ class Download:
         '''
         #variabili provenienti dalla ricerca
         self.file_signature = 'd054890aa6a20fe5273d24feff7acc79'
-        self.filename = 'Profile.jpg'
+        self.filename = 'CesOS.png'
 
         # lista con chunk
         self.data_recv = []
@@ -44,6 +45,8 @@ class Download:
 
         # sessionID for numero di download
         self.sid = 'ALGIqwert12345yuiop5'
+
+        mutex = mp.Lock()
 
     def connection(self, ip, port):
         try:
@@ -64,7 +67,7 @@ class Download:
     def download(self):
         print("\n--- DOWNLOAD ---\n")
 
-        self.connection(self.ipp2p_A, self.pp2p_A)
+        self.connection(self.ipp2p_B, self.pp2p_B)
 
         self.md5 = self.file_signature  # md5 from search
         print(self.md5)
@@ -123,7 +126,7 @@ class Download:
         f = open(self.filename,"rb")
         r = f.read()
         print("\n--- FILE DOWNLOADED ---\n")
-
+        '''
         self.connection(self.ipp2p_dir, self.pp2p_dir)
 
         self.info_packet = "DREG" + self.sid + self.md5
@@ -139,7 +142,7 @@ class Download:
 
         print(self.num_download)
         self.deconnection()
-
+        '''
     def chunking(self, file_obj, file_name, chunk_size):
         list_of_chunk = []
         info = os.stat(file_name)
@@ -163,9 +166,9 @@ class Download:
 
     def upload(self):
         # dizionario simulato da creare nell'add file
-        dict = {self.file_signature: 'profile.jpg'}
-        print(self.file_signature)
-        print(dict[self.file_signature])
+        dict = {self.file_signature: 'reddit_recv.png'}
+        #print(self.file_signature)
+        #print(dict[self.file_signature])
 
         peersocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         peersocket.bind((self.ipp2p_A, self.pp2p_A))
@@ -174,13 +177,13 @@ class Download:
 
         while True:
             other_peersocket, addr = peersocket.accept()
-            print("Connesso al peer " + str(addr))
+            #print("Connesso al peer " + str(addr))
 
             self.from_peer = other_peersocket.recv(36)
             if (self.from_peer[:4].decode() == "RETR"):
                 try:
                     file_to_send = dict[self.from_peer[4:36].decode()]
-                    print("file to send ---> " + str(file_to_send))
+                    #print("file to send ---> " + str(file_to_send))
                     f = open(file_to_send, "rb")
                     self.data_to_send, self.nchunk = self.chunking(f, file_to_send, self.chunk_size)
 
@@ -191,10 +194,7 @@ class Download:
                     for i in self.data_to_send:
                         length = str(len(i)).zfill(5)
                         other_peersocket.send(length.encode('ascii'))
-                        print(length)
                         other_peersocket.send(i)
-                        print(len(i))
-                        print(i)
 
                 except IOError:
                     print("Errore, file non trovato! errore")
@@ -203,12 +203,13 @@ class Download:
 if __name__ == "__main__":
     l = []
     down = Download()
-    #p1 = mp.Process(target=down.upload)
-    #p1.start()  # processo con l'upload dei dati quando vengo contattato da un alto peer
-    op = input("'D' for download or 'U' for upload: ")
-    if(op == "U"):
-        down.upload()
+    uploading = mp.Process(target=down.upload)
+    uploading.start()
+    #down.upload()
 
-    elif (op == "D"):
-        down.download()
+    op = input("'D' for download: ")
+    if (op == "D"):
+        downloading = mp.Process(target=down.download)
+        downloading.start()
+        #down.download()
         print("\n--- END ---")
