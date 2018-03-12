@@ -14,7 +14,7 @@ class Download:
         self.pp2p_A = 12346
 
         # ip e porta che ricavo dalla funzione di 'search'
-        self.ipp2p_B = '192.168.43.69'
+        self.ipp2p_B = '192.168.43.69' # ip of other peer
         self.pp2p_B = 54322
 
         # ip e porta della directory
