@@ -1,20 +1,16 @@
 import socket
 import hashlib
 
-clientSocket=socket.socket(socket.AF_INET,socket.SOCK_STREAM)
+class Ricerca:
 
-host='localhost'
-port=3000
+	def _init_(self,sessionid):
 
-clientSocket.connect((host,port))
+	self.sID=sessionid
+	pack='FIND'+'.'+sessionid+'.'
 
-sessionid='a111f5j5kk9090l0'
-pack='FIND'+'.'+sessionid+'.'
-
-print('Collegato! benvenuto utente con id ',sessionid,', inserisci una sequenza di caratteri per iniziare la ricerca! ')
+print('Inserisci una sequenza di caratteri per iniziare la ricerca! ')
 
 flag=True
-
 while flag:
     flag=False
     fileFind=input()
