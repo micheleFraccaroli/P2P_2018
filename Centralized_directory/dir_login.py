@@ -5,14 +5,13 @@ from pathlib import Path
 
 class Peer:
 
-    def __init__(self):
-        self.ip_dir = '192.168.43.57'  # edit for presentation
+    def __init__(self,ip_dir,my_ipv4,my_ipv6,pPort):
+        self.ip_dir = ip_dir
         self.dir_port = 3000
-        self.dir_addr = (self.ip_dir, self.dir_port)
 
-        self.my_ipv4 = '192.168.43.33'
-        self.my_ipv6 = 'fe80::ac89:c3f8:ea1a:ca4b'
-        self.pPort = 50001  # peer port for receaving connection from other peer
+        self.my_ipv4 = my_ipv4
+        self.my_ipv6 = my_ipv6
+        self.pPort = pPort  # Porta di comunicazione verso gli altri Peers
 
     # -------- fase di login e logout con la directory --------
 
