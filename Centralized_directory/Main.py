@@ -1,5 +1,5 @@
-from dir_login import Peer
-from ricerca import Ricerca
+from Centralized_directory.dir_login import Peer
+from Centralized_directory.ricerca import Ricerca
 from time import sleep
 import os
 import multiprocessing as mp
@@ -39,7 +39,7 @@ clear()
 print("Indicare l'operazione da eseguire: ")
 
 flag=True
-while flag
+while flag:
 	flag=False
 	print("1-\tRicerca\n2-\tAggiunta\n3-\tRimozione\n4-\tLogout")
 	op=input()
