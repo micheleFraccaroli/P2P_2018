@@ -2,8 +2,8 @@ import socket
 import hashlib
 import os
 import sys
-from Centralized_directory.Conn import Conn
-from Centralized_directory.download import Download
+from Conn import Conn
+from Download import Download
 
 
 class Ricerca:

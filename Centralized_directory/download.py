@@ -2,9 +2,9 @@ import socket
 import os
 import math
 from pathlib import Path
-from Centralized_directory.Add_Remove import AddRm
-from Centralized_directory.Conn import Conn
-from Centralized_directory.dir_login import Peer
+from Add_Remove import AddRm
+from Conn import Conn
+from Dir_login import Peer
 import multiprocessing as mp
 
 class Download:

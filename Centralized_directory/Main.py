@@ -1,11 +1,11 @@
 import os
 import multiprocessing as mp
 from pathlib import Path
-from Centralized_directory.dir_login import Peer
-from Centralized_directory.ricerca import Ricerca
-from Centralized_directory.Add_Remove import AddRm
-from Centralized_directory.upload import Upload
-from Centralized_directory.file_system import file_system
+from Dir_login import Peer
+from Ricerca import Ricerca
+from Add_Remove import AddRm
+from Upload import Upload
+from File_system import File_system
 
 IpMap = {'LR': '172.16.8.1', 'MC': '172.16.8.2', 'MF': '172.16.8.3',
          'MG': '172.16.8.4'}  # Dizionario per gli ip statici
@@ -17,7 +17,13 @@ if (check_filesystem.is_file()):
     dict = file_read.read()
 
 def clear():
-    os.system('cls||clear')
+	# Clear Windows command prompt.
+	if (os.name in ('ce', 'nt', 'dos')):
+		os.system('cls')
+
+	# Clear the Linux terminal.
+	elif ('posix' in os.name):
+		os.system('clear')
 
 
 ######### INPUT INIZIALE #########
@@ -25,7 +31,7 @@ def clear():
 flag = True
 while flag:
     flag = False
-    print("Benvenuto! Fornisci (nick IPv4|Ipv6 porta) per fare il login: ")
+    print("Benvenuto! Fornisci (nick IPv4_direcotry||Ipv6_directory porta) per effettuare il login: ")
     info = input()
     info = info.split(' ')
     if len(info) > 3:
@@ -42,6 +48,7 @@ while flag:
             print('Nick non corretto!')
             flag = True
 
+clear()
 peer = Peer(info[1], IpMap[info[0]], 'mettiquiiltuoipv6quandosaichesicuramentefunziona', info[2])
 sid = peer.login()
 

@@ -1,5 +1,5 @@
 import socket
-from Centralized_directory.Conn import Conn
+from Conn import Conn
 #import hashlib
 #from pathlib import Path
 
@@ -39,7 +39,11 @@ class Peer:
     def login(self):
         print("\n--- LOGIN ---\n")
 
-        self.con.connection()
+        try:
+			self.con.connection()
+		except:
+			print("Errore di connessione")
+			sys.exit(0)
 
         # self.ipp2p_bf = self.s.getsockname()[0] #ip peer bad formatted
 

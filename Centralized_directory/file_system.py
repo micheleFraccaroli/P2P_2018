@@ -1,4 +1,4 @@
-class file_system:
+class File_system:
     def __init__(self, md5, filename):
         self.md5 = md5
         self.filename = filename

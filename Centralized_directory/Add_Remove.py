@@ -1,7 +1,8 @@
+import sys
 import hashlib
 from pathlib import Path
-from Centralized_directory.Conn import Conn
-from Centralized_directory.file_system import file_system
+from Conn import Conn
+from File_system import File_system
 
 class AddRm:
     def __init__(self, ipp2p, pp2p, dict_filesystem):
