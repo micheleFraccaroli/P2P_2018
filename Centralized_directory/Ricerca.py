@@ -40,16 +40,16 @@ class Ricerca:
         print('Ecco il pacchetto pronto da inviare al server: ', self.pack, 'lunghezza totale file: ', len(fileFind))
 
         self.con.connection()
-        self.s.send(self.pack.encode('ascii'))
+        self.con.s.send(self.pack.encode('ascii'))
 
-        msg = self.s.recv(7)  # Ricevo identificativo pacchetto e numero di md5
+        msg = self.con.s.recv(7)  # Ricevo identificativo pacchetto e numero di md5
         msg = msg.decode()
 
         if msg[:4] == 'AFIN':
             nFile = int(msg[4:])  # Numero di md5 ottenuti
             if nFile == 0:
                 print('File richiesto non trovato')
-                self.s.recv(1024)  # Butto via i dati in eccesso
+                self.con.s.recv(1024)  # Butto via i dati in eccesso
                 sys.exit(0)
         else:
             print('errore codice pacchetto')
@@ -58,11 +58,11 @@ class Ricerca:
 
         self.listPeers = []
         for i in range(0, nFile):
-            data = self.s.recv(135)  # Ricevo md5, descrizione e numero di copie
+            data = self.con.s.recv(135)  # Ricevo md5, descrizione e numero di copie
             data = data.decode()
             self.listPeers.insert(i, [data[:32], data[32:132], int(data[132:]), []])
             for j in range(0, self.listPeers[i][2]):  # Per ogni copia dello specifico file
-                data = self.s.recv(60)  # Ricevo IP e porta del prossimo peer
+                data = self.con.s.recv(60)  # Ricevo IP e porta del prossimo peer
                 data = data.decode()
                 IPv4, IPv6 = data[:55].split('|')
                 self.listPeers[i][3].append([IPv4, IPv6, int(data[55:])])

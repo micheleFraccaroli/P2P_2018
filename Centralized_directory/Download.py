@@ -45,31 +45,31 @@ class Download:
 
         to_peer = "RETR" + self.md5
 
-        self.s.send(to_peer.encode('ascii'))
+        self.con.s.send(to_peer.encode('ascii'))
 
-        self.first_packet = self.s.recv(10)
+        self.first_packet = self.con.s.recv(10)
         self.bytes_read_f = len(self.first_packet)
         while (self.bytes_read_f < 10):
-            self.first_packet += self.s.recv(10 - self.bytes_read_f)
+            self.first_packet += self.con.s.recv(10 - self.bytes_read_f)
             self.bytes_read_f = len(self.first_packet)
 
         if (self.first_packet[:4].decode() == "ARET"):
             i = self.first_packet[4:10].decode()  # n di chunk o indice del ciclo for
 
             for j in range(int(i)):
-                self.chunk_length = self.s.recv(5)  # lunghezza del primo chunk
+                self.chunk_length = self.con.s.recv(5)  # lunghezza del primo chunk
 
                 self.bytes_read_l = len(self.chunk_length)
                 while (self.bytes_read_l < 5):       # controllo che siano stati realmente letti i bytes richiesti
-                    self.chunk_length += self.s.recv(5 - self.bytes_read_l)
+                    self.chunk_length += self.con.s.recv(5 - self.bytes_read_l)
                     self.bytes_read_l = len(self.chunk_length)
 
-                self.chunk = self.s.recv(int(self.chunk_length))  # dati
+                self.chunk = self.con.s.recv(int(self.chunk_length))  # dati
                 #self.data_recv.append(self.chunk)
                 self.bytes_read = len(self.chunk)
 
                 while (self.bytes_read < int(self.chunk_length)):        # controllo che siano stati realmente letti i bytes richiesti
-                    self.chunk += self.s.recv(int(self.chunk_length) - self.bytes_read)
+                    self.chunk += self.con.s.recv(int(self.chunk_length) - self.bytes_read)
                     self.bytes_read = len(self.chunk)
                     #self.data_recv.append(buffer)
                 self.data_recv.append(self.chunk)
@@ -100,12 +100,12 @@ class Download:
         self.con.connection()
 
         self.info_packet = "DREG" + self.sid + self.md5
-        self.s.send(self.info_packet.encode('ascii'))
+        self.con.s.send(self.info_packet.encode('ascii'))
 
-        self.info_recv = self.s.recv(9)
+        self.info_recv = self.con.s.recv(9)
         self.bytes_read_i = len(self.info_recv)
         while (self.bytes_read_i < 9):
-            self.info_recv += self.s.recv(9 - self.bytes_read_i)
+            self.info_recv += self.con.s.recv(9 - self.bytes_read_i)
             self.bytes_read_i = len(self.info_recv)
         if(self.info_recv[:4].decode() == "ADRE"):
             self.num_download = self.info_recv[4:9]

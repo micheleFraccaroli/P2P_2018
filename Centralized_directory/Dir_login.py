@@ -16,26 +16,6 @@ class Peer:
 
         self.con = Conn(self.ip_dir, self.dir_port)
 
-    # -------- fase di login e logout con la directory --------
-    '''
-    def connection(self):
-        try:
-            # this is for ipv4 and ipv6
-            self.infoS = socket.getaddrinfo(self.ip_dir, self.dir_port)
-            self.s = socket.socket(*self.infoS[0][:3])
-            self.s.connect(self.infoS[0][4])
-
-        # self.s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        # self.s.connect(self.dir_addr)
-        except IOError as expt:  # l'eccezione ha una sotto eccez. per la socket
-            print("Errore nella connessione alla directory --> " + expt)
-
-    def deconnection(self):
-        try:
-            self.s.close()
-        except IOError as expt:  # l'eccezione ha una sotto eccez. per la socket
-            print("Errore nella connessione alla directory --> " + expt)
-    '''
     def login(self):
         print("\n--- LOGIN ---\n")
 
@@ -61,9 +41,9 @@ class Peer:
 
         data_login = "LOGI" + self.ipp2p + self.pp2p
 
-        self.s.send(data_login.encode('ascii'))
+        self.con.s.send(data_login.encode('ascii'))
 
-        self.ack_login = self.s.recv(20)  # 4B di ALGI + 16B di SID
+        self.ack_login = self.con.s.recv(20)  # 4B di ALGI + 16B di SID
 
         bytes_read = len(self.ack_login)
 
@@ -92,21 +72,21 @@ class Peer:
 
         return self.sid
 
-    def logout(self):
+    def logout(self, sid):
         print("\n--- LOGOUT ---\n")
 
         self.con.connection()
 
-        data_logout = "LOGO" + self.sid.decode()
+        data_logout = "LOGO" + sid.decode()
 
-        self.s.send(data_logout.encode('ascii'))
+        self.con.s.send(data_logout.encode('ascii'))
 
         self.ack_logout = self.s.recv(7)
 
         self.bytes_read = len(self.ack_logout)
 
         while(self.bytes_read < 7):
-            self.ack_logout += self.s.recv(7 - self.bytes_read)
+            self.ack_logout += self.con.s.recv(7 - self.bytes_read)
             self.bytes_read = len(self.ack_logout)
 
         print("First 4 byte from dir----> " + str(self.ack_logout[:4].decode()))

@@ -5,9 +5,10 @@ from Conn import Conn
 from File_system import File_system
 
 class AddRm:
-    def __init__(self, ipp2p, pp2p, dict_filesystem):
+    def __init__(self, ipp2p, pp2p, dict_filesystem, sid):
         self.ipp2p = ipp2p
         self.pp2p = pp2p
+        self.sid = sid
         self.dict_filesystem = dict_filesystem
         self.con = Conn(self.ipp2p, self.pp2p)
 
@@ -33,22 +34,24 @@ class AddRm:
                 self.filename = self.filename.ljust(100, ' ')
 
             self.con.connection()
+            print(self.FileHash.hexdigest())
+            print(self.filename)
 
             self.dict_filesystem[self.FileHash.hexdigest()] = self.filename
 
             data_add_file = "ADDF" + str(self.sid.decode()) + self.FileHash.hexdigest() + self.filename
 
-            self.s.send(data_add_file.encode())
+            self.con.s.send(data_add_file.encode())
 
             print("Ip peer ---> " + str(self.ipp2p))
             print("Port peer ---> " + str(self.pp2p))
             print(data_add_file)
 
-            self.ack_add = self.s.recv(7)  # 4B di AADD + 3B di copia del file
+            self.ack_add = self.con.s.recv(7)  # 4B di AADD + 3B di copia del file
             self.bytes_read = len(self.ack_add)
 
             while(self.bytes_read < 7):
-                self.ack_add += self.s.recv(7 - self.bytes_read)
+                self.ack_add += self.con.s.recv(7 - self.bytes_read)
                 self.bytes_read = len(self.ack_add)
 
             if (self.ack_add[:4].decode() == "AADD"):
@@ -62,7 +65,7 @@ class AddRm:
         else:
             print("Controllare l'esistenza del file o il percorso indicato in fase di input")
 
-        file_write = file_system(self.FileHash.hexdigest(), self.filename)
+        file_write = File_system(self.FileHash.hexdigest(), self.filename)
         file_write.write()
 
         return self.dict_filesystem

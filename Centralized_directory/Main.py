@@ -11,12 +11,14 @@ IpMap = {'LR': '172.16.8.1', 'MC': '172.16.8.2', 'MF': '192.168.43.33',
          'MG': '172.16.8.4'}  # Dizionario per gli ip statici pu your ip here
 
 dict = {}
+'''
+print(dict)
 check_filesystem = Path("File_System.txt")
 if (check_filesystem.is_file()):
     file_read = File_system(None, None)
     dict = file_read.read()
-
-
+print(dict)
+'''
 def clear():
     # Clear Windows command prompt.
     if (os.name in ('ce', 'nt', 'dos')):
@@ -57,8 +59,8 @@ sid = peer.login()
 clear()
 
 # background process for upload
-uploading = Upload(dict, IpMap['MF'], 50003)
-up = mp.Process(target=uploading.upload())
+uploading = Upload(dict, IpMap[info[0]], int(info[2]))
+up = mp.Process(target=uploading.upload)
 up.start()
 
 print("Indicare l'operazione da eseguire: ")
@@ -76,19 +78,17 @@ while flag:
     elif op == '2':
         file_dict = open("File_System.txt", "a")
 
-        add_rm = AddRm(info[1], 3000, dict)
+        add_rm = AddRm(info[1], 3000, dict, sid)
         file_add = input("Digita il nome del file che vuoi aggiungere: ")
         dict = add_rm.aggiunta(file_add)
 
-        file_dict.write(dict)
-
     elif op == '3':
-        add_rm = AddRm(info[1], 3000, dict)
+        add_rm = AddRm(info[1], 3000, dict, sid)
         dict = add_rm.rimuovi()
 
     elif op == '4':
         peer = Peer(info[1], IpMap[info[0]], 'mettiquiiltuoipv6quandosaichesicuramentefunziona', info[2])
-        peer.logout()
+        peer.logout(sid)
 
         flag = False
 
@@ -96,4 +96,4 @@ while flag:
         print('Input errato!')
         flag = True
 
-    exit()
+    #exit()
