@@ -8,7 +8,7 @@ class Conn:
     def connection(self):
         try:
             # this is for ipv4 and ipv6
-            self.infoS = socket.getaddrinfo(self.ip, self.port)
+            self.infoS = socket.getaddrinfo(self.ipp2p, self.pp2p)
             self.s = socket.socket(*self.infoS[0][:3])
             self.s.connect(self.infoS[0][4])
 
