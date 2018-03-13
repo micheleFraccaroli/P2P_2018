@@ -1,10 +1,10 @@
-from Centralized_directory.dir_login import Peer
-from Centralized_directory.ricerca import Ricerca
-from Centralized_directory.Add_Remove import AddRm
-from time import sleep
 import os
 import multiprocessing as mp
 from pathlib import Path
+from Centralized_directory.dir_login import Peer
+from Centralized_directory.ricerca import Ricerca
+from Centralized_directory.Add_Remove import AddRm
+from Centralized_directory.upload import Upload
 from Centralized_directory.file_system import file_system
 
 IpMap = {'LR': '172.16.8.1', 'MC': '172.16.8.2', 'MF': '172.16.8.3',
@@ -47,6 +47,11 @@ sid = peer.login()
 
 ######### MENU PRINCIPALE #########
 clear()
+
+# background process for upload
+uploading = Upload(dict, IpMap['MF'], 50003)
+up = mp.Process(target=uploading.upload())
+up.start()
 
 print("Indicare l'operazione da eseguire: ")
 
