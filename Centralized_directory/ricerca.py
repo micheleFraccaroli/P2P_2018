@@ -1,13 +1,16 @@
 import socket
 import hashlib
 import sys
+from Centralized_directory.Conn import Conn
+from Centralized_directory.download import Download
+
 
 class Ricerca:
-
-    def _init_(self, sessionid):
-
+    def __init__(self, sessionid, ipp2p_dir):
+        self.ipp2p_dir = ipp2p_dir
         self.sID = sessionid
         self.pack = 'FIND' + '.' + sessionid + '.'
+        self.con = Conn(self.ipp2p_dir, 3000)
 
     def cerca(self):
 
@@ -35,29 +38,30 @@ class Ricerca:
         self.pack = self.pack + fileFind
         print('Ecco il pacchetto pronto da inviare al server: ', self.pack, 'lunghezza totale file: ', len(fileFind))
 
-        clientSocket.send(self.pack.encode('ascii'))
+        self.con.connection()
+        self.s.send(self.pack.encode('ascii'))
 
-        msg = clientSocket.recv(7)  # Ricevo identificativo pacchetto e numero di md5
+        msg = self.s.recv(7)  # Ricevo identificativo pacchetto e numero di md5
         msg = msg.decode()
 
         if msg[:4] == 'AFIN':
             nFile = int(msg[4:])  # Numero di md5 ottenuti
             if nFile == 0:
                 print('File richiesto non trovato')
-                clientSocket.recv(1024)  # Butto via i dati in eccesso
+                self.s.recv(1024)  # Butto via i dati in eccesso
                 sys.exit(0)
         else:
             print('errore codice pacchetto')
-            clientSocket.recv(4096)  # Butto via i dati in eccesso
+            self.con.deconnection()
             sys.exit(0)
 
         self.listPeers = []
         for i in range(0, nFile):
-            data = clientSocket.recv(135)  # Ricevo md5, descrizione e numero di copie
+            data = self.s.recv(135)  # Ricevo md5, descrizione e numero di copie
             data = data.decode()
             self.listPeers.insert(i, [data[:32], data[32:132], int(data[132:]), []])
             for j in range(0, self.listPeers[i][2]):  # Per ogni copia dello specifico file
-                data = clientSocket.recv(60)  # Ricevo IP e porta del prossimo peer
+                data = self.s.recv(60)  # Ricevo IP e porta del prossimo peer
                 data = data.decode()
                 IPv4, IPv6 = data[:55].split('|')
                 self.listPeers[i][3].append([IPv4, IPv6, int(data[55:])])
@@ -68,48 +72,38 @@ class Ricerca:
         for index in range(0, len(self.listPeers)):
             print('\n', index + 1, '- descrizione: ', self.listPeers[index][1])
 
-        if len(self.listPeers) > 1:
-            flag = True
-            while flag:
-                flag = False
-                print('\nSono stati trovati diversi file, indicare quale si desidera scaricare (0 per annullare):')
-                choice = int(input())
-                if choice == 0:
-                    sys.exit(0)
-                elif not choice in range(1, len(self.listPeers) + 1):
-                    print('La risorsa non esiste, ritenta')
-                    flag = True
-                else:
-                    for copy in range(0, len(self.listPeers[choice - 1][3])):
-                        print('\n', copy + 1, '- \n\tIPv4P2P: \t', self.listPeers[index][3][copy][0], '\n\tIPv6P2P: \t',
-                              self.listPeers[index][3][copy][1], '\n\tPP2P: \t\t', self.listPeers[index][3][copy][2])
+        flag = True
+        while flag:
+            flag = False
+            print('\nIndicare quale si desidera scaricare (0 per annullare):')
+            choice = int(input())
+            if choice == 0:
+                sys.exit(0)
+            elif not choice in range(1, len(self.listPeers) + 1):
+                print('La risorsa non esiste, ritenta')
+                flag = True
+            else:
+                self.index_md5 = choice
+                for copy in range(0, len(self.listPeers[choice - 1][3])):
+                    print('\n', copy + 1, '- \n\tIPv4P2P: \t', self.listPeers[index][3][copy][0], '\n\tIPv6P2P: \t',
+                          self.listPeers[index][3][copy][1], '\n\tPP2P: \t\t', self.listPeers[index][3][copy][2])
 
-                    flag = True
-                    while flag:
-                        flag = False
+                flag = True
+                while flag:
+                    flag = False
 
-                        print('Indicare da quale peer scaricare il file selezionato (0 per annullare):')
-                        choicePeer = int(input())
-                        if choicePeer == 0:
-                            print('Abortito')
-                            sys.exit(0)
-                        elif not choicePeer in range(1, len(self.listPeers[choice - 1][3]) + 1):
-                            print('Il peer non esiste, ritenta')
-                            flag = True
-                        else:
-                            print('Scaricato!')
-        else:
-            print('La ricerca ha prodotto un risultato, scaricarlo? (y|n))')
-            choice = input()
-
-            flag = True
-            while flag:
-                flag = False
-                if choice == 'y':
-                    print('Scaricato!')
-                elif choice == 'n':
-                    print('Abortito')
-                    sys.exit(0)
-                else:
-                    print('Input errato, riprovare')
-                    flag = True
+                    print('Indicare da quale peer scaricare il file selezionato (0 per annullare):')
+                    choicePeer = int(input())
+                    if choicePeer == 0:
+                        print('Abortito')
+                        sys.exit(0)
+                    elif not choicePeer in range(1, len(self.listPeers[choice - 1][3]) + 1):
+                        print('Il peer non esiste, ritenta')
+                        flag = True
+                    else:
+                        down = Download(self.sID, self.listPeers[self.index_md5][3][choicePeer][0],
+                                        self.listPeers[self.index_md5][3][choicePeer][2],
+                                        self.listPeers[self.index_md5][0], self.listPeers[self.index_md5][1],
+                                        self.ipp2p_dir)
+                        down.download()
+                        print('Scaricato!')

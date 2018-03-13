@@ -1,12 +1,13 @@
 import hashlib
 from pathlib import Path
 from Centralized_directory.Conn import Conn
+from Centralized_directory.file_system import file_system
 
 class AddRm:
-    def __init__(self, ipp2p, pp2p):
+    def __init__(self, ipp2p, pp2p, dict_filesystem):
         self.ipp2p = ipp2p
         self.pp2p = pp2p
-        self.dict_filesystem = {}
+        self.dict_filesystem = dict_filesystem
         self.con = Conn(self.ipp2p, self.pp2p)
 
     def aggiunta(self, file):
@@ -60,6 +61,9 @@ class AddRm:
         else:
             print("Controllare l'esistenza del file o il percorso indicato in fase di input")
 
+        file_write = file_system(self.FileHash.hexdigest(), self.filename)
+        file_write.write()
+
         return self.dict_filesystem
 
     def rimuovi(self):
@@ -99,7 +103,11 @@ class AddRm:
                 print("Errore del pacchetto, stringa 'ADEL' non trovata")
                 exit()
 
+            del self.dict_filesystem[self.FileHash.hexdigest()]
+
             self.con.deconnection()
+
+            return self.dict_filesystem
 
         else:
             print("Controllare l'esistenza del file o che il percorso indicato in fase di input sia corretto")

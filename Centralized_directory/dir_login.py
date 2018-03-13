@@ -6,13 +6,13 @@ from Centralized_directory.Conn import Conn
 
 class Peer:
 
-    def __init__(self, ipp2p_dir, pp2p_dir):
+    def __init__(self, ipp2p_dir, my_ipv4, my_ipv6, pp2p_bf):
         self.ip_dir = ipp2p_dir
-        self.dir_port = pp2p_dir
+        self.dir_port = 3000
 
-        self.my_ipv4 = '192.168.43.33'
-        self.my_ipv6 = 'fe80::ac89:c3f8:ea1a:ca4b'
-        self.pPort = 50001  # peer port for receaving connection from other peer
+        self.my_ipv4 = my_ipv4
+        self.my_ipv6 = my_ipv6
+        self.pp2p_bf = pp2p_bf
 
         self.con = Conn(self.ip_dir, self.dir_port)
 
@@ -53,7 +53,6 @@ class Peer:
         self.ipp2p = ip1 + '.' + ip2 + '.' + ip3 + '.' + ip4 + '|' + 'ffff:ffff:ffff:ffff:ffff:ffff:ffff:ffff80'
 
         # formattazione porta
-        self.pp2p_bf = self.s.getsockname()[1]  # porta peer bad formatted
         self.pp2p = '%(#)03d' % {"#": int(self.pp2p_bf)}
 
         data_login = "LOGI" + self.ipp2p + self.pp2p
@@ -82,6 +81,7 @@ class Peer:
                 print("Session ID ---> " + str(self.sid.decode()) + "\n")
         else:
             print("Errore del pacchetto, string 'ALGI' non trovata")
+            self.con.deconnection()
             exit()
 
         self.con.deconnection()
@@ -114,7 +114,7 @@ class Peer:
 
 # ---------------------------------------------
 
-
+'''
 if __name__ == "__main__":
     peer = Peer()
     op = input("LI for login: ")
@@ -126,3 +126,4 @@ if __name__ == "__main__":
             peer.logout()
         elif(op == "AG"):
             peer.aggiunta("lion.jpg")
+'''

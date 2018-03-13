@@ -8,35 +8,7 @@ from Centralized_directory.dir_login import Peer
 import multiprocessing as mp
 
 class Download:
-    def __init__(self, sid, ipp2p_A, pp2p_A, ipp2p_B, pp2p_B, md5, filename, ipp2p_dir, dict):
-
-        '''
-        # mio ip e porta
-        self.ipp2p_A = '192.168.43.69' #put your ip here!
-        self.pp2p_A = 12345
-
-        # ip e porta che ricavo dalla funzione di 'search'
-        self.ipp2p_B = '192.168.43.192' # ip of other peer
-        self.pp2p_B = 54321
-
-        # ip e porta della directory
-        self.ipp2p_dir = ''
-        self.pp2p_dir = 3000
-
-        # md5 del file che mi restituisce la 'search'
-
-        file = open("lion.jpg", "rb")
-        img = file.read()
-        # self.file_signature = hl.md5(img).hexdigest()
-
-        #variabili provenienti dalla ricerca
-        self.file_signature = 'd054890aa6a20fe5273d24feff7acc79'
-        self.filename = 'CesOS.png'
-        '''
-
-        #your ip
-        self.ipp2p_A = ipp2p_A
-        self.pp2p_A = pp2p_A
+    def __init__(self, sid, ipp2p_B, pp2p_B, md5, filename, ipp2p_dir):
 
         #ip other peer
         self.ipp2p_B = ipp2p_B
@@ -52,8 +24,6 @@ class Download:
 
         #chunk veriables
         self.data_recv = []
-        self.data_to_send = []
-        self.chunk_size = 1024
 
         #var for bytes controller
         self.bytes_read_f = 0
@@ -63,28 +33,7 @@ class Download:
 
         #sessionID for download number
         self.sid = sid
-        #self.sid = 'ALGIqwert12345yuiop5'
 
-        self.dict = dict
-
-        self.mutex = mp.Lock()
-    '''
-    def connection(self, ip, port):
-        try:
-            # this is for ipv4 and ipv6
-            self.infoS = socket.getaddrinfo(ip, port)
-            self.s = socket.socket(*self.infoS[0][:3])
-            self.s.connect(self.infoS[0][4])
-
-        except IOError as expt:
-            print ("Errore nella connessione alla directory --> " + expt)
-
-    def deconnection(self):
-        try:
-            self.s.close()
-        except IOError as expt:
-            print ("Errore nella connessione alla directory --> " + expt)
-    '''
     def download(self):
         print("\n--- DOWNLOAD ---\n")
 
@@ -164,61 +113,7 @@ class Download:
         print(self.num_download)
         self.con.deconnection()
 
-    def chunking(self, file_obj, file_name, chunk_size):
-        list_of_chunk = []
-        info = os.stat(file_name)
-        dim_file = info.st_size
-
-        nchunk = math.modf(dim_file / chunk_size)[1] + 1  # numero di chunk
-        for i in range(int(nchunk)):
-            d = file_obj.read(chunk_size)
-            #d = bytearray(f)
-            if (len(d) == chunk_size):
-                list_of_chunk.append(d)
-            elif (len(d) < chunk_size):
-                '''
-                dif = chunk_size - len(d)
-                for i in range(dif):  # aggiungo gli spazi mancanti per colmare l'ultimo chunk
-                    d = d + bytes(' '.encode())
-                '''
-                list_of_chunk.append(d)
-
-        return list_of_chunk, int(nchunk)
-
-    def upload(self):
-        # dizionario simulato da creare nell'add file
-        dict = {self.file_signature: 'lion.jpg'}
-
-        peersocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        peersocket.bind((self.ipp2p_A, self.pp2p_A))
-
-        peersocket.listen(1)
-
-        while True:
-            other_peersocket, addr = peersocket.accept()
-            #print("Connesso al peer " + str(addr))
-
-            self.from_peer = other_peersocket.recv(36)
-            if (self.from_peer[:4].decode() == "RETR"):
-                try:
-                    file_to_send = dict[self.from_peer[4:36].decode()] # usare self.dict
-                    #print("file to send ---> " + str(file_to_send))
-                    f = open(file_to_send, "rb")
-                    self.data_to_send, self.nchunk = self.chunking(f, file_to_send, self.chunk_size)
-
-                    nchunk = int(self.nchunk)
-
-                    first_response = "ARET" + str(nchunk).zfill(6)
-                    other_peersocket.send(first_response.encode('ascii'))
-                    for i in self.data_to_send:
-                        length = str(len(i)).zfill(5)
-                        other_peersocket.send(length.encode('ascii'))
-                        other_peersocket.send(i)
-
-                except IOError:
-                    print("Errore, file non trovato! errore")
-
-
+'''
 if __name__ == "__main__":
     l = []
     down = Download('192.168.43.69', 12345, '192.168.43.225', 54321, 'd054890aa6a20fe5273d24feff7acc79', 'other.jpg', '127.0.0.1')
@@ -232,3 +127,4 @@ if __name__ == "__main__":
         downloading.start()
         #down.download()
         print("\n--- END ---")
+'''
