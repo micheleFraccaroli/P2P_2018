@@ -1,5 +1,6 @@
 import socket
 import hashlib
+import os
 import sys
 from Centralized_directory.Conn import Conn
 from Centralized_directory.download import Download
@@ -19,7 +20,7 @@ class Ricerca:
         flag = True
         while flag:
             flag = False
-            fileFind = input() # Stringa di ricerca
+            fileFind = input()  # Stringa di ricerca
 
             lenFile = len(fileFind)
 
@@ -71,12 +72,12 @@ class Ricerca:
         print('Risultati ricerca:')
         for index in range(0, len(self.listPeers)):
             print('\n', index + 1, '- descrizione: ', self.listPeers[index][1])
-		
-		# Formato listPeers:
-		#						0		 1			2						3
-		#														0			1			2
-		#                    [ md5 | nome_file | n_copie [ peer_IPv4 | peer_IPv6 | peer_porta ] ]	
-		
+
+        # Formato listPeers:
+        #						0		 1			2						3
+        #														0			1			2
+        #                    [ md5 | nome_file | n_copie [ peer_IPv4 | peer_IPv6 | peer_porta ] ]
+
         flag = True
         while flag:
             flag = False
@@ -106,11 +107,11 @@ class Ricerca:
                         print('Il peer non esiste, ritenta')
                         flag = True
                     else:
-						pid=os.fork()
-						if pid==0:
-							down = Download(self.sID, self.listPeers[self.index_md5][3][choicePeer][0],
-											self.listPeers[self.index_md5][3][choicePeer][2],
-											self.listPeers[self.index_md5][0], self.listPeers[self.index_md5][1],
-											self.ipp2p_dir)
-							down.download()
-							sys.exit(0)
+                        pid = os.fork()
+                        if pid == 0:
+                            down = Download(self.sID, self.listPeers[self.index_md5][3][choicePeer][0],
+                                            self.listPeers[self.index_md5][3][choicePeer][2],
+                                            self.listPeers[self.index_md5][0], self.listPeers[self.index_md5][1],
+                                            self.ipp2p_dir)
+                            down.download()
+                            sys.exit(0)
