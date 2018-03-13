@@ -8,7 +8,7 @@ from Upload import Upload
 from File_system import File_system
 
 IpMap = {'LR': '172.16.8.1', 'MC': '172.16.8.2', 'MF': '192.168.43.33',
-         'MG': '172.16.8.4'}  # Dizionario per gli ip statici
+         'MG': '172.16.8.4'}  # Dizionario per gli ip statici pu your ip here
 
 dict = {}
 check_filesystem = Path("File_System.txt")
