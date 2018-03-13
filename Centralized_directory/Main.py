@@ -7,23 +7,24 @@ from Add_Remove import AddRm
 from Upload import Upload
 from File_system import File_system
 
-IpMap = {'LR': '172.16.8.1', 'MC': '172.16.8.2', 'MF': '172.16.8.3',
+IpMap = {'LR': '172.16.8.1', 'MC': '172.16.8.2', 'MF': '192.168.43.33',
          'MG': '172.16.8.4'}  # Dizionario per gli ip statici
 
 dict = {}
 check_filesystem = Path("File_System.txt")
 if (check_filesystem.is_file()):
-    file_read = file_system(None, None)
+    file_read = File_system(None, None)
     dict = file_read.read()
 
-def clear():
-	# Clear Windows command prompt.
-	if (os.name in ('ce', 'nt', 'dos')):
-		os.system('cls')
 
-	# Clear the Linux terminal.
-	elif ('posix' in os.name):
-		os.system('clear')
+def clear():
+    # Clear Windows command prompt.
+    if (os.name in ('ce', 'nt', 'dos')):
+        os.system('cls')
+
+    # Clear the Linux terminal.
+    elif ('posix' in os.name):
+        os.system('clear')
 
 
 ######### INPUT INIZIALE #########

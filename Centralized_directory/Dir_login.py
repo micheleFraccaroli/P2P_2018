@@ -1,8 +1,8 @@
+import sys
 import socket
 from Conn import Conn
 #import hashlib
 #from pathlib import Path
-
 
 class Peer:
 
@@ -40,10 +40,10 @@ class Peer:
         print("\n--- LOGIN ---\n")
 
         try:
-			self.con.connection()
-		except:
-			print("Errore di connessione")
-			sys.exit(0)
+            self.con.connection()
+        except:
+            print("Errore di connessione")
+            sys.exit(0)
 
         # self.ipp2p_bf = self.s.getsockname()[0] #ip peer bad formatted
 
