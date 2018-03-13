@@ -106,9 +106,11 @@ class Ricerca:
                         print('Il peer non esiste, ritenta')
                         flag = True
                     else:
-                        down = Download(self.sID, self.listPeers[self.index_md5][3][choicePeer][0],
-                                        self.listPeers[self.index_md5][3][choicePeer][2],
-                                        self.listPeers[self.index_md5][0], self.listPeers[self.index_md5][1],
-                                        self.ipp2p_dir)
-                        down.download()
-                        print('Scaricato!')
+						pid=os.fork()
+						if pid==0:
+							down = Download(self.sID, self.listPeers[self.index_md5][3][choicePeer][0],
+											self.listPeers[self.index_md5][3][choicePeer][2],
+											self.listPeers[self.index_md5][0], self.listPeers[self.index_md5][1],
+											self.ipp2p_dir)
+							down.download()
+							sys.exit(0)
