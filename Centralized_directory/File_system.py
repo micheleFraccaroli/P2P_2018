@@ -6,18 +6,30 @@ class File_system:
     def write(self):
         file = open("File_System.txt","a")
 
-        content = self.md5 + "|" + self.filename
+        content = self.md5 + "|" + self.filename + "\n"
         file.write(content)
 
         file.close()
 
     def read(self):
+        dict = {}
         f = open("File_System.txt", "r")
-        contents = f.readlines()
+        
+        r = f.read().splitlines()
+        for i in r:
+            line = i.split("|")
+            dict[line[0]] = line[1]
 
-        for content in contents:
-            content.split("|")
-            dict[content[0]] = content[1]
+        f.close()
+
+        return dict
+
+    def over(self, dict):
+        f = open("File_System.txt","w")
+
+        for i in dict:
+            line = i + "|" + dict[i] + "\n"
+            f.write(line)
 
         f.close()
 

@@ -1,6 +1,7 @@
 import os
 import math
 import socket
+from File_system import File_system
 
 class Upload:
     def __init__(self, dict, ipp2p_A, pp2p_A):
@@ -42,7 +43,7 @@ class Upload:
         peersocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         peersocket.bind((self.ipp2p_A, self.pp2p_A))
 
-        peersocket.listen(1)
+        peersocket.listen(5)
 
         while True:
             other_peersocket, addr = peersocket.accept()
@@ -67,3 +68,15 @@ class Upload:
 
                 except IOError:
                     print("Errore, file non trovato! errore")
+
+if __name__ == '__main__':
+    dict = {}
+
+    if (os.path.exists("File_System.txt")):
+        file_read = File_system(None, None)
+        dict = file_read.read()
+
+    print(dict)
+
+    u = Upload(dict, '192.168.43.69', 50004)
+    u.upload()

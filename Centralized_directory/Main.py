@@ -11,14 +11,13 @@ IpMap = {'LR': '172.16.8.1', 'MC': '172.16.8.2', 'MF': '192.168.43.33',
          'MG': '172.16.8.4'}  # Dizionario per gli ip statici pu your ip here
 
 dict = {}
-'''
+
 print(dict)
-check_filesystem = Path("File_System.txt")
-if (check_filesystem.is_file()):
+if (os.path.exists("File_System.txt")):
     file_read = File_system(None, None)
     dict = file_read.read()
 print(dict)
-'''
+
 def clear():
     # Clear Windows command prompt.
     if (os.name in ('ce', 'nt', 'dos')):

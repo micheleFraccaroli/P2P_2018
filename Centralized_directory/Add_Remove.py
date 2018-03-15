@@ -1,4 +1,5 @@
 import sys
+import os
 import hashlib
 from pathlib import Path
 from Conn import Conn
@@ -31,15 +32,13 @@ class AddRm:
             self.FileHash.hexdigest()
 
             if (len(self.filename) < 100):
-                self.filename = self.filename.ljust(100, ' ')
+                f_name = self.filename.ljust(100, ' ')
 
             self.con.connection()
-            print(self.FileHash.hexdigest())
-            print(self.filename)
 
             self.dict_filesystem[self.FileHash.hexdigest()] = self.filename
 
-            data_add_file = "ADDF" + str(self.sid.decode()) + self.FileHash.hexdigest() + self.filename
+            data_add_file = "ADDF" + str(self.sid.decode()) + self.FileHash.hexdigest() + f_name
 
             self.con.s.send(data_add_file.encode())
 
@@ -80,7 +79,7 @@ class AddRm:
 
         if (self.check_file.is_file()):
 
-            self.f = open(self.file, 'rb')
+            self.f = open(self.rm_file, 'rb')
             self.contenuto = self.f.read()
 
             self.FileHash = hashlib.md5()
@@ -92,9 +91,9 @@ class AddRm:
             data_remove_file = "DELF" + str(self.sid.decode()) + self.FileHash.hexdigest()
             print(data_remove_file)
 
-            self.s.send(data_remove_file.encode())
+            self.con.s.send(data_remove_file.encode())
 
-            self.ack_rm = self.s.recv(7)  # 4B di DELF + 3B di copia del file
+            self.ack_rm = self.con.s.recv(7)  # 4B di DELF + 3B di copia del file
             self.bytes_read = len(self.ack_rm)
 
             while(self.bytes_read < 7):
@@ -107,11 +106,28 @@ class AddRm:
                 print("Errore del pacchetto, stringa 'ADEL' non trovata")
                 exit()
 
+            print(self.dict_filesystem)
             del self.dict_filesystem[self.FileHash.hexdigest()]
 
             self.con.deconnection()
+
+            file_delete = File_system(self.FileHash.hexdigest(), self.rm_file)
+            self.dict_filesystem = file_delete.over(self.dict_filesystem)
 
             return self.dict_filesystem
 
         else:
             print("Controllare l'esistenza del file o che il percorso indicato in fase di input sia corretto")
+
+if __name__ == '__main__':
+    dict = {}
+    if (os.path.exists("File_System.txt")):
+        file_read = File_system(None, None)
+        dict = file_read.read()
+    sid = 'qwertyuio0987654'
+    add_rm = AddRm('192.168.43.225','3000',dict, sid.encode())
+    file_add = input("Digita il nome del file che vuoi aggiungere: ")
+    dict = add_rm.aggiunta(file_add)
+
+    dict = add_rm.rimuovi()
+    print(dict)

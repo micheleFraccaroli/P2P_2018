@@ -113,18 +113,13 @@ class Download:
         print(self.num_download)
         self.con.deconnection()
 
-'''
-if __name__ == "__main__":
+if name == "__main__":
     l = []
-    down = Download('192.168.43.69', 12345, '192.168.43.225', 54321, 'd054890aa6a20fe5273d24feff7acc79', 'other.jpg', '127.0.0.1')
-    uploading = mp.Process(target=down.upload)
-    uploading.start()
-    #down.upload()
 
+    file_name = "jupiter.png"
+
+    down = Download('12345', '192.168.43.225', 50003, '25c29973f98cff1c40704efebd10ccb7', file_name, '127.0.0.1')
     op = input("'D' for download: ")
     if (op == "D"):
-        downloading = mp.Process(target=down.download)
-        downloading.start()
-        #down.download()
+        down.download()
         print("\n--- END ---")
-'''
