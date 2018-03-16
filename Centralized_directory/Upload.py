@@ -1,3 +1,4 @@
+import signal
 import os
 import math
 import socket
@@ -5,6 +6,7 @@ import multiprocessing as mp
 from File_system import File_system
 
 class Upload:
+
     def __init__(self, dict, pp2p_A):
         self.dict = dict
         self.pp2p_A = pp2p_A
@@ -14,6 +16,9 @@ class Upload:
         self.data_to_send = []
         self.chunk_size = 1024
 
+    def handler(signo,frame):
+        print('Programma fermato....... codice segnale',signo)
+        sys.exit(0)
 
     def chunking(self, file_obj, file_name, chunk_size):
         list_of_chunk = []
@@ -76,6 +81,9 @@ class Upload:
             other_peersocket, addr = peersocket.accept()
             worker = mp.Process(target=upload_worker, args=(other_peersocket))
             worker.start()
+
+            signal.signal(signal.SIGINT,handler)
+            signal.signal(signal.SIGTSTP,handler)
 
 
 

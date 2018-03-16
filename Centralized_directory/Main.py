@@ -95,6 +95,9 @@ while flag:
         peer = Peer(info[1], info[2], IpMap[info[0]], IpMap_6[info[2]], info[3])
         peer.logout(sid)
 
+        up_4.terminate()
+        up_6.terminate()
+        
         flag = False
 
     else:
