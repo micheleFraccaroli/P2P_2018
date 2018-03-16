@@ -34,10 +34,11 @@ class Peer:
         ip3 = self.split_ip[2].zfill(3)
         ip4 = self.split_ip[3].zfill(3)
 
-        self.ipp2p = ip1 + '.' + ip2 + '.' + ip3 + '.' + ip4 + '|' + 'ffff:ffff:ffff:ffff:ffff:ffff:ffff:ffff80'
+        self.ipp2p = ip1 + '.' + ip2 + '.' + ip3 + '.' + ip4 + '|' + 'ffff:ffff:ffff:ffff:ffff:ffff:ffff:ffff'
 
         # formattazione porta
-        self.pp2p = '%(#)03d' % {"#": int(self.pp2p_bf)}
+        self.pp2p = '%(#)05d' % {"#": int(self.pp2p_bf)}
+        print(self.pp2p)
 
         data_login = "LOGI" + self.ipp2p + self.pp2p
 

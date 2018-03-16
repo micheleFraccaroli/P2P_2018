@@ -34,11 +34,13 @@ class Download:
         #sessionID for download number
         self.sid = sid
 
+
     def download(self):
         print("\n--- DOWNLOAD ---\n")
 
-        self.con = Conn(self.ipp2p_B, self.pp2p_B)
+        self.con = Conn(self.ipp2p_B, int(self.pp2p_B))
         self.con.connection()
+        print(self.con.connection())
 
         self.md5 = self.file_signature
         print(self.md5)
@@ -96,7 +98,8 @@ class Download:
         r = f.read()
         print("\n--- FILE DOWNLOADED ---\n")
 
-        self.con = Conn(self.ipp2p_dir, self.pp2p_dir)
+
+        self.con = Conn(self.ipp2p_dir, int(self.pp2p_dir))
         self.con.connection()
 
         self.info_packet = "DREG" + self.sid + self.md5
@@ -113,13 +116,15 @@ class Download:
         print(self.num_download)
         self.con.deconnection()
 
-if name == "__main__":
+'''
+if __name__ == "__main__":
     l = []
 
     file_name = "jupiter.png"
 
-    down = Download('12345', '192.168.43.225', 50003, '25c29973f98cff1c40704efebd10ccb7', file_name, '127.0.0.1')
+    down = Download('12345', '192.168.43.225', 50004, '25c29973f98cff1c40704efebd10ccb7', file_name, '127.0.0.1')
     op = input("'D' for download: ")
     if (op == "D"):
         down.download()
-        print("\n--- END ---")
+        print("\n--- END ---") 
+'''

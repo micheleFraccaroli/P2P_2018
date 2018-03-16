@@ -119,6 +119,7 @@ class AddRm:
         else:
             print("Controllare l'esistenza del file o che il percorso indicato in fase di input sia corretto")
 
+'''
 if __name__ == '__main__':
     dict = {}
     if (os.path.exists("File_System.txt")):
@@ -131,3 +132,4 @@ if __name__ == '__main__':
 
     dict = add_rm.rimuovi()
     print(dict)
+'''

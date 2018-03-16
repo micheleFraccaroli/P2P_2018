@@ -7,7 +7,7 @@ from Add_Remove import AddRm
 from Upload import Upload
 from File_system import File_system
 
-IpMap = {'LR': '172.16.8.1', 'MC': '172.16.8.2', 'MF': '192.168.43.33',
+IpMap = {'LR': '172.16.8.1', 'MC': '172.16.8.2', 'MF': '172.30.8.3',
          'MG': '172.16.8.4'}  # Dizionario per gli ip statici pu your ip here
 
 dict = {}
@@ -53,6 +53,7 @@ while flag:
 clear()
 peer = Peer(info[1], IpMap[info[0]], 'mettiquiiltuoipv6quandosaichesicuramentefunziona', info[2])
 sid = peer.login()
+print(sid)
 
 ######### MENU PRINCIPALE #########
 clear()
@@ -70,7 +71,7 @@ while flag:
     op = input()
 
     if op == '1':
-        ricerca = Ricerca(sid, info[1])
+        ricerca = Ricerca(sid.decode(), info[1])
         ricerca.cerca()
         ricerca.stampaRicerca()
 

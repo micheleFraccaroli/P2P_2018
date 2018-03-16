@@ -37,9 +37,6 @@ class Upload:
         return list_of_chunk, int(nchunk)
 
     def upload(self):
-        # dizionario simulato da creare nell'add file
-        #dict = {self.file_signature: 'lion.jpg'}
-
         peersocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         peersocket.bind((self.ipp2p_A, self.pp2p_A))
 
@@ -69,6 +66,7 @@ class Upload:
                 except IOError:
                     print("Errore, file non trovato! errore")
 
+'''
 if __name__ == '__main__':
     dict = {}
 
@@ -80,3 +78,4 @@ if __name__ == '__main__':
 
     u = Upload(dict, '192.168.43.69', 50004)
     u.upload()
+'''

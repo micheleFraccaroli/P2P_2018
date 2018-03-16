@@ -13,10 +13,10 @@ class Conn:
             self.s.connect(self.infoS[0][4])
 
         except IOError as expt:
-            print ("Errore nella connessione alla directory")
+            print (expt)
 
     def deconnection(self):
         try:
             self.s.close()
         except IOError as expt:
-            print ("Errore nella connessione alla directory")
+            print (expt)
