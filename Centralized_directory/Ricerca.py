@@ -67,7 +67,7 @@ class Ricerca:
 
             data = data.decode()
             print(data)
-            self.listPeers.insert(i, [data[:32], data[32:132], int(data[132:]), []])
+            self.listPeers.insert(i, [data[:32], data[32:132].strip(), int(data[132:]), []])
             for j in range(0, self.listPeers[i][2]):  # Per ogni copia dello specifico file
                 data = self.con.s.recv(60)  # Ricevo IP e porta del prossimo peer
                 data = data.decode()
@@ -101,13 +101,10 @@ class Ricerca:
                     print('\n', copy + 1, '- \n\tIPv4P2P: \t', self.listPeers[index][3][copy][0], '\n\tIPv6P2P: \t',
                           self.listPeers[index][3][copy][1], '\n\tPP2P: \t\t', self.listPeers[index][3][copy][2])
 
+                #Formattazione IPv4 eliminando gli zeri non necessari
                 self.split_ip = self.listPeers[index][3][copy][0].split(".")
-                ip1 = int(self.split_ip[0])
-                ip2 = int(self.split_ip[1])
-                ip3 = int(self.split_ip[2])
-                ip4 = int(self.split_ip[3])
 
-                self.ipp2p = str(ip1) + '.' + str(ip2) + '.' + str(ip3) + '.' + str(ip4)
+                self.ipp2p = self.split_ip[0].lstrip('0') + '.' + self.split_ip[1].lstrip('0') + '.' + self.split_ip[2].lstrip('0') + '.' + self.split_ip[3].lstrip('0') + '.' + 
 
                 flag = True
                 while flag:
@@ -124,7 +121,6 @@ class Ricerca:
                     else:
                         pid = os.fork()
                         if pid == 0:
-                            print(self.index_md5,' kkk ',choicePeer)
                             down = Download(self.sID, self.ipp2p,
                                             self.listPeers[self.index_md5-1][3][choicePeer-1][2],
                                             self.listPeers[self.index_md5-1][0], self.listPeers[self.index_md5-1][1],
