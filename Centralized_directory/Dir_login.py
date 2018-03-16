@@ -6,15 +6,16 @@ from Conn import Conn
 
 class Peer:
 
-    def __init__(self, ipp2p_dir, my_ipv4, my_ipv6, pp2p_bf):
-        self.ip_dir = ipp2p_dir
+    def __init__(self, ipp2p_dir_v4, ipp2p_dir_v6, my_ipv4, my_ipv6, pp2p_bf):
+        self.ip_dir_4 = ipp2p_dir_v4
+        self.ip_dir_6 = ipp2p_dir_v6
         self.dir_port = 3000
 
         self.my_ipv4 = my_ipv4
         self.my_ipv6 = my_ipv6
         self.pp2p_bf = pp2p_bf
 
-        self.con = Conn(self.ip_dir, self.dir_port)
+        self.con = Conn(self.ip_dir_4, self.ip_dir_6, self.dir_port)
 
     def login(self):
         print("\n--- LOGIN ---\n")
@@ -27,14 +28,26 @@ class Peer:
 
         # self.ipp2p_bf = self.s.getsockname()[0] #ip peer bad formatted
 
-        # formattazione ip
-        self.split_ip = self.my_ipv4.split(".")
-        ip1 = self.split_ip[0].zfill(3)
-        ip2 = self.split_ip[1].zfill(3)
-        ip3 = self.split_ip[2].zfill(3)
-        ip4 = self.split_ip[3].zfill(3)
+        # formattazione ipv4
+        self.split_ip_4 = self.my_ipv4.split(".")
+        ip1_4 = self.split_ip_4[0].zfill(3)
+        ip2_4 = self.split_ip_4[1].zfill(3)
+        ip3_4 = self.split_ip_4[2].zfill(3)
+        ip4_4 = self.split_ip_4[3].zfill(3)
 
-        self.ipp2p = ip1 + '.' + ip2 + '.' + ip3 + '.' + ip4 + '|' + 'ffff:ffff:ffff:ffff:ffff:ffff:ffff:ffff'
+        # formattazione ipv6
+        self.split_ip_6 = self.my_ipv6.split(":")
+        ip1_6 = self.split_ip_6[0].zfill(4)
+        ip2_6 = self.split_ip_6[1].zfill(4)
+        ip3_6 = self.split_ip_6[2].zfill(4)
+        ip4_6 = self.split_ip_6[3].zfill(4)
+        ip5_6 = self.split_ip_6[4].zfill(4)
+        ip6_6 = self.split_ip_6[5].zfill(4)
+        ip7_6 = self.split_ip_6[6].zfill(4)
+        ip8_6 = self.split_ip_6[7].zfill(4)
+
+        self.ipp2p = ip1_4 + '.' + ip2_4 + '.' + ip3_4 + '.' + ip4_4 + '|' + ip1_6 + ':' + ip2_6 + ':' + ip3_6 + ':' + ip4_6 + ':' + ip5_6 + ':' + ip6_6 + ':' + ip6_7 + ':' + ip6_8 
+        print(self.ipp2p)
 
         # formattazione porta
         self.pp2p = '%(#)05d' % {"#": int(self.pp2p_bf)}

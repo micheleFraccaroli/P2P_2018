@@ -6,12 +6,13 @@ from Conn import Conn
 from File_system import File_system
 
 class AddRm:
-    def __init__(self, ipp2p, pp2p, dict_filesystem, sid):
-        self.ipp2p = ipp2p
+    def __init__(self, ipp2p_4, ipp2p_6, pp2p, dict_filesystem, sid):
+        self.ipp2p_4 = ipp2p_4
+        self.ipp2p_6 = ipp2p_6
         self.pp2p = pp2p
         self.sid = sid
         self.dict_filesystem = dict_filesystem
-        self.con = Conn(self.ipp2p, self.pp2p)
+        self.con = Conn(self.ipp2p_4, self.ipp2p_6, self.pp2p)
 
     def aggiunta(self, file):
 
@@ -42,7 +43,8 @@ class AddRm:
 
             self.con.s.send(data_add_file.encode())
 
-            print("Ip peer ---> " + str(self.ipp2p))
+            print("Ip peer ---> " + str(self.ipp2p_4))
+            print("Ip peer ---> " + str(self.ipp2p_6))
             print("Port peer ---> " + str(self.pp2p))
             print(data_add_file)
 
