@@ -8,14 +8,16 @@ from Dir_login import Peer
 import multiprocessing as mp
 
 class Download:
-    def __init__(self, sid, ipp2p_B, pp2p_B, md5, filename, ipp2p_dir):
+    def __init__(self, sid, ipp2p_B_4, ipp2p_B_6, pp2p_B, md5, filename, ipp2p_dir_4, ipp2p_dir_6):
 
         #ip other peer
-        self.ipp2p_B = ipp2p_B
+        self.ipp2p_B_4 = ipp2p_B_4
+        self.ipp2p_B_6 = ipp2p_B_6
         self.pp2p_B = pp2p_B
 
         #ip directory
-        self.ipp2p_dir = ipp2p_dir
+        self.ipp2p_dir_4 = ipp2p_dir_4
+        self.ipp2p_dir_6 = ipp2p_dir_6
         self.pp2p_dir = 3000
 
         #file
@@ -38,7 +40,7 @@ class Download:
     def download(self):
         print("\n--- DOWNLOAD ---\n")
 
-        self.con = Conn(self.ipp2p_B, int(self.pp2p_B))
+        self.con = Conn(self.ipp2p_B_4, self.ipp2p_B_6, int(self.pp2p_B))
         self.con.connection()
         print(self.con.connection())
 
@@ -99,7 +101,7 @@ class Download:
         print("\n--- FILE DOWNLOADED ---\n")
 
 
-        self.con = Conn(self.ipp2p_dir, int(self.pp2p_dir))
+        self.con = Conn(self.ipp2p_dir_4, self.ipp2p_dir_6, int(self.pp2p_dir))
         self.con.connection()
 
         self.info_packet = "DREG" + self.sid + self.md5

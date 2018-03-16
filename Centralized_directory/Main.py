@@ -58,10 +58,15 @@ sid = peer.login()
 ######### MENU PRINCIPALE #########
 clear()
 
-# background process for upload
-uploading = Upload(dict, IpMap[info[0]], int(info[2]))
-up = mp.Process(target=uploading.upload)
-up.start()
+# background process for upload in v4 and v6
+#process for ipv4
+uploading = Upload(dict, int(info[2]))
+up_4 = mp.Process(target=uploading.upload, args=(IpMap[info[0]]))
+up_4.start()
+
+#process for ipv6
+up_6 = mp.Process(target=uploading.upload, args=(IpMap_6[info[2]]))
+up_6.start()
 
 print("Indicare l'operazione da eseguire: ")
 
@@ -71,7 +76,7 @@ while flag:
     op = input()
 
     if op == '1':
-        ricerca = Ricerca(sid.decode(), info[1])
+        ricerca = Ricerca(sid.decode(), info[1], info[2])
         ricerca.cerca()
         ricerca.stampaRicerca()
 

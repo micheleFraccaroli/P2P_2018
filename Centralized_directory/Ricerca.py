@@ -7,11 +7,12 @@ from Download import Download
 
 
 class Ricerca:
-    def __init__(self, sessionid, ipp2p_dir):
-        self.ipp2p_dir = ipp2p_dir
+    def __init__(self, sessionid, ipp2p_dir_4, ipp2p_dir_6):
+        self.ipp2p_dir_4 = ipp2p_dir_4
+        self.ipp2p_dir_6 = ipp2p_dir_6
         self.sID = sessionid
         self.pack = 'FIND' + sessionid
-        self.con = Conn(self.ipp2p_dir, 3000)
+        self.con = Conn(self.ipp2p_dir_4, self.ipp2p_dir_6, 3000)
         self.bytes_read = 0
 
     def cerca(self):
@@ -103,8 +104,16 @@ class Ricerca:
 
                 #Formattazione IPv4 eliminando gli zeri non necessari
                 self.split_ip = self.listPeers[index][3][copy][0].split(".")
+                self.ipp2p = self.split_ip[0].lstrip('0') + '.' + self.split_ip[1].lstrip('0') + '.' + self.split_ip[2].lstrip('0') + '.' + self.split_ip[3].lstrip('0') 
 
-                self.ipp2p = self.split_ip[0].lstrip('0') + '.' + self.split_ip[1].lstrip('0') + '.' + self.split_ip[2].lstrip('0') + '.' + self.split_ip[3].lstrip('0') + '.' + 
+                #Formattazione IPv6 eliminando gli zeri non necessari
+                self.split_ip_6 = self.listPeers[index][3][copy][1].split(":")
+                self.ipp2p_6 = ''
+                for i in range(8):
+                    self.ipp2p_6 = self.ipp2p_6 + self.split_ip_6[i].lstrip('0') + ':'
+
+                self.ipp2p_6 = self.ipp2p_6[:len(self.ipp2p_6)-1]
+                print(self.ipp2p_6)
 
                 flag = True
                 while flag:
@@ -121,9 +130,9 @@ class Ricerca:
                     else:
                         pid = os.fork()
                         if pid == 0:
-                            down = Download(self.sID, self.ipp2p,
+                            down = Download(self.sID, self.ipp2p, self.ipp2p_6,
                                             self.listPeers[self.index_md5-1][3][choicePeer-1][2],
                                             self.listPeers[self.index_md5-1][0], self.listPeers[self.index_md5-1][1],
-                                            self.ipp2p_dir)
+                                            self.ipp2p_dir_4, self.ipp2p_dir_6)
                             down.download()
                             sys.exit(0)
