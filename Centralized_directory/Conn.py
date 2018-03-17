@@ -7,7 +7,7 @@ class Conn:
         self.ipv6 = ipv6
         self.pp2p = port
 
-    def ip_choice(a,b):
+    def ip_choice(self, a,b):
         prob = random.random()
         if(prob < 0.5):
             return a
@@ -17,8 +17,8 @@ class Conn:
     def connection(self):
         try:
             # this is for ipv4 and ipv6
-
-            ip = ip_choice(0,1) #se 0:ipv4 altrimenti 1:ipv6
+            
+            ip = self.ip_choice(0,1) #se 0:ipv4 altrimenti 1:ipv6
 
             if(ip == 1):
                 print("\nUsing IPv6\n")
@@ -26,7 +26,7 @@ class Conn:
             else:
                 print("\nUsing IPv4\n")
                 self.ipp2p = self.ipv4
-
+            
             self.infoS = socket.getaddrinfo(self.ipp2p, self.pp2p)
             self.s = socket.socket(*self.infoS[0][:3])
             self.s.connect(self.infoS[0][4])

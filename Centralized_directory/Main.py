@@ -7,9 +7,9 @@ from Add_Remove import AddRm
 from Upload import Upload
 from File_system import File_system
 
-IpMap = {'LR': '172.16.8.1', 'MC': '172.16.8.2', 'MF': '172.30.8.3',
+IpMap = {'LR': '172.16.8.1', 'MC': '172.16.8.2', 'MF': '192.168.1.102',
          'MG': '172.16.8.4'}  # Dizionario per gli ipv4 statici put your ip here
-IpMap_6 = {'LR': 'fc00::8:1', 'MC': 'fc00::8:2', 'MF': 'fc00::8:3',
+IpMap_6 = {'LR': 'fc00::8:1', 'MC': 'fc00::8:2', 'MF': '0000:0000:0000:0000:0000:0000:0000:0001',
          'MG': 'fc00::8:4'}   # Dizionario per gli ipv6 statici put your ip here
 
 dict = {}
@@ -52,7 +52,7 @@ while flag:
 clear()
 
 #           IPv4_d   IPv6_d     mio_ipv4        mio_ipv6        port_p
-peer = Peer(info[1], info[2], IpMap[info[0]], IpMap_6[info[2]], info[3])
+peer = Peer(info[1], info[2], IpMap[info[0]], IpMap_6[info[0]], info[3])
 sid = peer.login()
 
 ######### MENU PRINCIPALE #########
@@ -60,13 +60,15 @@ clear()
 
 # background process for upload in v4 and v6
 #process for ipv4
-uploading = Upload(dict, int(info[2]))
-up_4 = mp.Process(target=uploading.upload, args=(IpMap[info[0]]))
+uploading = Upload(dict, IpMap[info[0]], int(info[3]))
+up_4 = mp.Process(target=uploading.upload)
 up_4.start()
 
 #process for ipv6
-up_6 = mp.Process(target=uploading.upload, args=(IpMap_6[info[2]]))
+uploading_6 = Upload(dict, IpMap_6[info[0]], int(info[3]))
+up_6 = mp.Process(target=uploading_6.upload)
 up_6.start()
+
 
 print("Indicare l'operazione da eseguire: ")
 
@@ -92,7 +94,7 @@ while flag:
         dict = add_rm.rimuovi()
 
     elif op == '4':
-        peer = Peer(info[1], info[2], IpMap[info[0]], IpMap_6[info[2]], info[3])
+        peer = Peer(info[1], info[2], IpMap[info[0]], IpMap_6[info[0]], info[3])
         peer.logout(sid)
 
         up_4.terminate()

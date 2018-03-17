@@ -22,8 +22,9 @@ class Peer:
 
         try:
             self.con.connection()
-        except:
+        except IOError as expt:
             print("Errore di connessione")
+            print(expt)
             sys.exit(0)
 
         # self.ipp2p_bf = self.s.getsockname()[0] #ip peer bad formatted
@@ -46,12 +47,10 @@ class Peer:
         ip7_6 = self.split_ip_6[6].zfill(4)
         ip8_6 = self.split_ip_6[7].zfill(4)
 
-        self.ipp2p = ip1_4 + '.' + ip2_4 + '.' + ip3_4 + '.' + ip4_4 + '|' + ip1_6 + ':' + ip2_6 + ':' + ip3_6 + ':' + ip4_6 + ':' + ip5_6 + ':' + ip6_6 + ':' + ip6_7 + ':' + ip6_8 
-        print(self.ipp2p)
-
+        self.ipp2p = ip1_4 + '.' + ip2_4 + '.' + ip3_4 + '.' + ip4_4 + '|' + ip1_6 + ':' + ip2_6 + ':' + ip3_6 + ':' + ip4_6 + ':' + ip5_6 + ':' + ip6_6 + ':' + ip7_6 + ':' + ip8_6 
+        
         # formattazione porta
         self.pp2p = '%(#)05d' % {"#": int(self.pp2p_bf)}
-        print(self.pp2p)
 
         data_login = "LOGI" + self.ipp2p + self.pp2p
 
@@ -67,7 +66,6 @@ class Peer:
 
         print("Ip peer ---> " + str(self.ipp2p))
         print("Port peer ---> " + str(self.pp2p))
-        print("First 4 byte from dir----> " + str(self.ack_login[:4].decode()))
 
         if (self.ack_login[:4].decode() == "ALGI"):
             self.sid = self.ack_login[4:20]
@@ -95,7 +93,7 @@ class Peer:
 
         self.con.s.send(data_logout.encode('ascii'))
 
-        self.ack_logout = self.s.recv(7)
+        self.ack_logout = self.con.s.recv(7)
 
         self.bytes_read = len(self.ack_logout)
 

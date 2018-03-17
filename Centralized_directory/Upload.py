@@ -3,18 +3,21 @@ import os
 import math
 import socket
 import multiprocessing as mp
+import ipaddress as ipaddr
 from File_system import File_system
 
 class Upload:
 
-    def __init__(self, dict, pp2p_A):
+    def __init__(self, dict, ipp2p_A, pp2p_A):
         self.dict = dict
+        self.ipp2p_A = ipp2p_A
         self.pp2p_A = pp2p_A
-
 
         #chunk veriables
         self.data_to_send = []
         self.chunk_size = 1024
+
+        self.bytes_read = 0
 
     def handler(signo,frame):
         print('Programma fermato....... codice segnale',signo)
@@ -42,48 +45,50 @@ class Upload:
         return list_of_chunk, int(nchunk)
 
 
-    def upload_worker():
-        print("Process grandson pid -------> " + os.getpid())
-        self.from_peer = other_peersocket.recv(36)
-        if (self.from_peer[:4].decode() == "RETR"):
-            try:
-                file_to_send = self.dict[self.from_peer[4:36].decode()]
-                #print("file to send ---> " + str(file_to_send))
-                f = open(file_to_send, "rb")
-                self.data_to_send, self.nchunk = self.chunking(f, file_to_send, self.chunk_size)
-
-                nchunk = int(self.nchunk)
-
-                first_response = "ARET" + str(nchunk).zfill(6)
-                other_peersocket.send(first_response.encode('ascii'))
-                for i in self.data_to_send:
-                    length = str(len(i)).zfill(5)
-                    other_peersocket.send(length.encode('ascii'))
-                    other_peersocket.send(i)
-
-            except IOError:
-                print("Errore, file non trovato! errore")
-
-
-    def upload(self, ip):
-        if(ip.find('.') != -1): #ha trovato il punto, quindi ipv4
+    def upload(self):
+        print(str(ipaddr.ip_address(self.ipp2p_A)))
+        if(str(ipaddr.ip_address(self.ipp2p_A)).find('.') != -1): #ha trovato il punto, quindi ipv4
             peersocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            peersocket.bind((ip, self.pp2p_A))
-            print("Process son pid -------> " + os.getpid())
+            peersocket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+            peersocket.bind((self.ipp2p_A, self.pp2p_A))
+        
         else:
             peersocket = socket.socket(socket.AF_INET6, socket.SOCK_STREAM)
-            peersocket.bind((ip, self.pp2p_A))
-            print("Process son pid -------> " + os.getpid())
-
+            peersocket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+            peersocket.bind((self.ipp2p_A, self.pp2p_A))
+        
         peersocket.listen(5)
 
         while True:
             other_peersocket, addr = peersocket.accept()
-            worker = mp.Process(target=upload_worker, args=(other_peersocket))
-            worker.start()
 
-            signal.signal(signal.SIGINT,handler)
-            signal.signal(signal.SIGTSTP,handler)
+            self.from_peer = other_peersocket.recv(36)
+            self.bytes_read = len(self.from_peer)
+            while (self.bytes_read < 36):
+                self.from_peer += other_peersocket.recv(36 - self.bytes_read)
+                self.bytes_read = len(self.from_peer)
+
+            if (self.from_peer[:4].decode() == "RETR"):
+                try:
+                    file_to_send = self.dict[self.from_peer[4:36].decode()]
+                    f = open(file_to_send, "rb")
+                    print(f)
+                    self.data_to_send, self.nchunk = self.chunking(f, file_to_send, self.chunk_size)
+
+                    nchunk = int(self.nchunk)
+
+                    first_response = "ARET" + str(nchunk).zfill(6)
+                    other_peersocket.send(first_response.encode('ascii'))
+                    for i in self.data_to_send:
+                        length = str(len(i)).zfill(5)
+                        other_peersocket.send(length.encode('ascii'))
+                        other_peersocket.send(i)
+
+                except IOError:
+                    print("Errore, file non trovato! errore")
+
+            #signal.signal(signal.SIGINT,handler)
+            #signal.signal(signal.SIGTSTP,handler)
 
 
 

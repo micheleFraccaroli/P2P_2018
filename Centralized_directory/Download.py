@@ -42,7 +42,6 @@ class Download:
 
         self.con = Conn(self.ipp2p_B_4, self.ipp2p_B_6, int(self.pp2p_B))
         self.con.connection()
-        print(self.con.connection())
 
         self.md5 = self.file_signature
         print(self.md5)
@@ -100,7 +99,7 @@ class Download:
         r = f.read()
         print("\n--- FILE DOWNLOADED ---\n")
 
-
+        '''
         self.con = Conn(self.ipp2p_dir_4, self.ipp2p_dir_6, int(self.pp2p_dir))
         self.con.connection()
 
@@ -117,16 +116,15 @@ class Download:
 
         print(self.num_download)
         self.con.deconnection()
+        '''
 
-'''
 if __name__ == "__main__":
     l = []
 
-    file_name = "jupiter.png"
+    file_name = "old_jupiter.png"
 
-    down = Download('12345', '192.168.43.225', 50004, '25c29973f98cff1c40704efebd10ccb7', file_name, '127.0.0.1')
+    down = Download('qwert12345yuiop5', '192.168.1.102', '::1', 50003, '25c29973f98cff1c40704efebd10ccb7', file_name, '127.0.1.1', '::1')
     op = input("'D' for download: ")
     if (op == "D"):
         down.download()
         print("\n--- END ---") 
-'''
