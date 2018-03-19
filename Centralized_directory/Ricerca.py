@@ -92,7 +92,8 @@ class Ricerca:
             print('\nIndicare quale si desidera scaricare (0 per annullare):')
             choice = int(input())
             if choice == 0:
-                sys.exit(0)
+                os.system('clear')
+                flag=False
             elif not choice in range(1, len(self.listPeers) + 1):
                 print('La risorsa non esiste, ritenta')
                 flag = True
@@ -110,7 +111,10 @@ class Ricerca:
                 self.split_ip_6 = self.listPeers[index][3][copy][1].split(":")
                 self.ipp2p_6 = ''
                 for i in range(8):
-                    self.ipp2p_6 = self.ipp2p_6 + self.split_ip_6[i].lstrip('0') + ':'
+                    if self.split_ip_6[i]=='0000':
+                        self.ipp2p_6 = self.ipp2p_6 + self.split_ip_6[i] + ':'
+                    else:
+                        self.ipp2p_6 = self.ipp2p_6 + self.split_ip_6[i].lstrip('0') + ':'
 
                 self.ipp2p_6 = self.ipp2p_6[:len(self.ipp2p_6)-1]
                 print(self.ipp2p_6)
@@ -123,16 +127,18 @@ class Ricerca:
                     choicePeer = int(input())
                     if choicePeer == 0:
                         print('Abortito')
-                        exit(0)
+                        flag=False
+                        os.system('clear')
                     elif not choicePeer in range(1, len(self.listPeers[choice - 1][3]) + 1):
                         print('Il peer non esiste, ritenta')
                         flag = True
                     else:
-                        pid = os.fork()
-                        if pid == 0:
-                            down = Download(self.sID, self.ipp2p, self.ipp2p_6,
-                                            self.listPeers[self.index_md5-1][3][choicePeer-1][2],
-                                            self.listPeers[self.index_md5-1][0], self.listPeers[self.index_md5-1][1],
-                                            self.ipp2p_dir_4, self.ipp2p_dir_6)
-                            down.download()
-                            sys.exit(0)
+                        print(self.sID, self.ipp2p, self.ipp2p_6,
+                                        self.listPeers[self.index_md5-1][3][choicePeer-1][2],
+                                        self.listPeers[self.index_md5-1][0], self.listPeers[self.index_md5-1][1],
+                                        self.ipp2p_dir_4, self.ipp2p_dir_6)
+                        down = Download(self.sID, self.ipp2p, self.ipp2p_6,
+                                        self.listPeers[self.index_md5-1][3][choicePeer-1][2],
+                                        self.listPeers[self.index_md5-1][0], self.listPeers[self.index_md5-1][1],
+                                        self.ipp2p_dir_4, self.ipp2p_dir_6)
+                        down.download()

@@ -29,6 +29,7 @@ class Conn:
             
             self.infoS = socket.getaddrinfo(self.ipp2p, self.pp2p)
             self.s = socket.socket(*self.infoS[0][:3])
+            self.s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
             self.s.connect(self.infoS[0][4])
 
         except IOError as expt:
