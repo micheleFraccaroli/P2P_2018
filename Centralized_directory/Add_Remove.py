@@ -63,11 +63,11 @@ class AddRm:
 
             self.con.deconnection()
 
+            file_write = File_system(self.FileHash.hexdigest(), self.filename)
+            file_write.write()
+
         else:
             print("Controllare l'esistenza del file o il percorso indicato in fase di input")
-
-        file_write = File_system(self.FileHash.hexdigest(), self.filename)
-        file_write.write()
 
         return self.dict_filesystem
 
@@ -108,15 +108,14 @@ class AddRm:
                 print("Errore del pacchetto, stringa 'ADEL' non trovata")
                 exit()
 
-            print(self.dict_filesystem)
-            del self.dict_filesystem[self.FileHash.hexdigest()]
+            if(self.ack_rm[4:].decode() != "999"):
+                del self.dict_filesystem[self.FileHash.hexdigest()]
+                file_delete = File_system(self.FileHash.hexdigest(), self.rm_file)
+                self.dict_filesystem = file_delete.over(self.dict_filesystem)
+                self.con.deconnection()
+                return self.dict_filesystem
 
             self.con.deconnection()
-
-            file_delete = File_system(self.FileHash.hexdigest(), self.rm_file)
-            self.dict_filesystem = file_delete.over(self.dict_filesystem)
-
-            return self.dict_filesystem
 
         else:
             print("Controllare l'esistenza del file o che il percorso indicato in fase di input sia corretto")
