@@ -62,7 +62,7 @@ class AddRm:
                 exit()
 
             self.con.deconnection()
-            
+
             file_write = File_system(self.FileHash.hexdigest(), self.filename)
             file_write.write()
 
