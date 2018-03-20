@@ -62,12 +62,13 @@ class AddRm:
                 exit()
 
             self.con.deconnection()
+            
+            file_write = File_system(self.FileHash.hexdigest(), self.filename)
+            file_write.write()
 
         else:
             print("Controllare l'esistenza del file o il percorso indicato in fase di input")
 
-        file_write = File_system(self.FileHash.hexdigest(), self.filename)
-        file_write.write()
 
         return self.dict_filesystem
 
