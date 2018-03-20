@@ -7,10 +7,10 @@ from Add_Remove import AddRm
 from Upload import Upload
 from File_system import File_system
 
-IpMap = {'LR': '172.16.8.1', 'MC': '172.16.8.2', 'MF': '172.16.8.3',
+IpMap = {'LR': '172.16.8.1', 'MC': '172.16.8.6', 'MF': '172.16.8.3',
          'MG': '172.16.8.4'}  # Dizionario per gli ipv4 statici put your ip here
 
-IpMap_6 = {'LR': 'fc00::8:1', 'MC': 'fc00:0000:0000:0000:0000:0000:0008:0005', 'MF': 'fc00:0000:0000:0000:0000:0000:0008:0003',
+IpMap_6 = {'LR': 'fc00::8:1', 'MC': 'fc00:0000:0000:0000:0000:0000:0008:0006', 'MF': 'fc00:0000:0000:0000:0000:0000:0008:0003',
          'MG': 'fc00:0000:0000:0000:0000:0000:0008:0004'}   # Dizionario per gli ipv6 statici put your ip here
 
 dict = {}
@@ -70,18 +70,19 @@ uploading_6 = Upload(IpMap_6[info[0]], int(info[3]))
 up_6 = mp.Process(target=uploading_6.upload)
 up_6.start()
 
-
-print("Indicare l'operazione da eseguire: ")
-
 flag = True
 while flag:
+    
+    clear()
+    print("Indicare l'operazione da eseguire: ")
     print("1-\tRicerca\n2-\tAggiunta\n3-\tRimozione\n4-\tLogout")
     op = input()
 
     if op == '1':
         ricerca = Ricerca(sid.decode(), info[1], info[2])
-        ricerca.cerca()
-        ricerca.stampaRicerca()
+        ris=ricerca.cerca()
+        if ris==1:
+            ricerca.stampaRicerca()
 
     elif op == '2':
         file_dict = open("File_System.txt", "a")

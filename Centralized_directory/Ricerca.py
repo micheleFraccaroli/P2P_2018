@@ -1,3 +1,4 @@
+from time import sleep
 import socket
 import hashlib
 import os
@@ -52,8 +53,9 @@ class Ricerca:
             nFile = int(msg[4:])  # Numero di md5 ottenuti
             if nFile == 0:
                 print('File richiesto non trovato')
+                sleep(3)
                 #self.con.s.recv(1024)  # Butto via i dati in eccesso
-                #sys.exit(0)
+                return 0
         else:
             print('errore codice pacchetto')
             self.con.deconnection()
@@ -75,6 +77,7 @@ class Ricerca:
                 data = data.decode()
                 IPv4, IPv6 = data[:55].split('|')
                 self.listPeers[i][3].append([IPv4, IPv6, int(data[55:])])
+        return 1
 
     def stampaRicerca(self):
 
