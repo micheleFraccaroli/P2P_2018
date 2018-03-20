@@ -99,7 +99,7 @@ class Download:
         r = f.read()
         print("\n--- FILE DOWNLOADED ---\n")
 
-        '''
+        
         self.con = Conn(self.ipp2p_dir_4, self.ipp2p_dir_6, int(self.pp2p_dir))
         self.con.connection()
 
@@ -116,8 +116,8 @@ class Download:
 
         print(self.num_download)
         self.con.deconnection()
-        '''
-
+        
+'''
 if __name__ == "__main__":
     l = []
 
@@ -128,3 +128,4 @@ if __name__ == "__main__":
     if (op == "D"):
         down.download()
         print("\n--- END ---") 
+'''

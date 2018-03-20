@@ -46,7 +46,6 @@ class Upload:
 
 
     def upload(self):
-        print(str(ipaddr.ip_address(self.ipp2p_A)))
         if(str(ipaddr.ip_address(self.ipp2p_A)).find('.') != -1): #ha trovato il punto, quindi ipv4
             peersocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             peersocket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)

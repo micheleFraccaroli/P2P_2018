@@ -7,9 +7,9 @@ from Add_Remove import AddRm
 from Upload import Upload
 from File_system import File_system
 
-IpMap = {'LR': '172.16.8.1', 'MC': '172.16.8.2', 'MF': '192.168.1.102',
+IpMap = {'LR': '172.16.8.1', 'MC': '172.16.8.2', 'MF': '172.16.8.3',
          'MG': '172.16.8.4'}  # Dizionario per gli ipv4 statici put your ip here
-IpMap_6 = {'LR': 'fc00::8:1', 'MC': 'fc00::8:2', 'MF': '0000:0000:0000:0000:0000:0000:0000:0001',
+IpMap_6 = {'LR': 'fc00::8:1', 'MC': 'fc00::8:2', 'MF': 'fc00:0000:0000:0000:0000:0000:0008:0003',
          'MG': 'fc00::8:4'}   # Dizionario per gli ipv6 statici put your ip here
 
 dict = {}
