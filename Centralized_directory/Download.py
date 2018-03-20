@@ -89,7 +89,7 @@ class Download:
                 for i in self.data_recv:
                     file_recv.write(i)
             else:
-                exit()
+                sys.exit(0)
         else:
             file_recv = open(self.filename,"ab")
             for i in self.data_recv:
@@ -99,7 +99,6 @@ class Download:
         r = f.read()
         print("\n--- FILE DOWNLOADED ---\n")
 
-        
         self.con = Conn(self.ipp2p_dir_4, self.ipp2p_dir_6, int(self.pp2p_dir))
         self.con.connection()
 
@@ -121,9 +120,9 @@ class Download:
 if __name__ == "__main__":
     l = []
 
-    file_name = "old_jupiter.png"
+    file_name = "bigimg.jpg"
 
-    down = Download('qwert12345yuiop5', '192.168.1.102', '::1', 50003, '25c29973f98cff1c40704efebd10ccb7', file_name, '127.0.1.1', '::1')
+    down = Download('qwert12345yuiop5', '172.16.8.3', 'fc00::8:3', 50003, '926e7971a76e7157b179b131f4f6e55a', file_name, '127.0.1.1', '::1')
     op = input("'D' for download: ")
     if (op == "D"):
         down.download()

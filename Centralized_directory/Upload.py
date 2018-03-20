@@ -85,7 +85,7 @@ class Upload:
 
                 except IOError:
                     print("Errore, file non trovato! errore")
-
+                    
             #signal.signal(signal.SIGINT,handler)
             #signal.signal(signal.SIGTSTP,handler)
 
