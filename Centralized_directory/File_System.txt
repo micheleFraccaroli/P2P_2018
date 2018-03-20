@@ -1,4 +1,2 @@
-25c29973f98cff1c40704efebd10ccb7|jupiter.png
-f723edb5cf693aaad3e2472d0284d19d|Profile.jpg
-926e7971a76e7157b179b131f4f6e55a|bigimg.jpg
-8d7db7b22f13396a94876ba2acbfb8d3|lion.jpg
+9bf614cb640f4ef35b380aa977e8242a|Mage.jpg
+75cfd764ce424ade5b02634623a1f044|tux.jpg

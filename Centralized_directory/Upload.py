@@ -8,8 +8,7 @@ from File_system import File_system
 
 class Upload:
 
-    def __init__(self, dict, ipp2p_A, pp2p_A):
-        self.dict = dict
+    def __init__(self, ipp2p_A, pp2p_A):
         self.ipp2p_A = ipp2p_A
         self.pp2p_A = pp2p_A
 
@@ -44,8 +43,22 @@ class Upload:
 
         return list_of_chunk, int(nchunk)
 
+    def readFileDict(self):
+        dict = {}
+        f = open("File_System.txt", "r")
+        
+        r = f.read().splitlines()
+        for i in r:
+            line = i.split("|")
+            dict[line[0]] = line[1]
+
+        f.close()
+
+        return dict
+
 
     def upload(self):
+        dict = {}
         if(str(ipaddr.ip_address(self.ipp2p_A)).find('.') != -1): #ha trovato il punto, quindi ipv4
             peersocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             peersocket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
@@ -61,6 +74,8 @@ class Upload:
         while True:
             other_peersocket, addr = peersocket.accept()
 
+            self.dict = self.readFileDict()
+
             self.from_peer = other_peersocket.recv(36)
             self.bytes_read = len(self.from_peer)
             while (self.bytes_read < 36):
@@ -70,6 +85,7 @@ class Upload:
             if (self.from_peer[:4].decode() == "RETR"):
                 try:
                     file_to_send = self.dict[self.from_peer[4:36].decode()]
+                    print(file_to_send)
                     f = open(file_to_send, "rb")
                     print(f)
                     self.data_to_send, self.nchunk = self.chunking(f, file_to_send, self.chunk_size)

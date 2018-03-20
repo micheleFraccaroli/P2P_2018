@@ -52,8 +52,8 @@ class Ricerca:
             nFile = int(msg[4:])  # Numero di md5 ottenuti
             if nFile == 0:
                 print('File richiesto non trovato')
-                self.con.s.recv(1024)  # Butto via i dati in eccesso
-                sys.exit(0)
+                #self.con.s.recv(1024)  # Butto via i dati in eccesso
+                #sys.exit(0)
         else:
             print('errore codice pacchetto')
             self.con.deconnection()

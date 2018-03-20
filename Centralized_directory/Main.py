@@ -61,12 +61,12 @@ clear()
 
 # background process for upload in v4 and v6
 #process for ipv4
-uploading = Upload(dict, IpMap[info[0]], int(info[3]))
+uploading = Upload(IpMap[info[0]], int(info[3]))
 up_4 = mp.Process(target=uploading.upload)
 up_4.start()
 
 #process for ipv6
-uploading_6 = Upload(dict, IpMap_6[info[0]], int(info[3]))
+uploading_6 = Upload(IpMap_6[info[0]], int(info[3]))
 up_6 = mp.Process(target=uploading_6.upload)
 up_6.start()
 
