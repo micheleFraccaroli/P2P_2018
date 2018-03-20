@@ -50,14 +50,14 @@ while flag:
             print('Nick non corretto!')
             flag = True
 
-clear()
+#clear()
 
 #           IPv4_d   IPv6_d     mio_ipv4        mio_ipv6        port_p
 peer = Peer(info[1], info[2], IpMap[info[0]], IpMap_6[info[0]], info[3])
 sid = peer.login()
 
 ######### MENU PRINCIPALE #########
-clear()
+#clear()
 
 # background process for upload in v4 and v6
 #process for ipv4
@@ -73,7 +73,7 @@ up_6.start()
 flag = True
 while flag:
     
-    clear()
+    #clear()
     print("Indicare l'operazione da eseguire: ")
     print("1-\tRicerca\n2-\tAggiunta\n3-\tRimozione\n4-\tLogout")
     op = input()

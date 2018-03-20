@@ -103,10 +103,10 @@ class Ricerca:
                 flag = True
             else:
                 self.index_md5 = choice
-                for copy in range(0, len(self.listPeers[choice - 1][3])):
+                for copy in range(len(self.listPeers[choice - 1][3])):
                     print('\n', copy + 1, '- \n\tIPv4P2P: \t', self.listPeers[index][3][copy][0], '\n\tIPv6P2P: \t',
                           self.listPeers[index][3][copy][1], '\n\tPP2P: \t\t', self.listPeers[index][3][copy][2])
-
+                    
                 #Formattazione IPv4 eliminando gli zeri non necessari
                 self.split_ip = self.listPeers[index][3][copy][0].split(".")
                 self.ipp2p = self.split_ip[0].lstrip('0') + '.' + self.split_ip[1].lstrip('0') + '.' + self.split_ip[2].lstrip('0') + '.' + self.split_ip[3].lstrip('0') 
