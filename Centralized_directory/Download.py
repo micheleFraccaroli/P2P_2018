@@ -89,7 +89,7 @@ class Download:
                 for i in self.data_recv:
                     file_recv.write(i)
             else:
-                sys.exit(0)
+                return
         else:
             file_recv = open(self.filename,"ab")
             for i in self.data_recv:
