@@ -3,6 +3,7 @@ import hashlib
 import os
 import sys
 from Conn import Conn
+import ipaddress as ipaddr
 from Download import Download
 
 
@@ -107,16 +108,7 @@ class Ricerca:
                 self.split_ip = self.listPeers[index][3][copy][0].split(".")
                 self.ipp2p = self.split_ip[0].lstrip('0') + '.' + self.split_ip[1].lstrip('0') + '.' + self.split_ip[2].lstrip('0') + '.' + self.split_ip[3].lstrip('0') 
 
-                #Formattazione IPv6 eliminando gli zeri non necessari
-                self.split_ip_6 = self.listPeers[index][3][copy][1].split(":")
-                self.ipp2p_6 = ''
-                for i in range(8):
-                    if self.split_ip_6[i]=='0000':
-                        self.ipp2p_6 = self.ipp2p_6 + self.split_ip_6[i] + ':'
-                    else:
-                        self.ipp2p_6 = self.ipp2p_6 + self.split_ip_6[i].lstrip('0') + ':'
-
-                self.ipp2p_6 = self.ipp2p_6[:len(self.ipp2p_6)-1]
+                self.ipp2p_6 = str(ipaddr.ip_address(self.listPeers[index][3][copy][1]))
                 print(self.ipp2p_6)
 
                 flag = True

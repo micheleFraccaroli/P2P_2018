@@ -54,7 +54,7 @@ class Upload:
         else:
             peersocket = socket.socket(socket.AF_INET6, socket.SOCK_STREAM)
             peersocket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-            peersocket.bind((self.ipp2p_A, self.pp2p_A))
+            peersocket.bind((str(ipaddr.ip_address(self.ipp2p_A)), self.pp2p_A))
         
         peersocket.listen(5)
 

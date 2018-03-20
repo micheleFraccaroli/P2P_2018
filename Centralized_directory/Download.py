@@ -99,23 +99,24 @@ class Download:
         r = f.read()
         print("\n--- FILE DOWNLOADED ---\n")
 
-        self.con = Conn(self.ipp2p_dir_4, self.ipp2p_dir_6, int(self.pp2p_dir))
-        self.con.connection()
+        self.con2 = Conn(self.ipp2p_dir_4, self.ipp2p_dir_6, int(self.pp2p_dir))
+        self.con2.connection()
 
         self.info_packet = "DREG" + self.sid + self.md5
-        self.con.s.send(self.info_packet.encode('ascii'))
+        self.con2.s.send(self.info_packet.encode('ascii'))
 
-        self.info_recv = self.con.s.recv(9)
+        self.info_recv = self.con2.s.recv(9)
         self.bytes_read_i = len(self.info_recv)
         while (self.bytes_read_i < 9):
-            self.info_recv += self.con.s.recv(9 - self.bytes_read_i)
+            self.info_recv += self.con2.s.recv(9 - self.bytes_read_i)
             self.bytes_read_i = len(self.info_recv)
+
         if(self.info_recv[:4].decode() == "ADRE"):
             self.num_download = self.info_recv[4:9]
 
         print(self.num_download)
-        self.con.deconnection()
-        
+        self.con2.deconnection()
+
 '''
 if __name__ == "__main__":
     l = []
