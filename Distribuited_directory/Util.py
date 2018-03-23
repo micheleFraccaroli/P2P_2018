@@ -14,8 +14,8 @@ def ip_formatting(ipv4,ipv6,port):
         else:
             ip_6 += ip.zfill(4)+':'
     ip_6 = ip_6[:-1]
-
-    p2p = ''.join(ipp.zfill(3)+'.' for ipp in split_ip_4[:3])+split_ip_4[3]+'|'+ip_6
+    ip_6 = '0000:0000:0000:0000:0000:0000:0000:0001'
+    p2p = ''.join(ipp.zfill(3)+'.' for ipp in split_ip_4[:3])+split_ip_4[3].zfill(3)+'|'+ip_6
 
     # formattazione porta
     pp2p=str(port).zfill(5)

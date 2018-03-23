@@ -19,6 +19,7 @@ class thread_Response(th.Thread):
 
     def run(self):
         list = []
+        print("Thread partito")
         while True:
             recv_packet = self.other_peersocket.recv(212)
 
@@ -26,12 +27,13 @@ class thread_Response(th.Thread):
             while(self.bytes_read < 212):
                 recv_packet += self.other_peersocket.recv(212 - self.bytes_read)
                 self.bytes_read = len(recv_packet)
-            
+
             # retrieving data from file research
             if(recv_packet[:4].decode() == "AQUE"):
                 pktid_recv = recv_packet[4:20].decode()
                 if(pktid_recv in Util.diz.keys()):
-                    res = Search_res(pktid_recv, recv_packet[20:75].decode(), recv_packet[75:80].decode(), recv_packet[80:112].decode(), recv_packet[112:212].decode())
+                    res = Search_res(pktid_recv, recv_packet[20:80].decode(), recv_packet[80:112].decode(), recv_packet[112:212].decode())
                     lock.acquire()
                     Util.diz[pktid_recv].append(res)
                     lock.release()
+                    self.other_peersocket.close()
