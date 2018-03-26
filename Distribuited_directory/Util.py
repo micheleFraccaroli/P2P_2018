@@ -33,8 +33,9 @@ def ip_deformatting(ipv4,ipv6,port,ttl):
     f_ipv6 = re.sub('([:]0{1,3})',':',ipv6)
 
     f_port = int(port)
+    f_ttl = int(ttl)
 
-    return f_ipv4, f_ipv6, f_port
+    return f_ipv4, f_ipv6, f_port, f_ttl
 
 def ip_packet16_validation(packet16,packetWait):
 
