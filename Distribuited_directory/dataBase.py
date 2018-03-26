@@ -121,7 +121,7 @@ class dataBase:
 
 			return res
 	
-
+	'''
 if __name__ == '__main__':
 	print("faccio")
 	config=Config()
@@ -129,7 +129,6 @@ if __name__ == '__main__':
 	c.destroy()
 	c.create(config)
 	
-	'''
 	errno=c.retrievErrno(13)
 	print(errno)
 	c.insertNeighborhood('192.168.1.3',5600)

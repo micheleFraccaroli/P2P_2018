@@ -24,9 +24,4 @@ class Retr:
             except OSError as e:
                 print("Ricerca terminata per timeout")
                 print(e)
-                print(Util.diz)
                 exit(0)
-
-            
-            #thread.join()
-            
