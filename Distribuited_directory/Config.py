@@ -5,8 +5,16 @@ class Config:
     def __init__(self):
         
         data = config.ConfigParser() # Parser del file di configurazione
-        data.read('config.ini')
-        
+        try:
+            data.read_file(open('config.iniio'))
+        except IOError as e:
+            print(e.errno)
+            exit()
+        if len(data) == 0:
+            exit()    
+
+        dataSections=list(data)
+
         self.selfV4 = data['self']['selfV4']
         self.selfV6 = data['self']['selfV6']
         self.selfP = data.getint('self','selfP')
