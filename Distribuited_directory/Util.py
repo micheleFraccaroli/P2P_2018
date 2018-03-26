@@ -14,6 +14,7 @@ def ip_formatting(ipv4,ipv6,port):
         else:
             ip_6 += ip.zfill(4)+':'
     ip_6 = ip_6[:-1]
+    #ip_6 = '0000:0000:0000:0000:0000:0000:0000:0001'
 
     # formattazione ipv4
     split_ip_4 = ipv4.split(".")
