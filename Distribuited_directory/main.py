@@ -2,8 +2,7 @@ from Config import Config
 from time import *
 from Vicini import Vicini
 import Util
-
-Util.define_g()
+from Ricerca import Ricerca
 
 print('carico configurazione file')
 sleep(1)
