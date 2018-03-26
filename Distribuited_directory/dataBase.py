@@ -113,7 +113,7 @@ class dataBase:
 
 			return res
 	
-
+'''
 if __name__ == '__main__':
 	print("faccio")
 	c=dataBase()
@@ -148,3 +148,4 @@ if __name__ == '__main__':
     		print("pid: " + res[0] + " ip: " + res[1] + " port: " + str(res[2]) + " md5: " + res[3] + " name: " + res[4])
 	
 	del c
+'''

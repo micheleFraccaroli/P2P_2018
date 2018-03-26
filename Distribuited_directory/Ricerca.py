@@ -26,7 +26,6 @@ class Ricerca:
         db.insertRequest(pktid, ipp2p_pp2p[:55], ipp2p_pp2p[55:], time())
         self.research = "QUER" + pktid + ipp2p_pp2p + str(self.ttl).zfill(2) + self.search
 
-
         self.neighbors = db.retrieveNeighborhood()
 
         #sending query to roots
@@ -42,8 +41,10 @@ class Ricerca:
                 print(expt)
                 sys.exit(0)
         
+        del db
         return pktid
 
+'''
 if __name__ == '__main__':
     Util.define_g()
     l = [['127.0.0.2', '::1', 3000], ['127.0.0.3', '::1', 3003]]
@@ -62,3 +63,4 @@ if __name__ == '__main__':
 
     retr = Retr('127.0.0.1', 50003)
     retr.spawn_thread()
+'''

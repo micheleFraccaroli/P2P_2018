@@ -21,7 +21,8 @@ class thread_Response(th.Thread):
     def run(self):
         db = dataBase()
         list = []
-        print("Thread partito")
+        print("### NEW THREAD RUNNING ###\n")
+
         while True:
             recv_packet = self.other_peersocket.recv(212)
 
@@ -39,3 +40,4 @@ class thread_Response(th.Thread):
                 lock.release()
                 
                 self.other_peersocket.close()
+                del db

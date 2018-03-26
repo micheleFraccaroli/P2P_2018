@@ -6,7 +6,7 @@ class Config:
         
         data = config.ConfigParser() # Parser del file di configurazione
         try:
-            data.read_file(open('config.iniio'))
+            data.read_file(open('config.ini'))
         except IOError as e:
             print(e.errno)
             exit()
@@ -24,7 +24,7 @@ class Config:
         self.listNode.insert(1,[data['roots']['root2V4'],data['roots']['root2V6'],data.getint('roots','root2P')])
        
 
-        self.ttl = data.getint('general','ttl')
-        self.maxNear = data.getint('general','maxNear')
-        self.timeResearch = data.getint('general','timeResearch')
-        self.timeIdPacket = data.getint('general','timeIdPacket')
+        self.ttl = data.getint('DEFAULT','ttl')
+        self.maxNear = data.getint('DEFAULT','maxNear')
+        self.timeResearch = data.getint('DEFAULT','timeResearch')
+        self.timeIdPacket = data.getint('DEFAULT','timeIdPacket')
