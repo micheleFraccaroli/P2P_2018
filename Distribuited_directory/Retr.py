@@ -19,13 +19,9 @@ class Retr:
         while True:
             try:
                 other_peersocket, addr = peersocket.accept()
+                thread = thread_Response(other_peersocket)
+                thread.start()
             except OSError as e:
                 print("Ricerca terminata per timeout")
                 print(e)
-                print(Util.diz)
                 exit(0)
-
-            thread = thread_Response(other_peersocket)
-            thread.start()
-            #thread.join()
-            

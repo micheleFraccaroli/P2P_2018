@@ -25,18 +25,26 @@ def ip_formatting(ipv4,ipv6,port):
     pp2p=str(port).zfill(5)
     return p2p+pp2p
 
-def ip_deformatting(ipv4,ipv6,port,ttl):
+def ip_deformatting(ip,port,ttl):
 	
+    ipv4, ipv6 = ip.split('|')
+    
     f_ipv4 = re.sub('[.]0+','.',ipv4)
     
     ipv6 = re.sub('([:]0{4,4}){1,5}',':',ipv6)
     f_ipv6 = re.sub('([:]0{1,3})',':',ipv6)
 
     f_port = int(port)
-    f_ttl = int(ttl)
+    
+    if(ttl != None):
+        f_ttl = int(ttl)
+    else:
+        f_ttl = None
 
     return f_ipv4, f_ipv6, f_port, f_ttl
 
+# DA CONFIGURARE COL DATABASE
+'''
 def ip_packet16_validation(packet16,packetWait):
 
     res = ip_packet16_is_known(packet16)
@@ -53,23 +61,12 @@ def ip_packet16_is_known(packet16):
     else:
         ipPacket16[packet16]=int(time())
         return False
-
+'''
 def ip_packet16():
 
     # Per 16 volte scelgo un char casuale tra lower_case, upper_case o digit
     rand=''.join(random.choice(string.ascii_letters+string.digits) for _ in range(16))
     return rand
-
-def decrease_ttl(ttl):
-
-    return ttl-1
-
-# Definizione variabili globali
-def define_g():
-
-    global diz,ipPacket16
-    diz={}
-    ipPacket16={}
 
 # Per Test
 if __name__=='__main__':

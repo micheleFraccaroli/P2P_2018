@@ -1,2 +1,4 @@
 /Distribuited_directory/img
-config.ini
+**/.ini
+**/*.db
+*/__pycache__
