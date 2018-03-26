@@ -4,12 +4,13 @@ import socket
 from Conn import Conn
 import Util
 from Retr import Retr
+from dataBase import dataBase
 import random
 import string
 
 class Ricerca:
-    def __init__(self, neighbors, ipv4, ipv6, port, ttl, time_res, search):
-        self.neighbors = neighbors
+    def __init__(self, ipv4, ipv6, port, ttl, time_res, search):
+    
         self.ipv4 = ipv4
         self.ipv6 = ipv6
         self.port = port
@@ -18,10 +19,12 @@ class Ricerca:
         self.search = search
 
     def query(self):
+        db = dataBase()
         pktid = ''.join(random.choice(string.ascii_uppercase+string.digits) for _ in range(16))
         ipp2p_pp2p = Util.ip_formatting(self.ipv4, self.ipv6, self.port)
         self.research = "QUER" + pktid + ipp2p_pp2p + str(self.ttl).zfill(2) + self.search
 
+        db.insertRequests(self.research)
 
         print(self.neighbors)
         #sending query to roots
