@@ -83,6 +83,7 @@ class dataBase:
 		con.close()
 
 	def insertRequest(self, pktid, ip, port, timeOp):
+
 		con = sqlite3.connect('P2P.db')
 		c = con.cursor()
 
@@ -92,6 +93,7 @@ class dataBase:
 		con.close()
 	
 	def insertResponse(self, pktid, ip, port, md5, name):
+
 		con = sqlite3.connect('P2P.db')
 		c = con.cursor()
 
@@ -101,6 +103,7 @@ class dataBase:
 		con.close()
 	
 	def retrieveResponses(self, pid):
+		
 			con = sqlite3.connect('P2P.db')
 			c = con.cursor()
 
