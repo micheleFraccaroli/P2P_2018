@@ -7,6 +7,7 @@ import threading as th
 import ipaddress as ipaddr
 from Conn import Conn
 from Search_receive import Search_res
+from dataBase import dataBase
 
 # lock
 lock = th.Lock()
@@ -18,6 +19,7 @@ class thread_Response(th.Thread):
         self.other_peersocket = other_peersocket
 
     def run(self):
+        db = dataBase()
         list = []
         print("Thread partito")
         while True:
@@ -31,9 +33,9 @@ class thread_Response(th.Thread):
             # retrieving data from file research
             if(recv_packet[:4].decode() == "AQUE"):
                 pktid_recv = recv_packet[4:20].decode()
-                if(pktid_recv in Util.diz.keys()):
-                    res = Search_res(pktid_recv, recv_packet[20:80].decode(), recv_packet[80:112].decode(), recv_packet[112:212].decode())
-                    lock.acquire()
-                    Util.diz[pktid_recv].append(res)
-                    lock.release()
-                    self.other_peersocket.close()
+                
+                lock.acquire()
+                db.insertResponse(pktid_recv, recv_packet[20:75].decode(), recv_packet[75:80].decode(), recv_packet[80:112].decode(), recv_packet[112:212].decode())
+                lock.release()
+                
+                self.other_peersocket.close()

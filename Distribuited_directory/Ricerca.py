@@ -7,6 +7,7 @@ from Retr import Retr
 from dataBase import dataBase
 import random
 import string
+from time import  time
 
 class Ricerca:
     def __init__(self, ipv4, ipv6, port, ttl, time_res, search):
@@ -22,14 +23,16 @@ class Ricerca:
         db = dataBase()
         pktid = ''.join(random.choice(string.ascii_uppercase+string.digits) for _ in range(16))
         ipp2p_pp2p = Util.ip_formatting(self.ipv4, self.ipv6, self.port)
+        db.insertRequest(pktid, ipp2p_pp2p[:55], ipp2p_pp2p[55:], time())
         self.research = "QUER" + pktid + ipp2p_pp2p + str(self.ttl).zfill(2) + self.search
 
-        db.insertRequests(self.research)
 
-        print(self.neighbors)
+        self.neighbors = db.retrieveNeighborhood()
+
         #sending query to roots
         for n in self.neighbors:
-            self.con = Conn(n[0], n[1], n[2])
+            addr = ip_deformatting(n[0], n[1], self.ttl)
+            self.con = Conn(addr[0], addr[1], addr[2])
             try:
                 self.con.connection()
                 self.con.s.send(self.research.encode())
