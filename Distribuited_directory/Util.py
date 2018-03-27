@@ -3,6 +3,8 @@ import re
 import random
 import string
 from time import time
+from datetime import datetime
+from threading import Lock
 
 def ip_formatting(ipv4,ipv6,port):
 
@@ -67,6 +69,28 @@ def ip_packet16():
     # Per 16 volte scelgo un char casuale tra lower_case, upper_case o digit
     rand=''.join(random.choice(string.ascii_letters+string.digits) for _ in range(16))
     return rand
+
+def initializeFiles():
+
+    f = open('errors.log','w')
+    f.write('#### File errori avviato {:%d-%m-%Y %H:%M:%S} ####'.format(datetime.now())+'\n\n')
+    f.close()
+
+    f = open('logs.log','w')
+    f.write('#### File log avviato {:%d-%m-%Y %H:%M:%S} ####'.format(datetime.now())+'\n\n')
+    f.close()
+
+def printError(desc):
+
+    f = open('errors.log','a')
+    f.write('Timestamp: {:%d-%m-%Y %H:%M:%S} #### '.format(datetime.now())+desc+'\n')
+    f.close()
+    
+def printLog(log):
+
+    f = open('logs.log','a')
+    f.write('Timestamp: {:%d-%m-%Y %H:%M:%S} #### '.format(datetime.now())+log+'\n')
+    f.close()
 
 # Per Test
 if __name__=='__main__':
