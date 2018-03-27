@@ -30,7 +30,8 @@ class Ricerca:
 
         #sending query to roots
         for n in self.neighbors:
-            addr = ip_deformatting(n[0], n[1], self.ttl)
+            addr = Util.ip_deformatting(n[0], n[1], self.ttl)
+            print(addr)
             self.con = Conn(addr[0], addr[1], addr[2])
             try:
                 self.con.connection()
@@ -44,23 +45,21 @@ class Ricerca:
         del db
         return pktid
 
-'''
+
 if __name__ == '__main__':
-    Util.define_g()
-    l = [['127.0.0.2', '::1', 3000], ['127.0.0.3', '::1', 3003]]
+    db = dataBase()
+    db.destroy()
+    db.create()
+    ip1 = '127.000.000.002' + '|' + '0000:0000:0000:0000:0000:0000:0008:0001'
+    ip2 = '127.000.000.003' + '|' + '0000:0000:0000:0000:0000:0000:0008:0001'
+    db.insertNeighborhood(ip1, 3000)
+    db.insertNeighborhood(ip2, 3000)
+    
     search = input("Inserisci file da cercare: ")
-    src1 = Ricerca(l, '127.0.0.1', '::1', 50003, 1, 10, search)
-    src2 = Ricerca(l, '127.0.0.1', '::1', 50003, 1, 10, search)
+    src1 = Ricerca('127.0.0.1', '::1', 50003, 1, 10, search)
+    src2 = Ricerca('127.0.0.1', '::1', 50003, 1, 10, search)
     pkid = src1.query()
     pkid2 = src2.query()
 
-    print(pkid)
-    print(pkid2)
-    Util.diz[str(pkid)] = []
-    Util.diz[str(pkid2)] = []
-
-    print(Util.diz)
-
     retr = Retr('127.0.0.1', 50003)
     retr.spawn_thread()
-'''
