@@ -17,15 +17,21 @@ class dataBase:
 		c.execute('CREATE TABLE IF NOT EXISTS responses (id INTEGER,pid VARCHAR(16) NOT NULL, ip VARCHAR(55) NOT NULL, port VARCHAR(5) NOT NULL, md5 VARCHAR(32), name VARCHAR(100), PRIMARY KEY(id))')
 		c.execute('CREATE TABLE IF NOT EXISTS neighborhood (id INTEGER, ip VARCHAR(55) NOT NULL, port VARCHAR(5) NOT NULL, PRIMARY KEY(id))')
 		
-		c.executemany('INSERT INTO errors VALUES (?,?)',errors)
-		
+		try:
+			c.executemany('INSERT INTO errors VALUES (?,?)',errors)
+			c.commit()
+		except:
+			pass
+
 		root1 = ip_formatting(config.root1V4,config.root1V6,config.root1P)
 		root2 = ip_formatting(config.root2V4,config.root2V6,config.root2P)
 		
-		c.execute('INSERT INTO neighborhood VALUES (1,?,?)',(root1[:55],root1[55:]))
-		c.execute('INSERT INTO neighborhood VALUES (2,?,?)',(root2[:55],root2[55:]))
-
-		con.commit()
+		try:
+			c.execute('INSERT INTO neighborhood VALUES (1,?,?)',(root1[:55],root1[55:]))
+			c.execute('INSERT INTO neighborhood VALUES (2,?,?)',(root2[:55],root2[55:]))
+			con.commit()
+		except:
+			pass
 		con.close()
 	
 	def destroy(self):
@@ -147,7 +153,6 @@ class dataBase:
 
 			return res
 	
-	'''
 if __name__ == '__main__':
 	print("faccio")
 	config=Config()
@@ -184,4 +189,3 @@ if __name__ == '__main__':
     		print("pid: " + res[0] + " ip: " + res[1] + " port: " + str(res[2]) + " md5: " + res[3] + " name: " + res[4])
 	
 	del c
-	'''

@@ -17,7 +17,6 @@ sleep(2)
 
 c=Config() #istanza delle configurazioni
 db = dataBase()
-db.destroy()
 db.create(c)
 del db
 
