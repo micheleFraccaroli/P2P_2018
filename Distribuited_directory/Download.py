@@ -3,9 +3,7 @@ import socket
 import os
 import math
 from pathlib import Path
-from Add_Remove import AddRm
 from Conn import Conn
-from Dir_login import Peer
 import multiprocessing as mp
 
 class Download:
@@ -15,11 +13,6 @@ class Download:
         self.ipp2p_B_4 = ipp2p_B_4
         self.ipp2p_B_6 = ipp2p_B_6
         self.pp2p_B = pp2p_B
-
-        #ip directory
-        self.ipp2p_dir_4 = ipp2p_dir_4
-        self.ipp2p_dir_6 = ipp2p_dir_6
-        self.pp2p_dir = 3000
 
         #file
         self.file_signature = md5

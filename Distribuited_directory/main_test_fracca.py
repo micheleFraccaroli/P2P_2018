@@ -19,6 +19,8 @@ while True:
 		print(res[80:82].decode())
 
 	ippp = res[20:75].decode().split("|")
+	print(ippp[0])
+	print(str(ipa.ip_address(ippp[1])))
 
 	con = Conn(str(ipa.ip_address(ippp[0])), str(ipa.ip_address(ippp[1])), int(res[75:80]))
 	con.connection()
