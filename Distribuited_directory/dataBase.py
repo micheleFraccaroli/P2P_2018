@@ -1,23 +1,29 @@
 import sqlite3
 import os
+from Util import *
+from Config import Config
 
 class dataBase:
 
-	def create(self):
+	def create(self,config):
 
 		errors=self.set()
 		
 		con = sqlite3.connect('P2P.db')
 		c = con.cursor()
 
-		c.execute('CREATE TABLE errors (errno INTEGER, errStr VARCHAR(255) NOT NULL, PRIMARY KEY(errno))')
-		c.execute('CREATE TABLE requests (pid VARCHAR(16), ip VARCHAR(55), timeOperation FLOAT NOT NULL,PRIMARY KEY(pid,ip))')
-		c.execute('CREATE TABLE responses (id INTEGER, pid VARCHAR(16) NOT NULL, ip VARCHAR(55) NOT NULL, port VARCHAR(5) NOT NULL, md5 VARCHAR(32), name VARCHAR(100), PRIMARY KEY(id))')
-		c.execute('CREATE TABLE neighborhood (id INTEGER, ip VARCHAR(55) NOT NULL, port VARCHAR(5) NOT NULL, PRIMARY KEY(id))')
+		c.execute('CREATE TABLE IF NOT EXISTS errors (errno INTEGER, errStr VARCHAR(255) NOT NULL, PRIMARY KEY(errno))')
+		c.execute('CREATE TABLE IF NOT EXISTS requests (pid VARCHAR(16), ip VARCHAR(55), timeOperation FLOAT NOT NULL,PRIMARY KEY(pid,ip))')
+		c.execute('CREATE TABLE IF NOT EXISTS responses (pid VARCHAR(16) NOT NULL, ip VARCHAR(55) NOT NULL, port VARCHAR(5) NOT NULL, md5 VARCHAR(32), name VARCHAR(100), PRIMARY KEY(pid,ip))')
+		c.execute('CREATE TABLE IF NOT EXISTS neighborhood (id INTEGER, ip VARCHAR(55) NOT NULL, port VARCHAR(5) NOT NULL, PRIMARY KEY(id))')
 		
-		c.executemany("INSERT INTO errors VALUES (?,?)",errors)
-		c.execute("INSERT INTO neighborhood VALUES (1,'192.168.1.1',5000)")
-		c.execute("INSERT INTO neighborhood VALUES (2,'192.168.1.2',5001)")
+		c.executemany('INSERT INTO errors VALUES (?,?)',errors)
+		
+		root1 = ip_formatting(config.root1V4,config.root1V6,config.root1P)
+		root2 = ip_formatting(config.root2V4,config.root2V6,config.root2P)
+		
+		c.execute('INSERT INTO neighborhood VALUES (1,?,?)',(root1[:55],root1[55:]))
+		c.execute('INSERT INTO neighborhood VALUES (2,?,?)',(root2[:55],root2[55:]))
 
 		con.commit()
 		con.close()
@@ -30,7 +36,7 @@ class dataBase:
 		return	[
 					(2,'File non trovato'),
 					(13,'Accesso negato alla risorsa')
-			]
+				]
 
 	def retrievErrno(self,errno):
 
@@ -47,19 +53,21 @@ class dataBase:
 
 		c.execute('SELECT ip, port FROM neighborhood ORDER BY random() LIMIT 4')
 		res = c.fetchall()
+		
 		resId = list(res[0] for res in res)
-		print(resId)
+		
 		if 1 not in resId:
 			resId[0] = 1
 		if 2 not in resId:
 			resId[1] = 2
+		
 		resId=tuple(resId)
-		print(resId)
+		
 		c.execute('DELETE FROM neighborhood WHERE id NOT IN '+str(resId))
 
 		con.commit()
 		con.close()
-		#print('culo ',[res[0] for res in res])
+
 		return res
 
 	def retrieveAll(self):
@@ -82,6 +90,32 @@ class dataBase:
 		con.commit()
 		con.close()
 
+	def insertSearch(self, pktid, ip, timestamp):
+
+		con = sqlite3.connect('P2P.db')
+		c = con.cursor()
+		c.execute('INSERT INTO requests VALUES (?,?,?)', (pktid, ip, timestamp))
+		con.commit()
+		con.close()
+
+	def retrivenSearch(self, pktid, ip):
+
+		con = sqlite3.connect('P2P.db')
+		c = con.cursor()
+		c.execute('SELECT count(*) FROM requests WHERE pid=? AND ip=?',(pktid, ip))
+		res = c.fetchone()
+		con.close()
+		return res[0]
+
+	def retriveSearch(self, pktid, ip):
+
+		con = sqlite3.connect('P2P.db')
+		c = con.cursor()
+		c.execute('SELECT timeOperation FROM requests WHERE pid=? AND ip=?',(pktid, ip))
+		res = c.fetchone()
+		con.close()
+		return res[0]
+
 	def insertRequest(self, pktid, ip, port, timeOp):
 
 		con = sqlite3.connect('P2P.db')
@@ -103,7 +137,7 @@ class dataBase:
 		con.close()
 	
 	def retrieveResponses(self, pid):
-		
+
 			con = sqlite3.connect('P2P.db')
 			c = con.cursor()
 
@@ -113,12 +147,14 @@ class dataBase:
 
 			return res
 	
-'''
+	'''
 if __name__ == '__main__':
 	print("faccio")
+	config=Config()
 	c=dataBase()
 	c.destroy()
-	c.create()
+	c.create(config)
+	
 	errno=c.retrievErrno(13)
 	print(errno)
 	c.insertNeighborhood('192.168.1.3',5600)
@@ -148,4 +184,4 @@ if __name__ == '__main__':
     		print("pid: " + res[0] + " ip: " + res[1] + " port: " + str(res[2]) + " md5: " + res[3] + " name: " + res[4])
 	
 	del c
-'''
+	'''
