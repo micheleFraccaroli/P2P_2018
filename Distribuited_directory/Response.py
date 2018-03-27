@@ -8,6 +8,7 @@ import ipaddress as ipaddr
 from Conn import Conn
 from Search_receive import Search_res
 from dataBase import dataBase
+from Download import Download
 
 # lock
 lock = th.Lock()
@@ -39,5 +40,10 @@ class thread_Response(th.Thread):
                 db.insertResponse(pktid_recv, recv_packet[20:75].decode(), recv_packet[75:80].decode(), recv_packet[80:112].decode(), recv_packet[112:212].decode())
                 lock.release()
                 
+                # download
+                ipv4, ipv6 = recv_packet[20:75].decode().split('|')
+                ipv4, ipv6, port, ttl = Util.ip_deformatting(ipv4, ipv6, recv_packet[75:80].decode(), None)
+                down = Download(ipv4,ipv6,port,recv_packet[80:112].decode(),recv_packet[112:212].decode())
+
                 self.other_peersocket.close()
                 del db
