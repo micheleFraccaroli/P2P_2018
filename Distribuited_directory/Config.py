@@ -12,10 +12,9 @@ class Config:
         try:
             data.read_file(open('config.ini'))
         except IOError as e:
-            print(e.errno)
-            exit()
-        if len(data) == 0:
-            exit()    
+            self.create()
+            print('File di configurazione mancante...... Effettuata generazione automatica del file')
+            exit()   
 
         initializeFiles()
 
@@ -28,12 +27,12 @@ class Config:
         errors = False
 
         try:
-            self.selfV4 = ip_address(data['self']['selfV4'])
+            self.selfV4 = str(ip_address(data['self']['selfV4']))
         except ValueError as e:
             printError('Parametro selfV4 non valido')
             errors = True
         try:
-            self.selfV6 = ip_address(data['self']['selfV6'])
+            self.selfV6 = str(ip_address(data['self']['selfV6']))
         except ValueError as e:
             printError('Parametro selfV6 non valido')
             errors = True
@@ -43,12 +42,12 @@ class Config:
             printError('Parametro selfP non valido')
             errors = True
         try:
-            self.root1V4 = ip_address(data['roots']['root1V4'])
+            self.root1V4 = str(ip_address(data['roots']['root1V4']))
         except ValueError as e:
             printError('Parametro root1V4 non valido')
             errors = True
         try:
-            self.root1V6 = ip_address(data['roots']['root1V6'])
+            self.root1V6 = str(ip_address(data['roots']['root1V6']))
         except ValueError as e:
             printError('Parametro root1V6 non valido')
             errors = True
@@ -58,12 +57,12 @@ class Config:
             printError('Parametro root1P non valido')
             errors = True
         try:
-            self.root2V4 = ip_address(data['roots']['root2V4'])
+            self.root2V4 = str(ip_address(data['roots']['root2V4']))
         except ValueError as e:
             printError('Parametro root2V4 non valido')
             errors = True
         try:
-            self.root2V6 = ip_address(data['roots']['root2V6'])
+            self.root2V6 = str(ip_address(data['roots']['root2V6']))
         except ValueError as e:
             printError('Parametro root2V6 non valido')
             errors = True
