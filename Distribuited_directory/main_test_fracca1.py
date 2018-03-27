@@ -4,7 +4,7 @@ import ipaddress as ipa
 
 peersocket = socket.socket(socket.AF_INET6, socket.SOCK_STREAM)
 peersocket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-peersocket.bind(('', 3000))
+peersocket.bind(('', 3001))
 
 peersocket.listen(3)
 

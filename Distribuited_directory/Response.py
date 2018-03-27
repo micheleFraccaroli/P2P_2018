@@ -34,16 +34,14 @@ class thread_Response(th.Thread):
 
             # retrieving data from file research
             if(recv_packet[:4].decode() == "AQUE"):
-                pktid_recv = recv_packet[4:20].decode()
                 
                 lock.acquire()
-                db.insertResponse(pktid_recv, recv_packet[20:75].decode(), recv_packet[75:80].decode(), recv_packet[80:112].decode(), recv_packet[112:212].decode())
+                db.insertResponse(recv_packet[4:20].decode(), recv_packet[20:75].decode(), recv_packet[75:80].decode(), recv_packet[82:114].decode(), recv_packet[114:212].decode())
                 lock.release()
                 
                 # download
-                ipv4, ipv6 = recv_packet[20:75].decode().split('|')
-                ipv4, ipv6, port, ttl = Util.ip_deformatting(ipv4, ipv6, recv_packet[75:80].decode(), None)
+                ipv4, ipv6, port, ttl = Util.ip_deformatting(recv_packet[20:75].decode(), recv_packet[75:80].decode(), None)
                 down = Download(ipv4,ipv6,port,recv_packet[80:112].decode(),recv_packet[112:212].decode())
 
-                self.other_peersocket.close()
-                del db
+            #self.other_peersocket.close()
+            del db

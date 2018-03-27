@@ -22,21 +22,20 @@ class Ricerca:
         self.search = search
 
     def query(self):
+        c = Config()
         db = dataBase()
+        db.destroy()
+        db.create(c)
         pktid = ''.join(random.choice(string.ascii_uppercase+string.digits) for _ in range(16))
         ipp2p_pp2p = Util.ip_formatting(self.ipv4, self.ipv6, self.port)
-        print("###################################################################################")
-        print(ipp2p_pp2p[:15])
         ip6 = ipad.ip_address(self.ipv6)
         ipv6 = ip6.exploded
         ipp2p_pp2p = ipp2p_pp2p[:15] + '|' + ipv6 + str(self.port)
-        print(ipp2p_pp2p)
-        print("###################################################################################")
-        #db.insertRequest(pktid, ipp2p_pp2p[:55], ipp2p_pp2p[55:], time())
+        db.insertRequest(pktid, ipp2p_pp2p[:55], ipp2p_pp2p[55:], time())
         self.research = "QUER" + pktid + ipp2p_pp2p + str(self.ttl).zfill(2) + self.search
 
         #self.neighbors = db.retrieveNeighborhood()
-        self.neighbors = [['127.000.000.002|0000:0000:0000:0000:0000:0000:0000:0001',3000,2]]
+        self.neighbors = [['127.000.000.002|0000:0000:0000:0000:0000:0000:0000:0001',3000,2],['127.000.000.003|0000:0000:0000:0000:0000:0000:0000:0001',3001,2]]
         #sending query to roots and neighbors
         for n in self.neighbors:
             addr = Util.ip_deformatting(n[0], n[1], self.ttl)
