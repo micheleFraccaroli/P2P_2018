@@ -1,4 +1,4 @@
-/Distribuited_directory/img
 **/.ini
 **/*.db
-*/__pycache__
+**/__pycache__
+**/*.log

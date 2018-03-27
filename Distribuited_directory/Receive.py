@@ -1,8 +1,10 @@
 import socket
+import Util
 import time
 import datetime
 import ipaddress as ipaddr
 import multiprocessing as mp
+from dataBase import dataBase
 
 class Receive():
 	def __init__(self, my_ip, my_door):
@@ -51,28 +53,35 @@ class Receive():
 			print('sono in ascolto\n')
 			other_peersocket, addr = peersocket.accept()
 			self.from_peer = other_peersocket.recv(102)
-			print(self.from_peer.decode(), "\n")
 			self.bytes_read = len(self.from_peer)
+
 			while (self.bytes_read < 102):
 				self.from_peer += other_peersocket.recv(102 - self.bytes_read)
 				self.bytes_read = len(self.from_peer)
-			print(self.from_peer[0:4].decode(), "\n")
-			if(self.from_peer[0:4].decode() == "QUER"):
-				self.pktid = self.from_peer[4:15].decode()
-				print(pktid_list.get(self.pktid,'False'),'\n')
-				if((pktid_list.get(self.pktid,'False'))!="False"):
-					print('già presente\n')
-					now = datetime.datetime.fromtimestamp(time.time())
-					before = pktid_list[str(self.pktid)]
-					diff = (now-before).total_seconds()
 
-					if(diff>300):
-						print("Invio ai vicini\n")
-						print(pktid_list)
+			if(self.from_peer[0:4].decode() == "QUER"):
+				self.pktid = self.from_peer[4:16].decode()
+				self.ip  = self.from_peer[16:75].decode()
+
+				db = dataBase()
+				res = db.retrivenSearch(self.pktid, self.ip)
+
+				if(res == 0):
+					print("vado ad aggiungere un nuovo record al dizzionario\n")
+					self.timestamp = time.time()
+					db.insertSearch(self.pktid, self.ip, self.timestamp)
+					#andrò ad eseguire l'inoltro ai vicini della richiesta
+					del db								
 				else:
-					pktid_list = self.insert_record(pktid_list, self.pktid)
-					print("ho aggiunto un nuovo record al dizzionario\n")
-					print(pktid_list)
+					print("E' già presente un pacchetto con questo pktid\n")
+					#vado a controllare se il timestamp è > o < di 300s e
+					before = db.retriveSearch(self.pktid, self.ip)
+					now = time.time()
+					if((now - before) < 300):
+						print('non faccio nulla\n')
+					else:
+						print('andrò ad aggiornare nel db il timestamp\n')
+					del db 
 
 '''
 def answer(self):
@@ -80,7 +89,9 @@ def answer(self):
 '''
 if __name__ == '__main__':
 
-	pktid_list = {}
+	db = dataBase()
+	db.create()
+	del db
 
 	Receive_4 = Receive('127.0.0.1','50004')
 	Re_4 = mp.Process(target=Receive_4.listen_other)

@@ -12,10 +12,10 @@ class dataBase:
 		con = sqlite3.connect('P2P.db')
 		c = con.cursor()
 
-		c.execute('CREATE TABLE errors (errno INTEGER, errStr VARCHAR(255) NOT NULL, PRIMARY KEY(errno))')
-		c.execute('CREATE TABLE requests (pid VARCHAR(16), ip VARCHAR(55), timeOperation FLOAT NOT NULL,PRIMARY KEY(pid,ip))')
-		c.execute('CREATE TABLE responses (id INTEGER, pid VARCHAR(16) NOT NULL, ip VARCHAR(55) NOT NULL, port VARCHAR(5) NOT NULL, md5 VARCHAR(32), name VARCHAR(100), PRIMARY KEY(id))')
-		c.execute('CREATE TABLE neighborhood (id INTEGER, ip VARCHAR(55) NOT NULL, port VARCHAR(5) NOT NULL, PRIMARY KEY(id))')
+		c.execute('CREATE TABLE IF NOT EXISTS errors (errno INTEGER, errStr VARCHAR(255) NOT NULL, PRIMARY KEY(errno))')
+		c.execute('CREATE TABLE IF NOT EXISTS requests (pid VARCHAR(16), ip VARCHAR(55), timeOperation FLOAT NOT NULL,PRIMARY KEY(pid,ip))')
+		c.execute('CREATE TABLE IF NOT EXISTS responses (pid VARCHAR(16) NOT NULL, ip VARCHAR(55) NOT NULL, port VARCHAR(5) NOT NULL, md5 VARCHAR(32), name VARCHAR(100), PRIMARY KEY(pid,ip))')
+		c.execute('CREATE TABLE IF NOT EXISTS neighborhood (id INTEGER, ip VARCHAR(55) NOT NULL, port VARCHAR(5) NOT NULL, PRIMARY KEY(id))')
 		
 		c.executemany('INSERT INTO errors VALUES (?,?)',errors)
 		
@@ -89,6 +89,32 @@ class dataBase:
 
 		con.commit()
 		con.close()
+
+	def insertSearch(self, pktid, ip, timestamp):
+
+		con = sqlite3.connect('P2P.db')
+		c = con.cursor()
+		c.execute('INSERT INTO requests VALUES (?,?,?)', (pktid, ip, timestamp))
+		con.commit()
+		con.close()
+
+	def retrivenSearch(self, pktid, ip):
+
+		con = sqlite3.connect('P2P.db')
+		c = con.cursor()
+		c.execute('SELECT count(*) FROM requests WHERE pid=? AND ip=?',(pktid, ip))
+		res = c.fetchone()
+		con.close()
+		return res[0]
+
+	def retriveSearch(self, pktid, ip):
+
+		con = sqlite3.connect('P2P.db')
+		c = con.cursor()
+		c.execute('SELECT timeOperation FROM requests WHERE pid=? AND ip=?',(pktid, ip))
+		res = c.fetchone()
+		con.close()
+		return res[0]
 
 	def insertRequest(self, pktid, ip, port, timeOp):
 
