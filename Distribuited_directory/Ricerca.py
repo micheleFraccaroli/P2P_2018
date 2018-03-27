@@ -47,7 +47,6 @@ class Ricerca:
             
             ip4 = ipad.ip_address(n[0][:15])
             ip6 = ipad.ip_address(n[0][16:])
-            print(ip6)
             self.con = Conn(str(ip4), str(ip6), addr[2])
             try:
                 self.con.connection()
@@ -64,7 +63,7 @@ class Ricerca:
 
 if __name__ == '__main__':
     search = input("Inserisci file da cercare: ")
-    src1 = Ricerca('127.0.0.1', '::1', 50003, 1, 10, search)
+    src1 = Ricerca('127.0.0.1', '::1', 50003, 1, 300, search)
     pkid = src1.query()
 
     retr = Retr('127.0.0.1', 50003)
@@ -72,7 +71,7 @@ if __name__ == '__main__':
     print("IO SONO QUI ")
 
     search = input("Inserisci file da cercare: ")
-    src2 = Ricerca('127.0.0.1', '::1', 50004, 1, 10, search)
+    src2 = Ricerca('127.0.0.1', '::1', 50004, 1, 300, search)
     pkid2 = src2.query()
     retr = Retr('127.0.0.1', 50004)
     retr.start()
