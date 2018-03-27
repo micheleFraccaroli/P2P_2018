@@ -7,7 +7,7 @@ from Retr import Retr
 from dataBase import dataBase
 import random
 import string
-from time import  time
+from time import time
 
 class Ricerca:
     def __init__(self, ipv4, ipv6, port, ttl, time_res, search):

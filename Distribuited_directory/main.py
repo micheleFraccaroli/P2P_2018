@@ -6,10 +6,6 @@ from Ricerca import Ricerca
 from Retr import Retr
 from dataBase import dataBase
 
-db = dataBase()
-db.destroy()
-db.create()
-
 print('carico configurazione file')
 sleep(1)
 print('.')
@@ -20,9 +16,11 @@ print('.')
 sleep(2)
 
 c=Config() #istanza delle configurazioni
+db = dataBase()
+db.destroy()
+db.create(c)
+del db
 
-print('root 1: ',c.listNode[0][0],' ',c.listNode[0][1],' ',c.listNode[0][2])
-print('root 2: ',c.listNode[1][0],' ',c.listNode[1][1],' ',c.listNode[1][2])
 print('ttl: ',c.ttl)
 print('maxNear: ',c.maxNear)
 print('timeResearch: ',c.timeResearch)
