@@ -101,7 +101,7 @@ class Config:
         f = open('config.ini','w')
         f.write('[general]\n\nttl =\nmaxNear =\ntimeResearch =\ntimeIdPacket =\n\n')
         f.write('[self]\n\nselfV4 =\nselfV6 =\nselfP =\n\n')
-        f.write('[roots]\n\nroot1V4 =\nroot1V6 =\nroot1P =\n\nroot2V4 =\nroot1V6 =\nroot2P =')
+        f.write('[roots]\n\nroot1V4 =\nroot1V6 =\nroot1P =\n\nroot2V4 =\nroot2V6 =\nroot2P =')
         f.close()
 
 if __name__=='__main__':
