@@ -10,17 +10,18 @@ class Vicini:
 
 	def cercaVicini(self,config):
 
-		connRoot1 = Conn(config.listNode[0][0],config.listNode[0][1],config.listNode[0][2])
-		connRoot2 = Conn(config.listNode[1][0],config.listNode[1][1],config.listNode[1][2])
+		dataBase = dataBase()
+		dataBase.create()
+		nears = dataBase.retrieveNeighborhood()
 
-		connRoot1.connection()
-		connRoot2.connection()
+		for near in nears:
 
-		connRoot1.send(self.pack.encode())
-		connRoot2.send(self.pack.encode())
-
-		connRoot1.deconnection()
-		connRoot2.deconnection()
+			data = ip_deformatting(near[0],near[1],None)
+			
+			connRoot = Conn(data[0],data[1],data[2])
+			connRoot.connection()
+			connRoot.sed(self.pack.encode())
+			connRoot.deconnection()
 
 if __name__=='__main__':
 
