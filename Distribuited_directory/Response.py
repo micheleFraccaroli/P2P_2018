@@ -15,14 +15,13 @@ lock = th.Lock()
 
 class thread_Response(th.Thread):
     def __init__(self, other_peersocket): # dict_src è una lista di paket id che ho generato con la ricerca
-        th.Thread.__init__(self) # thread istance 
+        th.Thread.__init__(self) # thread istance second level
         self.bytes_read = 0
         self.other_peersocket = other_peersocket
 
     def run(self):
         db = dataBase()
         list = []
-        print("### NEW THREAD RUNNING ###\n")
 
         while True:
             recv_packet = self.other_peersocket.recv(212)

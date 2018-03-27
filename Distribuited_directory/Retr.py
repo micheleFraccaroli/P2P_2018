@@ -4,17 +4,19 @@ import threading as th
 from Response import thread_Response
 import Util
 
-class Retr:
+class Retr(th.Thread):
     def __init__(self, ip, port):
+        th.Thread.__init__(self) # thread istance first level
         self.ip = ip
         self.port = port
 
-    def spawn_thread(self):
+    def run(self):
         peersocket = socket.socket(socket.AF_INET6, socket.SOCK_STREAM)
         peersocket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         peersocket.bind(('', self.port))
         peersocket.settimeout(35)
         peersocket.listen(5)
+
 
         while True:
             try:
