@@ -17,7 +17,6 @@ class Retr(th.Thread):
         peersocket.settimeout(35)
         peersocket.listen(5)
 
-
         while True:
             try:
                 other_peersocket, addr = peersocket.accept()
