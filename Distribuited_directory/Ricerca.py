@@ -28,7 +28,7 @@ class Ricerca:
 
         self.neighbors = db.retrieveNeighborhood()
 
-        #sending query to roots
+        #sending query to roots and neighbors
         for n in self.neighbors:
             addr = Util.ip_deformatting(n[0], n[1], self.ttl)
             print(addr)
