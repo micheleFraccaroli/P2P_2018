@@ -1,10 +1,11 @@
 import socket
 from Conn import Conn
 import ipaddress as ipa
+import Util
 
 peersocket = socket.socket(socket.AF_INET6, socket.SOCK_STREAM)
 peersocket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-peersocket.bind(('', 3001))
+peersocket.bind(('', 50004))
 
 peersocket.listen(5)
 
@@ -18,13 +19,14 @@ while True:
         print(res[20:80].decode())
         print(res[80:82].decode())
 
-    ippp = res[20:75].decode().split("|")
-    print("\n\n")
-    print(ipa.ip_address(ippp[0]))
-    print(ipa.ip_address(ippp[1]))
-    print(int(res[75:80]))
+    ipp = Util.ip_deformatting(res[20:75].decode(),res[75:80].decode(),None)
+    #print("\n\n")
+    
+   # print(int(res[75:80]))
 
-    con = Conn(str(ipa.ip_address(ippp[0])), str(ipa.ip_address(ippp[1])), int(res[75:80]))
+    #con = Conn(str(ipa.ip_address(ippp[0])), str(ipa.ip_address(ippp[1])), int(res[75:80]))
+    con = Conn(ipp[0], ipp[1], ipp[2])
+    
     con.connection()
     filename = 'file.jpg' + ((100-8)*' ')
     

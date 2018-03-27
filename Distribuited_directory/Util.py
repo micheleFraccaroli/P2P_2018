@@ -70,23 +70,23 @@ def initializeFiles():
     f = open('errors.log','w')
     f.write('#### File errori avviato {:%d-%m-%Y %H:%M:%S} ####'.format(datetime.now())+'\n\n')
     f.close()
-
+    '''
     f = open('logs.log','w')
     f.write('#### File log avviato {:%d-%m-%Y %H:%M:%S} ####'.format(datetime.now())+'\n\n')
     f.close()
-
+    '''
 def printError(desc):
 
     f = open('errors.log','a')
     f.write('Timestamp: {:%d-%m-%Y %H:%M:%S} #### '.format(datetime.now())+desc+'\n')
     f.close()
-    
+'''
 def printLog(log):
 
     f = open('logs.log','a')
     f.write('Timestamp: {:%d-%m-%Y %H:%M:%S} #### '.format(datetime.now())+log+'\n')
     f.close()
-
+'''
 # Per Test
 if __name__=='__main__':
     #define_g()
