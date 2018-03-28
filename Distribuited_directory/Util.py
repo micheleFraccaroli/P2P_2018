@@ -68,7 +68,7 @@ def ip_packet16():
 def initializeFiles():
 
     f = open('errors.log','w')
-    f.write('#### File errori avviato {:%d-%m-%Y %H:%M:%S} ####'.format(datetime.now())+'\n\n')
+    f.write('#### Error file launched on {:%d-%m-%Y %H:%M:%S} ####'.format(datetime.now())+'\n\n')
     f.close()
     '''
     f = open('logs.log','w')

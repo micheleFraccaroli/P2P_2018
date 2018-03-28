@@ -1,7 +1,6 @@
 import Util
 import time
 from Config import Config
-from time import *
 from Vicini import Vicini
 from Ricerca import Ricerca
 from Retr import Retr
@@ -10,22 +9,19 @@ from tqdm import tqdm
 from Download import Download
 
 
-print("____________________________ ")
-print("\______   \_____  \______   \ ")
-print(" |     ___//  ____/|     ___/")
-print(" |    |   /       \|    |    ")
-print(" |____|   \_______ \____|    ")
-print("                  \/         \n")
+print("____________________________      ________   ______   ")
+print("\______   \_____  \______   \    /  _____/  /  __  \  ")
+print(" |     ___//  ____/|     ___/   /   \  ___  >      <  ")
+print(" |    |   /       \|    |       \    \_\  \/   --   \ ")
+print(" |____|   \_______ \____|        \______  /\______  / ")
+print("                  \/                    \/        \/  ")
+print("\n\n")
 
-
-print('Loading configuration file')
-for i in tqdm(range(4), desc="Loading: "):
-	time.sleep(1)
-print("Configuration done!")
-
+#for i in tqdm(range(4), desc="Loading: "):
+time.sleep(2)
 c=Config() #istanza delle configurazioni
-db = dataBase()
-db.create(c)
+#db = dataBase()
+#db.create(c)
 #del db
 
 print("\n--- Configurations ---\n")
@@ -35,7 +31,7 @@ print('timeResearch: ',c.timeResearch)
 print('timeIdPacket: ',c.timeIdPacket)
 print("\n------------------------\n")
 #near=Vicini(c)
-
+'''
 while True:
     name_search = input("Insert file to search into net: ")
     search = Ricerca(c.selfV4, c.selfV6, c.selfP, c.ttl, c.timeResearch, name_search)
@@ -63,3 +59,4 @@ while True:
 		download.download()
 
 del db
+'''
