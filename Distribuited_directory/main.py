@@ -1,10 +1,12 @@
+import Util
+import time
 from Config import Config
 from time import *
 from Vicini import Vicini
-import Util
 from Ricerca import Ricerca
 from Retr import Retr
 from dataBase import dataBase
+from tqdm import tqdm
 
 print('carico configurazione file')
 sleep(1)
@@ -18,17 +20,32 @@ sleep(2)
 c=Config() #istanza delle configurazioni
 db = dataBase()
 db.create(c)
-del db
+#del db
 
+print("\n--- configurazioni ---\n")
 print('ttl: ',c.ttl)
 print('maxNear: ',c.maxNear)
 print('timeResearch: ',c.timeResearch)
 print('timeIdPacket: ',c.timeIdPacket)
-near=Vicini(c)
+#near=Vicini(c)
 
-name_search = input("Insert file to search into net: ")
-search = Ricerca(c.selfV4, c.selfV6, c.selfP, c.ttl, c.timeResearch, name_search)
-pktid = search.query()
-print("\n--- New research launched ---> pid: " + pktid + " ---\n")
+while True:
+    name_search = input("Insert file to search into net: ")
+    search = Ricerca(c.selfV4, c.selfV6, c.selfP, c.ttl, c.timeResearch, name_search)
+    print("\n--- New research launched ---> pid: " + pktid + "\n")
+    pktid = search.query(c)
 
-listen_response = Retr() # chiamo la funzione che lancia un thread per ogni ricerca inviata
+    for i in tqdm(range(35), desc="Loading: "):
+    	time.sleep(1)
+
+	# choice
+	print("--- Result for " + pktid + " ---")
+	print("[select with the number the file to download")
+	res = db.retrieveResponses(pktid)
+	i = 1
+	for row in res:
+		print(i + ") " + "ip: " + row[1] + "  port: " + row[2] + "  md5: " + row[3] + "  file: " + row[4])
+		i = i + 1
+
+	choice = input("> ")
+	if(choice)

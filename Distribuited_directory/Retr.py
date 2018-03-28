@@ -1,13 +1,12 @@
 import socket
 import os
+import Util
 import threading as th
 from Response import thread_Response
-import Util
 
 class Retr(th.Thread):
-    def __init__(self, ip, port):
+    def __init__(self, port):
         th.Thread.__init__(self) # thread istance first level
-        self.ip = ip
         self.port = port
 
     def run(self):
