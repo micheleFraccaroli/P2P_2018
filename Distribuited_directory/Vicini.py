@@ -11,7 +11,6 @@ class Vicini:
 	def cercaVicini(self,config):
 
 		dataBase = dataBase()
-		dataBase.create()
 		nears = dataBase.retrieveNeighborhood()
 
 		for near in nears:
