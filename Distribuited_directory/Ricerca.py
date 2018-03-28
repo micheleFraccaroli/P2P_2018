@@ -42,9 +42,9 @@ class Ricerca:
         # thread per ascolto di riposta dei vicini
         th_near = Vicini_res(self.port)
         th_near.start()
-        th_near.join()
         # partenza richiesta dei vicini
         near.searchNeighborhood() 
+        th_near.join()
         
         db.insertRequest(pktid, ipp2p_pp2p[:55], ipp2p_pp2p[55:], time())
         self.research = "QUER" + pktid + ipp2p_pp2p + str(self.ttl).zfill(2) + self.search
