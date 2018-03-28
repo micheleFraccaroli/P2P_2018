@@ -6,7 +6,7 @@ print('inizio invio')
 Conn = Conn('127.0.0.1', '::1', 50004)
 Conn.connection()
 #pktid = ''.join(random.choice(string.ascii_uppercase+string.digits) for _ in range(16))
-pktid = 'COR3BEWPI98CHFOI'
+pktid = 'COR3BEWPI98CHFOP'
 ip = '172.016.008.004|fc00:0000:0000:0000:0000:0000:0008:0004'
 door = '50004'
 ttl = '02'
