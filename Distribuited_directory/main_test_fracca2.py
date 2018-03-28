@@ -7,7 +7,7 @@ peersocket = socket.socket(socket.AF_INET6, socket.SOCK_STREAM)
 peersocket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
 peersocket.bind(('', 50005))
 
-peersocket.listen(3)
+peersocket.listen(5)
 
 while True:
     other_peersocket, addr = peersocket.accept()

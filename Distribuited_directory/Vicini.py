@@ -4,11 +4,10 @@ from dataBase import dataBase
 
 class Vicini:
 	def __init__(self,config):
-
 		rand=Util.ip_packet16()
 		self.pack = 'NEAR' + rand + Util.ip_formatting(config.selfV4,config.selfV6,config.selfP) + str(config.ttl)
 
-	def cercaVicini(self,config):
+	def searchNeighborhood(self):
 
 		dataBase = dataBase()
 		nears = dataBase.retrieveNeighborhood()
