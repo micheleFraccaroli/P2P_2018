@@ -31,15 +31,15 @@ print('timeResearch: ',c.timeResearch)
 print('timeIdPacket: ',c.timeIdPacket)
 print("\n------------------------\n")
 #near=Vicini(c)
-'''
-while True:
-    name_search = input("Insert file to search into net: ")
-    search = Ricerca(c.selfV4, c.selfV6, c.selfP, c.ttl, c.timeResearch, name_search)
-    print("\n--- New research launched ---> pid: " + pktid + "\n")
-    pktid = search.query(c)
 
-    for i in tqdm(range(35), desc="Loading: "):
-    	time.sleep(1)
+while True:
+	name_search = input("Insert file to search from net: ")
+	search = Ricerca(c.selfV4, c.selfV6, c.selfP, c.ttl, c.timeResearch, name_search)
+	print("\n--- New research launched ---> pid: " + pktid + "\n")
+	pktid = search.query(c)
+
+	for i in tqdm(range(35), desc="Loading: "):
+		time.sleep(1)
 
 	# choice section
 	print("Research termined\n--- Result for " + pktid + " ---")
@@ -53,10 +53,9 @@ while True:
 		i = i + 1
 
 	choice = input("> ")
-		peer = choice_list[choice-1]
-		ipv4,ipv6 = peer[1].split('|')
-		download = Download(ipv4,ipv6,peer[2],peer[2],peer[4])
-		download.download()
+	peer = choice_list[choice-1]
+	ipv4,ipv6 = peer[1].split('|')
+	download = Download(ipv4,ipv6,peer[2],peer[2],peer[4])
+	download.download()
 
 del db
-'''
