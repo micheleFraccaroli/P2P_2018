@@ -19,7 +19,7 @@ class Vicini_res(th.Thread):
 
         while True:
             other_peersocket, addr = peersocket.accept()
-            recv_packet = self.other_peersocket.recv(80)
+            recv_packet = other_peersocket.recv(80)
 
             self.bytes_read = len(recv_packet)
             while(self.bytes_read < 80):

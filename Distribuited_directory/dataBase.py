@@ -2,6 +2,7 @@ import sqlite3
 import os
 from Util import *
 from Config import Config
+import time
 
 class dataBase:
 
@@ -121,6 +122,15 @@ class dataBase:
 		res = c.fetchone()
 		con.close()
 		return res[0]
+
+	def updateTimestamp(self, pktid, ip):
+
+		con = sqlite3.connect('P2P.db')
+		c = con.cursor()
+		new_timestamp = time.time()
+		c.execute('UPDATE requests SET timeOperation = ? WHERE pid=? AND ip=?',(new_timestamp, pktid, ip))
+		con.commit()
+		con.close()
 
 	def insertRequest(self, pktid, ip, port, timeOp):
 
