@@ -87,8 +87,3 @@ def printLog(log):
     f.write('Timestamp: {:%d-%m-%Y %H:%M:%S} #### '.format(datetime.now())+log+'\n')
     f.close()
 '''
-# Per Test
-if __name__=='__main__':
-    #define_g()
-    ip_packet16_validation(ip_packet16())
-    print(ipPacket16)

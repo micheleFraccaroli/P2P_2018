@@ -75,7 +75,7 @@ class dataBase:
 		con.commit()
 		con.close()
 
-		return res
+		return resId
 
 	def retrieveAll(self):
 

@@ -35,7 +35,7 @@ print("\n------------------------\n")
 
 while True:
 	# background thread
-	central_thread = Central_Thread(c.selfP)
+	central_thread = Central_Thread(c)
 	central_thread.start()
 
     name_search = input("Insert file to search into net: ")
