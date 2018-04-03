@@ -51,5 +51,7 @@ class Central_Thread(th.Thread):
 	        		self.bytes_read = len(recv_packet)
 
         		# lancio il thread per l'ascolto delle richieste di contenuti
-				th_QUER = Thread_quer(recv_packet)
+        		pkt = recv_type+recv_packet
+        		
+				th_QUER = Thread_quer(self.ipv4, self.ipv6, pkt)
 				th_QUER.start()
