@@ -21,6 +21,7 @@ class Central_Thread(th.Thread):
 
         while True:
         	other_peersocket, addr = peersocket.accept()
+        	print('Connessione aperta sul MAIN_THREAD '+addr)
         	recv_type = other_peersocket.recv(4)
 
         	self.bytes_read = len(recv_type)
