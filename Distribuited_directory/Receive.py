@@ -199,7 +199,7 @@ class Thread_quer(th.Thread):
 						self.con = Conn(addr[0], str(ip6), addr[2])
 						try:
 							self.con.connection()
-							if((addr[0] != self.ip_request) && (ip6 != self.ip_request)):
+							if((addr[0] != self.ip_request) and (ip6 != self.ip_request)):
 								self.con.s.send(self.new_quer.encode())
 							self.con.deconnection()
 						except IOError as expt:
