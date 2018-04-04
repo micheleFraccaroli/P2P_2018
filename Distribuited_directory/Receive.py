@@ -6,25 +6,30 @@ import time
 import datetime
 import re
 import os
-import ipaddress as ipaddr
+import ipaddress as ipad
 import hashlib
 import multiprocessing as mp
 from dataBase import dataBase
+from Conn import Conn
 from Vicini import Vicini
 from Vicini_res import Vicini_res
 from Config import Config
 from Upload import Upload
+import threading as th
+from File_system import File_system
 
-class Receive():
-	def __init__(self, my_ip, my_door, config):
-		self.my_ip = my_ip
+#inizializzo il thread
+class Thread_quer(th.Thread):
+	def __init__(self, my_ipv4, my_ipv6, my_door, quer_pkt):
+		th.Thread.__init__(self)
+		self.my_ipv4 = my_ipv4
 		self.my_door = int(my_door)
 		#self.pktid_list = pktid_list
 		self.bytes_read = 0
-		self.config = config
-
+		#self.config = config
+		self.from_peer = quer_pkt
 	
-	#insersce un nuovo lecord nella lista dei packet id
+	#insersce un nuovo record nella lista dei packet id
 
 	def remove_record(self, pktid_dict, key):
 		del pktid_dict[str(key)]
@@ -48,161 +53,177 @@ class Receive():
 			contenuto = open_file.read()
 			FileHash = hashlib.md5()
 			FileHash.update(contenuto)
-			dict_list[file] = FileHash.hexdigest()
+			dict_list[FileHash.hexdigest()] = file
+			#il file File_System viene utilizzato come appoggio alla funzione di upload
+			file_write = File_system(FileHash.hexdigest(), file)
+			file_write.write()
+			open_file.close()
 		return dict_list
 
-	#risponde al peer che ha effettuato una ricerca
-
-	def answer(self, file_list, pktid, ip, door, other_peersocket):
+	#risponde al peer che ha effettuato una ricerca, incompleta
+	def answer(self, file_list, pktid, ip, door, ttl):
 		dict_list = self.convert_md5(file_list)
-		for file in dict_list:
-			file_complete = file.ljust(100,' ')
-			answer = "AQUE"+pktid+ip+door+dict_list[file]+file_complete
-			other_peersocket.send(answer.encode())
+		#stabilisco una connessione con il peer che ha iniziato
+		addr = Util.ip_deformatting(ip, door, ttl)
+							
+		self.con = Conn(addr[0], addr[1], addr[2])
 
-	def listen_other(self):
-		if(str(ipaddr.ip_address(self.my_ip)).find('.') != -1): #ha trovato il punto, quindi ipv4
-			peersocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-			peersocket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-			peersocket.bind((self.my_ip, self.my_door))
-			print('Uso ipv4\n')
+		try:
+			self.con.connection()
+			for md5 in dict_list:
+				file_name = dict_list[md5].ljust(100,' ')
+				answer = "AQUE"+pktid+ip+door+md5+file_name
+				self.con.s.send(answer.encode())
+			self.con.deconnection()
+		except IOError as expt:
+			print("Errore di connessione")
+			print(expt)
+			sys.exit(0)
+
+	#vado a calcolare il nuovo ttl
+
+	def new_ttl(self, ttl):
+		new_ttl = ttl - 1
+		if(new_ttl>10):
+			str(new_ttl)
 		else:
-		    peersocket = socket.socket(socket.AF_INET6, socket.SOCK_STREAM)
-		    peersocket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-		    peersocket.bind((str(ipaddr.ip_address(self.my_ip)), self.my_door))
-		    print('Uso ipv6\n')
+			str(new_ttl).rjust(2, '0')
+		return new_ttl
 
-		peersocket.listen(5)
+	#funzione principale
 
+	def run(self):
+
+		'''
+		peersocket = socket.socket(socket.AF_INET6, socket.SOCK_STREAM)
+		peersocket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+		peersocket.bind(('', self.my_door))
+
+		peersocket.listen(10)
+		
 		while True:
+			
 			other_peersocket, addr = peersocket.accept()
 			self.from_peer = other_peersocket.recv(102)
-			self.bytes_read = len(self.from_peer)
+		'''	
 
-			#Controllo il tipo di richiesta
+		self.pktid = self.from_peer[4:16]
+		self.ip  = self.from_peer[16:75]
+		self.door = self.from_peer[75:80]
+		self.ttl = int(self.from_peer[80:82])
+		self.string = self.from_peer[82:].rstrip()
 
-			while (self.bytes_read < 4):
-				self.from_peer += other_peersocket.recv(4 - self.bytes_read)
-				self.bytes_read = len(self.from_peer)
-				print(self.from_peer)
+		db = dataBase()
+		res = db.retrivenSearch(self.pktid, self.ip)
 
-			if(self.from_peer[:4].decode() == "QUER"):
+		if(res == 0):
 
-				while (self.bytes_read < 102):
-					self.from_peer += other_peersocket.recv(102 - self.bytes_read)
-					self.bytes_read = len(self.from_peer)
-					print(self.from_peer)
+			file_found = []
 
-				self.pktid = self.from_peer[4:16].decode()
-				self.ip  = self.from_peer[16:75].decode()
-				self.door = self.from_peer[75:80].decode()
-				self.ttl = self.from_peer[80:82].decode()
-				self.string = self.from_peer[82:].decode().rstrip()
+			for file in os.listdir("img"):
+				if re.search(self.string, file, re.IGNORECASE):
+					file_found.append(file)
 
-				db = dataBase()
-				res = db.retrivenSearch(self.pktid, self.ip)
+			if(len(file_found) != 0):
+				#rispondo e apro l'upload
+				self.answer(file_found, self.pktid, self.ip, self.door, None)
+				up = Upload(self.my_ipv4, self.my_door)
+				up.upload()
+				
+			elif(self.ttl>1):
+				print("andrò ad eseguire l'inoltro ai vicini della richiesta\n")
+				#vado a decrementare il ttl di uno e costruisco la nuova query da inviare ai vicini
+				self.new_ttl = new_ttl(self.ttl)
+				self.new_quer = "QUER"+self.pktid+self.ip+self.door+self.new_ttl+self.string
 
-				if(res == 0):
+				near = Vicini(self.config)
 
-					file_found = []
+				#thread per ascolto di riposta dei vicini
+				th_near = Vicini_res(self.my_door)
+				th_near.start()
+				
+				near.searchNeighborhood() #invia la richiesta ai vicini
+				th_near.join() #viene chiuso il thread e il db è aggiornato con i nuovi vicini
 
-					for file in os.listdir("img"):
-						if re.search(self.string, file, re.IGNORECASE):
-							file_found.append(file)
-
-					if(len(file_found) != 0):
-						self.answer(file_found, self.pktid, self.ip, self.door, other_peersocket)
-					else:
-						print("andrò ad eseguire l'inoltro ai vicini della richiesta\n")
-						near = Vicini(self.config)
-
-						# thread per ascolto di riposta dei vicini
-						th_near = Vicini_res(self.port)
-						th_near.start()
+				self.neighbors = db.retrieveNeighborhood() #mi tiro giù i vicini
+				for n in self.neighbors:
+					addr = Util.ip_deformatting(n[0], n[1], self.ttl)
 						
-						near.searchNeighborhood() #invia la richiesta ai vicini
-						th_near.join() #viene chiuso il thread e il db è aggiornato con i nuovi vicini
+					#ip4 = ipad.ip_address(n[0][:15])
+					ip6 = ipad.ip_address(n[0][16:])
 
-						self.neighbors = db.retrieveNeighborhood() #mi tiro giù i vicini
-						for n in self.neighbors:
-							addr = Util.ip_deformatting(n[0], n[1], self.ttl)
-								
-							#ip4 = ipad.ip_address(n[0][:15])
-							ip6 = ipad.ip_address(n[0][16:])
+					self.con = Conn(addr[0], str(ip6), addr[2])
+					try:
+						self.con.connection()
+						self.con.s.send(self.new_quer.encode())
+						self.con.deconnection()
+					except IOError as expt:
+						print("Errore di connessione")
+						print(expt)
+						sys.exit(0)
 
-							self.con = Conn(addr[0], str(ip6), addr[2])
-							try:
-								self.con.connection()
-								self.con.s.send(self.from_peer.encode())
-								self.con.deconnection()
-							except IOError as expt:
-								print("Errore di connessione")
-								print(expt)
-								sys.exit(0)
+			self.timestamp = time.time()
+			db.insertSearch(self.pktid, self.ip, self.timestamp)
 
-					self.timestamp = time.time()
-					db.insertSearch(self.pktid, self.ip, self.timestamp)
+			del db
 
-					del db
+		else:
+			print("E' già presente un pacchetto con questo pktid\n")
 
-				else:
-					print("E' già presente un pacchetto con questo pktid\n")
+			before = db.retriveSearch(self.pktid, self.ip)
+			now = time.time()
 
-					before = db.retriveSearch(self.pktid, self.ip)
-					now = time.time()
+			if((now - before) < 30):
+				print('non faccio nulla perchè ho già elaborato la richiesta\n')
+				del db
+			else:
 
-					if((now - before) < 30):
-						print('non faccio nulla perchè ho già elaborato la richiesta\n')
-						del db
-					else:
+				file_found = []
 
-						file_found = []
+				for file in os.listdir("img"):
+					if re.search(self.string, file, re.IGNORECASE):
+						file_found.append(file)
 
-						for file in os.listdir("img"):
-							if re.search(self.string, file, re.IGNORECASE):
-								file_found.append(file)
+				if(len(file_found) != 0):
+					#rispondo e apro l'upload
+					self.answer(file_found, self.pktid, self.ip, self.door, None)
+					up = Upload(self.my_ipv4, self.my_door)
+					up.upload()
 
-						if(len(file_found) != 0):
-							self.answer(file_found, self.pktid, self.ip, self.door, other_peersocket)
-						else:
-							print("andrò ad eseguire l'inoltro ai vicini della richiesta\n")
-							near = Vicini(self.config)
+				elif(self.ttl>1):
+					print("andrò ad eseguire l'inoltro ai vicini della richiesta\n")
+					self.new_ttl = new_ttl(self.ttl)
+					self.new_quer = "QUER"+self.pktid+self.ip+self.door+self.new_ttl+self.string
 
-							# thread per ascolto di riposta dei vicini
-							th_near = Vicini_res(self.port)
-							th_near.start()
+					near = Vicini(self.config)
+
+					# thread per ascolto di riposta dei vicini
+					th_near = Vicini_res(self.port)
+					th_near.start()
+					
+					near.searchNeighborhood() #invia la richiesta ai vicini
+					th_near.join() #viene chiuso il thread e il db è aggiornato con i nuovi vicini
+
+					self.neighbors = db.retrieveNeighborhood() #mi tiro giù i vicini
+					for n in self.neighbors:
+						addr = Util.ip_deformatting(n[0], n[1], self.ttl)
 							
-							near.searchNeighborhood() #invia la richiesta ai vicini
-							th_near.join() #viene chiuso il thread e il db è aggiornato con i nuovi vicini
+						#ip4 = ipad.ip_address(n[0][:15])
+						ip6 = ipad.ip_address(n[0][16:])
 
-							self.neighbors = db.retrieveNeighborhood() #mi tiro giù i vicini
-							for n in self.neighbors:
-								addr = Util.ip_deformatting(n[0], n[1], self.ttl)
-									
-								#ip4 = ipad.ip_address(n[0][:15])
-								ip6 = ipad.ip_address(n[0][16:])
+						self.con = Conn(addr[0], str(ip6), addr[2])
+						try:
+							self.con.connection()
+							self.con.s.send(self.new_quer.encode())
+							self.con.deconnection()
+						except IOError as expt:
+							print("Errore di connessione")
+							print(expt)
+							sys.exit(0)
 
-								self.con = Conn(addr[0], str(ip6), addr[2])
-								try:
-									self.con.connection()
-									self.con.s.send(self.from_peer.encode())
-									self.con.deconnection()
-								except IOError as expt:
-									print("Errore di connessione")
-									print(expt)
-									sys.exit(0)
+					db.updateTimestamp(self.pktid, self.ip)
 
-							db.updateTimestamp(self.pktid, self.ip)
-
-						del db				
-
-			elif(self.from_peer[0:4].decode() == "RETR"):
-				while (self.bytes_read < 36):
-					self.from_peer += other_peersocket.recv(102 - self.bytes_read)
-					self.bytes_read = len(self.from_peer)
-					print(self.from_peer)
-					up = Upload(self, ip, port)
-					up.Upload()
+				del db				
 
 
 if __name__ == '__main__':
@@ -211,7 +232,7 @@ if __name__ == '__main__':
 	conf = Config()
 	db.create(conf)
 	del db
-
+	'''
 	Receive_4 = Receive('127.0.0.1','50004', conf)
 	Re_4 = mp.Process(target=Receive_4.listen_other)
 	Re_4.start()
@@ -219,3 +240,14 @@ if __name__ == '__main__':
 	Receive_6 = Receive('::1','50004', conf)
 	Re_6 = mp.Process(target=Receive_6.listen_other)
 	Re_6.start()
+	'''
+	pktid = 'COR3BEWPI98CHFOP'
+	ip = '172.016.008.004|fc00:0000:0000:0000:0000:0000:0008:0004'
+	door = '50004'
+	ttl = '02'
+	ricerca = 'CrAs'
+	ricerca_20 = ricerca.ljust(20,' ')
+	string_request = "QUER"+pktid+ip+door+ttl+ricerca_20
+
+	th_QUER = Thread_quer('127.0.0.1', '::1', '50003', string_request)
+	th_QUER.start()
