@@ -23,6 +23,4 @@ class Retr(th.Thread):
                 thread = thread_Response(other_peersocket)
                 thread.start()
             except OSError as e:
-                print("Ricerca terminata per timeout")
-                print(e)
                 exit(0)

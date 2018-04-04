@@ -15,7 +15,7 @@ class Download:
         self.pp2p_B = pp2p_B
 
         #file
-        self.file_signature = md5
+        self.md5 = md5
         self.filename = filename
 
         #chunk veriables
@@ -32,9 +32,6 @@ class Download:
 
         self.con = Conn(self.ipp2p_B_4, self.ipp2p_B_6, int(self.pp2p_B))
         self.con.connection()
-
-        self.md5 = self.file_signature
-        print(self.md5)
 
         to_peer = "RETR" + self.md5
 
@@ -68,13 +65,13 @@ class Download:
                 self.data_recv.append(self.chunk)
         self.con.deconnection()
 
+        path_file = "img/" + self.filename
         check_file = Path(self.filename)
         print(check_file)
 
         if (check_file.is_file()):
             choice = input("\nIl file esiste già nel tuo file system, vuoi sovrascriverlo? (Y,n): ")
             if(choice == "Y"):
-                path_file = "/img/" + self.filename
                 os.remove(path_file)
                 file_recv = open(path_file, "ab")
                 for i in self.data_recv:
@@ -88,6 +85,7 @@ class Download:
 
         f = open(path_file,"rb")
         r = f.read()
+        f.close()
         print("\n--- FILE DOWNLOADED ---\n")
 
 '''

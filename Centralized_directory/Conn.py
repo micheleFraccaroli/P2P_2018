@@ -21,10 +21,8 @@ class Conn:
             ip = self.ip_choice(0,1) #se 0:ipv4 altrimenti 1:ipv6
 
             if(ip == 1):
-                print("\nUsing IPv6\n")
                 self.ipp2p = self.ipv6
             else:
-                print("\nUsing IPv4\n")
                 self.ipp2p = self.ipv4
             
             self.infoS = socket.getaddrinfo(self.ipp2p, self.pp2p)

@@ -44,8 +44,6 @@ class ThreadNEAR(th.Thread):
 						print(e)
 						exit()
 
-		# Risposta diretta
-		print('\nrisposta diretta...\n')
 		self.pack = 'ANEA'+self.pid+self.myIPP
 		self.con = Conn(self.ipv4,self.ipv6,self.port)
 		try:

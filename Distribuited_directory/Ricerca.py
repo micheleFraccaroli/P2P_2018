@@ -35,11 +35,14 @@ class Ricerca:
         # richiesta vicini
         near = Vicini(config)
         # thread per ascolto di riposta dei vicini
-        th_near = Vicini_res(self.port)
-        th_near.start()
-        # partenza richiesta dei vicini
-        near.searchNeighborhood() 
-        th_near.join()
+        try:
+            th_near = Vicini_res(self.port)
+            th_near.start()
+            # partenza richiesta dei vicini
+            near.searchNeighborhood() 
+            th_near.join()
+        except:
+            pass
         
         db.insertRequest(pktid, ipp2p_pp2p[:55], time.time())
 

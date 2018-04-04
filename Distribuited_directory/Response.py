@@ -29,11 +29,8 @@ class thread_Response(th.Thread):
                 recv_packet += self.other_peersocket.recv(212 - self.bytes_read)
                 self.bytes_read = len(recv_packet)
 
-            Util.printError(recv_packet.decode())
-
             # retrieving data from file research
             if(recv_packet[:4].decode() == "AQUE"):
-                
                 lock.acquire()
                 db.insertResponse(recv_packet[4:20].decode(), recv_packet[20:75].decode(), recv_packet[75:80].decode(), recv_packet[80:112].decode(), recv_packet[112:212].decode())
                 lock.release()
