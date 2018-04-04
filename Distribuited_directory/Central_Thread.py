@@ -2,7 +2,7 @@ import socket
 import os
 import threading as th
 from  ThreadNEAR import ThreadNEAR
-from Receive import Thread_quer
+from ThreadQUER import ThreadQUER
 
 class Central_Thread(th.Thread):
 	def __init__(self, config):
@@ -39,7 +39,7 @@ class Central_Thread(th.Thread):
 					self.bytes_read = len(recv_packet)
 
 				# lancio il thread per l'ascolto delle richieste di near
-				th_NEAR =  threadNEAR(recv_type+recv_packet,self.ipv4,self.ipv6,self.port,addr[0])
+				th_NEAR =  ThreadNEAR(recv_type+recv_packet,self.ipv4,self.ipv6,self.port,addr[0])
 				th_NEAR.start()
 
 			# QUER ------
@@ -54,5 +54,5 @@ class Central_Thread(th.Thread):
 				# lancio il thread per l'ascolto delle richieste di contenuti
 				pkt = recv_type+recv_packet
 				
-				th_QUER = Receive(self.port,pkt, addr[0])
+				th_QUER = ThreadQUER(self.port,pkt, addr[0])
 				th_QUER.start()
