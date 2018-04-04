@@ -58,12 +58,16 @@ class ThreadQUER(th.Thread):
 		return dict_list
 
 	#risponde al peer che ha effettuato una ricerca, incompleta
-	def answer(self, file_list, pktid, ip, door, ttl):
+	def answer(self, file_list, pktid, ip, door):
 		dict_list = self.convert_md5(file_list)
 		#stabilisco una connessione con il peer che ha iniziato
-		addr = Util.ip_deformatting(ip, door, ttl)
-							
-		self.con = Conn(addr[0], addr[1], addr[2])
+		addr = Util.ip_deformatting(ip, door, None)
+	
+		ip6 = ipad.ip_address(ip[16:])
+
+		self.con = Conn(addr[0], str(ip6), addr[2])
+
+		#self.con = Conn(addr[0], addr[1], addr[2])
 
 		try:
 			self.con.connection()
@@ -81,7 +85,7 @@ class ThreadQUER(th.Thread):
 
 	def new_ttl(self, ttl):
 		new_ttl = ttl - 1
-		if(new_ttl>10):
+		if(new_ttl>9):
 			str(new_ttl)
 		else:
 			str(new_ttl).rjust(2, '0')
@@ -91,12 +95,12 @@ class ThreadQUER(th.Thread):
 
 	def run(self):
 
-		self.pktid = self.from_peer[4:16]
-		self.ip  = self.from_peer[16:75]
+		self.pktid = self.from_peer[4:20]
+		self.ip  = self.from_peer[20:75]
 		self.door = self.from_peer[75:80]
 		self.ttl = int(self.from_peer[80:82])
 		self.string = self.from_peer[82:].rstrip()
-
+		print(len(self.string))
 		db = dataBase()
 		res = db.retrivenSearch(self.pktid, self.ip)
 
@@ -110,15 +114,15 @@ class ThreadQUER(th.Thread):
 
 			if(len(file_found) != 0):
 				#rispondo e apro l'upload
-				self.answer(file_found, self.pktid, self.ip, self.door, None)
+				self.answer(file_found, self.pktid, self.ip, self.door)
 				up = Upload(self.my_door)
 				up.upload()
 				
 			elif(self.ttl>1):
 				print("andrò ad eseguire l'inoltro ai vicini della richiesta\n")
 				#vado a decrementare il ttl di uno e costruisco la nuova query da inviare ai vicini
-				self.new_ttl = new_ttl(self.ttl)
-				self.new_quer = "QUER"+self.pktid+self.ip+self.door+self.new_ttl+self.string
+				self.ttl_new = self.new_ttl(self.ttl)
+				self.new_quer = "QUER"+self.pktid+self.ip+self.door+self.ttl_new+self.string
 
 				near = Vicini(self.config)
 
@@ -171,14 +175,14 @@ class ThreadQUER(th.Thread):
 
 				if(len(file_found) != 0):
 					#rispondo e apro l'upload
-					self.answer(file_found, self.pktid, self.ip, self.door, None)
+					self.answer(file_found, self.pktid, self.ip, self.door)
 					up = Upload(self.my_door)
 					up.upload()
 
 				elif(self.ttl>1):
 					print("andrò ad eseguire l'inoltro ai vicini della richiesta\n")
-					self.new_ttl = new_ttl(self.ttl)
-					self.new_quer = "QUER"+self.pktid+self.ip+self.door+self.new_ttl+self.string
+					self.ttl_new = self.new_ttl(self.ttl)
+					self.new_quer = "QUER"+self.pktid+self.ip+self.door+self.ttl_new+self.string
 
 					near = Vicini(self.config)
 
