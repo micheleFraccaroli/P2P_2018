@@ -33,7 +33,7 @@ print("\n\n")
 time.sleep(2)
 c=Config() #istanza delle configurazioni
 db = dataBase()
-#db.create(c)
+db.create(c)
 #del db
 
 print("\n--- Configurations ---\n")
@@ -53,25 +53,31 @@ while True:
     port = ra.randint(50000, 59999)
     search = Ricerca(c.selfV4, c.selfV6, port, c.ttl, c.timeResearch, name_search)
     pktid = search.query(c)
-    print("\nNew research launched |------\n")
+    print("\n------| New research launched |------\n")
 
-    for i in tqdm(range(35), desc="\033[94mLoading\033[0m"):
+    for i in tqdm(range(c.timeResearch), desc="\033[94mLoading\033[0m"):
         time.sleep(1)
 
-    print("Research termined\nResult for " + pktid + " |------")
-    print("[select with the number the file to download")
+    print("Research termined\nResult for " + pktid)
+    print("[select with the number the file to download]")
+    
     res = db.retrieveResponses(pktid)
-    choice_list = []
-    i = 1
-    for row in res:
-        print(i + ") " + "ip: " + row[1] + "  port: " + row[2] + "  md5: " + row[3] + "  file: " + row[4])
-        choice_list.append(row)
-        i = i + 1
+    
+    if(len(res) == 0):
+    	print("File not found")
 
-    choice = input("\033[1;35m> \033[0m")
-    peer = choice_list[choice-1]
-    ipv4,ipv6 = peer[1].split('|')
-    download = Download(ipv4,ipv6,peer[2],peer[2],peer[4])
-    download.download()
+	else:
+	    choice_list = []
+	    i = 1
+	    for row in res:
+	        print(str(i) + ") " + "ip: " + row[1] + "  port: " + row[2] + "  md5: " + row[3] + "  file: " + row[4])
+	        choice_list.append(row)
+	        i = i + 1
+
+	    choice = input(">> ")
+	    peer = choice_list[int(choice)-1]
+	    ipv4,ipv6 = peer[1].split('|')
+	    download = Download(ipv4,ipv6,peer[2],peer[2],peer[4])
+	    download.download()
 
 del db

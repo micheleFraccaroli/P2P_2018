@@ -10,7 +10,7 @@ class ThreadNEAR(th.Thread):
 
 		th.Thread.__init__(self)
 		self.myIPP     = Util.ip_formatting(ipv4,ipv6,port)
-		info           = Util.ip_deformatting(pack[20:75],pack[75:80],pack[:80])
+		info           = Util.ip_deformatting(pack[20:75],pack[75:80],pack[80:])
 		self.pack      = pack
 		self.pid       = pack[4:20]
 		self.ipv4      = info[0]
@@ -20,13 +20,13 @@ class ThreadNEAR(th.Thread):
 		self.ipRequest = str(ipRequest)
 
 	def run(self):
-
-		if ttl > 0: # Inoltro richiesta ai vicini
+		db = dataBase()
+		if self.ttl > 0: # Inoltro richiesta ai vicini
 
 			self.ttl = str(self.ttl-1).zfill(2)
 			self.pack=''.join((self.pack[:80],self.ttl))
 
-			neighborhood = retrieveNeighborhood()
+			neighborhood = db.retrieveNeighborhood()
 
 			for neighbor in neighborhood:
 

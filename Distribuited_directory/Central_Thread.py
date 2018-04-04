@@ -21,7 +21,6 @@ class Central_Thread(th.Thread):
 
 		while True:
 			other_peersocket, addr = peersocket.accept()
-			print('Connessione aperta sul MAIN_THREAD '+addr)
 			recv_type = other_peersocket.recv(4)
 
 			self.bytes_read = len(recv_type)
@@ -30,7 +29,7 @@ class Central_Thread(th.Thread):
 				self.bytes_read = len(recv_type)
 
 				# NEAR ------
-			if(recv_type == "NEAR"):
+			if(recv_type.decode() == "NEAR"):
 				recv_packet = other_peersocket.recv(78) # 82 - 4
 
 				self.bytes_read = len(recv_packet)
@@ -39,12 +38,13 @@ class Central_Thread(th.Thread):
 					self.bytes_read = len(recv_packet)
 
 				# lancio il thread per l'ascolto delle richieste di near
-				th_NEAR =  ThreadNEAR(recv_type+recv_packet,self.ipv4,self.ipv6,self.port,addr[0])
+				pkt = recv_type+recv_packet
+				th_NEAR =  ThreadNEAR(pkt.decode(),self.ipv4,self.ipv6,self.port,addr[0])
 				th_NEAR.start()
 
 			# QUER ------
-			elif(recv_type == "QUER"):
-				recv_packet = other_peersocket.recv(98) # 102 - 4
+			elif(recv_type.decode() == "QUER"):
+				recv_packet = other_peersocket.recv(98)# 102 - 4
 
 				self.bytes_read = len(recv_packet)
 				while (self.bytes_read < 98):
@@ -54,5 +54,5 @@ class Central_Thread(th.Thread):
 				# lancio il thread per l'ascolto delle richieste di contenuti
 				pkt = recv_type+recv_packet
 				
-				th_QUER = ThreadQUER(self.port,pkt, addr[0])
+				th_QUER = ThreadQUER(self.port,pkt.decode(), addr[0])
 				th_QUER.start()
