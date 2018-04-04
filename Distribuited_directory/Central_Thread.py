@@ -38,7 +38,7 @@ class Central_Thread(th.Thread):
 	        		self.bytes_read = len(recv_packet)
 
         		# lancio il thread per l'ascolto delle richieste di near
-				th_NEAR =  threadNEAR(recv_type+recv_packet,self.ipv4,self.ipv6,self.port)
+				th_NEAR =  threadNEAR(recv_type+recv_packet,self.ipv4,self.ipv6,self.port,addr[0])
 				th_NEAR.start()
 
 			# QUER ------

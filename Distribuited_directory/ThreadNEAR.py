@@ -6,17 +6,18 @@ from Conn import Conn
 
 class ThreadNEAR(th.Thread):
 
-	def __init__(self,pack,ipv4,ipv6,port):
+	def __init__(self,pack,ipv4,ipv6,port,ipRequest):
 
 		th.Thread.__init__(self)
-		self.myIPP = Util.ip_formatting(ipv4,ipv6,port)
-		info       = Util.ip_deformatting(pack[20:75],pack[75:80],pack[:80])
-		self.pack  = pack
-		self.pid   = pack[4:20]
-		self.ipv4  = info[0]
-		self.ipv6  = info[1]
-		self.port  = info[2]
-		self.ttl   = info[3]
+		self.myIPP     = Util.ip_formatting(ipv4,ipv6,port)
+		info           = Util.ip_deformatting(pack[20:75],pack[75:80],pack[:80])
+		self.pack      = pack
+		self.pid       = pack[4:20]
+		self.ipv4      = info[0]
+		self.ipv6      = info[1]
+		self.port      = info[2]
+		self.ttl       = info[3]
+		self.ipRequest = str(ipRequest)
 
 	def run(self):
 
@@ -30,14 +31,16 @@ class ThreadNEAR(th.Thread):
 			for neighbor in neighborhood:
 
 				params = Util.ip_deformatting(neighbor[0],neighbor[1],None)
-				self.con = Conn(params[0],params[1],params[2])
-				try:
-					self.con.connection()
-					self.con.s.send(self.pack.encode())
-					self.con.deconnection()
-				except IOError as e:
-					print('Connection error. '+e)
-					exit()
+				
+				if params[0] != self.ipRequest:
+					self.con = Conn(params[0],params[1],params[2])
+					try:
+						self.con.connection()
+						self.con.s.send(self.pack.encode())
+						self.con.deconnection()
+					except IOError as e:
+						print('Connection error. '+e)
+						exit()
 
 		# Risposta diretta
 
