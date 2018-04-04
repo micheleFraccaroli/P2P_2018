@@ -5,6 +5,7 @@ import Util
 import time
 import datetime
 import re
+import sys
 import os
 import ipaddress as ipad
 import hashlib
@@ -15,6 +16,7 @@ from Vicini_res import Vicini_res
 from Config import Config
 from Upload import Upload
 import threading as th
+import random as ra
 from File_system import File_system
 
 #inizializzo il thread
@@ -58,22 +60,22 @@ class ThreadQUER(th.Thread):
 		return dict_list
 
 	#risponde al peer che ha effettuato una ricerca, incompleta
-	def answer(self, file_list, pktid, ip, door):
+	def answer(self, file_list, pktid, ip, my_port, portB):
 		dict_list = self.convert_md5(file_list)
 		#stabilisco una connessione con il peer che ha iniziato
-		addr = Util.ip_deformatting(ip, door, None)
+		addr = Util.ip_deformatting(ip, portB, None)
 	
 		ip6 = ipad.ip_address(ip[16:])
 
 		self.con = Conn(addr[0], str(ip6), addr[2])
 
 		#self.con = Conn(addr[0], addr[1], addr[2])
-
+		
 		try:
 			self.con.connection()
 			for md5 in dict_list:
 				file_name = dict_list[md5].ljust(100,' ')
-				answer = "AQUE"+pktid+ip+door+md5+file_name
+				answer = "AQUE"+pktid+ip+my_port+md5+file_name
 				self.con.s.send(answer.encode())
 			self.con.deconnection()
 		except IOError as expt:
@@ -89,7 +91,7 @@ class ThreadQUER(th.Thread):
 			str(new_ttl)
 		else:
 			str(new_ttl).rjust(2, '0')
-		return new_ttl
+		return str(new_ttl)
 
 	#funzione principale
 
@@ -100,7 +102,6 @@ class ThreadQUER(th.Thread):
 		self.door = self.from_peer[75:80]
 		self.ttl = int(self.from_peer[80:82])
 		self.string = self.from_peer[82:].rstrip()
-		print(len(self.string))
 		db = dataBase()
 		res = db.retrivenSearch(self.pktid, self.ip)
 
@@ -114,8 +115,9 @@ class ThreadQUER(th.Thread):
 
 			if(len(file_found) != 0):
 				#rispondo e apro l'upload
-				self.answer(file_found, self.pktid, self.ip, self.door)
-				up = Upload(self.my_door)
+				self.new_port = ra.randint(50000, 59999)
+				self.answer(file_found, self.pktid, self.ip, str(self.new_port), self.door)
+				up = Upload(self.new_port)
 				up.upload()
 				
 			elif(self.ttl>1):
@@ -123,15 +125,6 @@ class ThreadQUER(th.Thread):
 				#vado a decrementare il ttl di uno e costruisco la nuova query da inviare ai vicini
 				self.ttl_new = self.new_ttl(self.ttl)
 				self.new_quer = "QUER"+self.pktid+self.ip+self.door+self.ttl_new+self.string
-
-				near = Vicini(self.config)
-
-				#thread per ascolto di riposta dei vicini
-				th_near = Vicini_res(self.my_door)
-				th_near.start()
-				
-				near.searchNeighborhood() #invia la richiesta ai vicini
-				th_near.join() #viene chiuso il thread e il db è aggiornato con i nuovi vicini
 
 				self.neighbors = db.retrieveNeighborhood() #mi tiro giù i vicini
 				for n in self.neighbors:
@@ -175,23 +168,15 @@ class ThreadQUER(th.Thread):
 
 				if(len(file_found) != 0):
 					#rispondo e apro l'upload
-					self.answer(file_found, self.pktid, self.ip, self.door)
-					up = Upload(self.my_door)
+					self.new_port = ra.randint(50000, 59999)
+					self.answer(file_found, self.pktid, self.ip, str(self.new_port), self.door)
+					up = Upload(self.new_port)
 					up.upload()
 
 				elif(self.ttl>1):
 					print("andrò ad eseguire l'inoltro ai vicini della richiesta\n")
 					self.ttl_new = self.new_ttl(self.ttl)
 					self.new_quer = "QUER"+self.pktid+self.ip+self.door+self.ttl_new+self.string
-
-					near = Vicini(self.config)
-
-					# thread per ascolto di riposta dei vicini
-					th_near = Vicini_res(self.port)
-					th_near.start()
-					
-					near.searchNeighborhood() #invia la richiesta ai vicini
-					th_near.join() #viene chiuso il thread e il db è aggiornato con i nuovi vicini
 
 					self.neighbors = db.retrieveNeighborhood() #mi tiro giù i vicini
 					for n in self.neighbors:
