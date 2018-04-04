@@ -38,8 +38,8 @@ class Config:
 
         lenWhiteList = sum(len(par) for par in data.values())
         pbar = tqdm(total = lenWhiteList)
-        sleepA = 0.2
-        sleepB = 0.5
+        sleepA = 0.1
+        sleepB = 0.1
 
         # errors:
         # 0: OK

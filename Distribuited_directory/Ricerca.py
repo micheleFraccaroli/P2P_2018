@@ -12,7 +12,7 @@ from Retr import Retr
 from Vicini import Vicini
 from dataBase import dataBase
 from Vicini_res import Vicini_res
-from time import time
+import time
 from Config import *
 
 class Ricerca:
@@ -26,12 +26,9 @@ class Ricerca:
         self.search = search
 
     def query(self, config):
-        '''
-        c = Config()
+        
         db = dataBase()
-        db.destroy()
-        db.create(c)
-        '''
+        
         pktid = ''.join(random.choice(string.ascii_uppercase+string.digits) for _ in range(16))
         
         ipp2p_pp2p = Util.ip_formatting(self.ipv4, self.ipv6, self.port)
@@ -46,7 +43,7 @@ class Ricerca:
         near.searchNeighborhood() 
         th_near.join()
         
-        db.insertRequest(pktid, ipp2p_pp2p[:55], ipp2p_pp2p[55:], time())
+        db.insertRequest(pktid, ipp2p_pp2p[:55], time.time())
         self.research = "QUER" + pktid + ipp2p_pp2p + str(self.ttl).zfill(2) + self.search
 
         # retrieve neighbors from database

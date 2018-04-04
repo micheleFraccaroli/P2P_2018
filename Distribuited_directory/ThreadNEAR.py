@@ -10,7 +10,7 @@ class ThreadNEAR(th.Thread):
 
 		th.Thread.__init__(self)
 		self.myIPP     = Util.ip_formatting(ipv4,ipv6,port)
-		info           = Util.ip_deformatting(pack[20:75],pack[75:80],pack[:80])
+		info           = Util.ip_deformatting(pack[20:75],pack[75:80],pack[80:])
 		self.pack      = pack
 		self.pid       = pack[4:20]
 		self.ipv4      = info[0]
@@ -21,13 +21,15 @@ class ThreadNEAR(th.Thread):
 
 	def run(self):
 
-		if ttl > 0: # Inoltro richiesta ai vicini
+		db = dataBase()
+		print('\nIniziamo\n')
+		if self.ttl > 0: # Inoltro richiesta ai vicini
 
 			self.ttl = str(self.ttl-1).zfill(2)
 			self.pack=''.join((self.pack[:80],self.ttl))
 
-			neighborhood = retrieveNeighborhood()
-
+			neighborhood = db.retrieveNeighborhood()
+			print('\ninvio vicini...\n')
 			for neighbor in neighborhood:
 
 				params = Util.ip_deformatting(neighbor[0],neighbor[1],None)
@@ -39,11 +41,11 @@ class ThreadNEAR(th.Thread):
 						self.con.s.send(self.pack.encode())
 						self.con.deconnection()
 					except IOError as e:
-						print('Connection error. '+e)
+						print(e)
 						exit()
 
 		# Risposta diretta
-
+		print('\nrisposta diretta...\n')
 		self.pack = 'ANEA'+self.pid+self.myIPP
 		self.con = Conn(self.ipv4,self.ipv6,self.port)
 		try:
