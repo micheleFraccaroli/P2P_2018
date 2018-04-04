@@ -19,12 +19,12 @@ from File_system import File_system
 
 #inizializzo il thread
 class Thread_quer(th.Thread):
-	def __init__(self, my_ipv4, my_ipv6, my_door, quer_pkt):
+	def __init__(self, my_door, quer_pkt, ip_request):
 		th.Thread.__init__(self)
-		self.my_ipv4 = my_ipv4
 		self.my_door = int(my_door)
 		self.bytes_read = 0
 		self.from_peer = quer_pkt
+		self.ip_request = str(ip_request)
 	
 	#insersce un nuovo record nella lista dei packet id
 
@@ -139,7 +139,8 @@ class Thread_quer(th.Thread):
 					self.con = Conn(addr[0], str(ip6), addr[2])
 					try:
 						self.con.connection()
-						self.con.s.send(self.new_quer.encode())
+						if((addr[0] != self.ip_request) && (ip6 != self.ip_request)):
+							self.con.s.send(self.new_quer.encode())
 						self.con.deconnection()
 					except IOError as expt:
 						print("Errore di connessione")
@@ -198,7 +199,8 @@ class Thread_quer(th.Thread):
 						self.con = Conn(addr[0], str(ip6), addr[2])
 						try:
 							self.con.connection()
-							self.con.s.send(self.new_quer.encode())
+							if((addr[0] != self.ip_request) && (ip6 != self.ip_request)):
+								self.con.s.send(self.new_quer.encode())
 							self.con.deconnection()
 						except IOError as expt:
 							print("Errore di connessione")
