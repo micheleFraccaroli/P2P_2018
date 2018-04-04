@@ -32,7 +32,7 @@ class ThreadNEAR(th.Thread):
 
 				params = Util.ip_deformatting(neighbor[0],neighbor[1],None)
 				
-				if params[0] != self.ipRequest:
+				if params[0] != self.ipRequest && params[1] != self.ipRequest:
 					self.con = Conn(params[0],params[1],params[2])
 					try:
 						self.con.connection()
