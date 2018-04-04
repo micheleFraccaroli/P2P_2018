@@ -75,7 +75,7 @@ class dataBase:
 		con.commit()
 		con.close()
 
-		return resId
+		return res
 
 	def retrieveAll(self):
 
@@ -132,7 +132,7 @@ class dataBase:
 		con.commit()
 		con.close()
 
-	def insertRequest(self, pktid, ip, port, timeOp):
+	def insertRequest(self, pktid, ip, timeOp):
 
 		con = sqlite3.connect('P2P.db')
 		c = con.cursor()

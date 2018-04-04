@@ -7,12 +7,12 @@ import random
 import ipaddress as ipad
 import threading as th
 import random as ra
+import time
 from Conn import Conn
 from Retr import Retr
 from Vicini import Vicini
 from dataBase import dataBase
 from Vicini_res import Vicini_res
-from time import time
 from Config import *
 
 class Ricerca:
@@ -26,19 +26,14 @@ class Ricerca:
         self.search = search
 
     def query(self, config):
-        '''
-        c = Config()
+
         db = dataBase()
-        db.destroy()
-        db.create(c)
-        '''
         pktid = ''.join(random.choice(string.ascii_uppercase+string.digits) for _ in range(16))
         
         ipp2p_pp2p = Util.ip_formatting(self.ipv4, self.ipv6, self.port)
         
         # richiesta vicini
         near = Vicini(config)
-
         # thread per ascolto di riposta dei vicini
         th_near = Vicini_res(self.port)
         th_near.start()
@@ -46,16 +41,17 @@ class Ricerca:
         near.searchNeighborhood() 
         th_near.join()
         
-        db.insertRequest(pktid, ipp2p_pp2p[:55], ipp2p_pp2p[55:], time())
-        self.research = "QUER" + pktid + ipp2p_pp2p + str(self.ttl).zfill(2) + self.search
+        db.insertRequest(pktid, ipp2p_pp2p[:55], time.time())
+
+        self.research = "QUER" + pktid + ipp2p_pp2p + str(self.ttl).zfill(2) + (self.search+(' '*(20-len(self.search))))
 
         # retrieve neighbors from database
         self.neighbors = db.retrieveNeighborhood()
         
         #thread in ascolto per ogni ricerca
-        retr = Retr(self.port)
+        retr = Retr(self.port, config)
         retr.start()
-        
+
         #sending query to roots and neighbors
         for n in self.neighbors:
             addr = Util.ip_deformatting(n[0], n[1], self.ttl)

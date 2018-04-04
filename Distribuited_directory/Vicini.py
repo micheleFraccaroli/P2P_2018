@@ -5,20 +5,20 @@ from dataBase import dataBase
 class Vicini:
 	def __init__(self,config):
 		rand=Util.ip_packet16()
-		self.pack = 'NEAR' + rand + Util.ip_formatting(config.selfV4,config.selfV6,config.selfP) + str(config.ttl)
+		self.pack = 'NEAR' + rand + Util.ip_formatting(config.selfV4,config.selfV6,config.selfP) + str(config.ttl).zfill(2)
 
 	def searchNeighborhood(self):
 
-		dataBase = dataBase()
-		nears = dataBase.retrieveNeighborhood()
+		db = dataBase()
+		nears = db.retrieveNeighborhood()
 
 		for near in nears:
 
-			data = ip_deformatting(near[0],near[1],None)
-			
+			data = Util.ip_deformatting(near[0],near[1],None)
+
 			connRoot = Conn(data[0],data[1],data[2])
 			connRoot.connection()
-			connRoot.sed(self.pack.encode())
+			connRoot.s.send(self.pack.encode())
 			connRoot.deconnection()
 
 if __name__=='__main__':
@@ -34,5 +34,5 @@ if __name__=='__main__':
 		
 		connRoot = Conn(data[0],data[1],data[2])
 		connRoot.connection()
-		connRoot.sed(self.pack.encode())
+		connRoot.s.send(self.pack.encode())
 		connRoot.deconnection()
