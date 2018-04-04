@@ -42,11 +42,11 @@ class ThreadNEAR(th.Thread):
 		# Risposta diretta
 
 		self.pack = 'ANEA'+self.pid+self.myIPP
-			self.con = Conn(self.ipv4,self.ipv6,self.port)
-			try:
-				self.con.connection()
-					self.con.s.send(self.pack.encode())
-					self.con.deconnection()
-				except IOError as e:
-					print('Connection error. '+e)
-					exit()
+		self.con = Conn(self.ipv4,self.ipv6,self.port)
+		try:
+			self.con.connection()
+			self.con.s.send(self.pack.encode())
+			self.con.deconnection()
+		except IOError as e:
+			print('Connection error. '+e)
+			exit()
