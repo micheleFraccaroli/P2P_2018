@@ -8,7 +8,6 @@ import re
 import os
 import ipaddress as ipad
 import hashlib
-import multiprocessing as mp
 from dataBase import dataBase
 from Conn import Conn
 from Vicini import Vicini
@@ -24,9 +23,7 @@ class Thread_quer(th.Thread):
 		th.Thread.__init__(self)
 		self.my_ipv4 = my_ipv4
 		self.my_door = int(my_door)
-		#self.pktid_list = pktid_list
 		self.bytes_read = 0
-		#self.config = config
 		self.from_peer = quer_pkt
 	
 	#insersce un nuovo record nella lista dei packet id
@@ -94,19 +91,6 @@ class Thread_quer(th.Thread):
 
 	def run(self):
 
-		'''
-		peersocket = socket.socket(socket.AF_INET6, socket.SOCK_STREAM)
-		peersocket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-		peersocket.bind(('', self.my_door))
-
-		peersocket.listen(10)
-		
-		while True:
-			
-			other_peersocket, addr = peersocket.accept()
-			self.from_peer = other_peersocket.recv(102)
-		'''	
-
 		self.pktid = self.from_peer[4:16]
 		self.ip  = self.from_peer[16:75]
 		self.door = self.from_peer[75:80]
@@ -127,7 +111,7 @@ class Thread_quer(th.Thread):
 			if(len(file_found) != 0):
 				#rispondo e apro l'upload
 				self.answer(file_found, self.pktid, self.ip, self.door, None)
-				up = Upload(self.my_ipv4, self.my_door)
+				up = Upload(self.my_door)
 				up.upload()
 				
 			elif(self.ttl>1):
@@ -187,7 +171,7 @@ class Thread_quer(th.Thread):
 				if(len(file_found) != 0):
 					#rispondo e apro l'upload
 					self.answer(file_found, self.pktid, self.ip, self.door, None)
-					up = Upload(self.my_ipv4, self.my_door)
+					up = Upload(self.my_door)
 					up.upload()
 
 				elif(self.ttl>1):
@@ -226,13 +210,14 @@ class Thread_quer(th.Thread):
 				del db				
 
 
+'''
 if __name__ == '__main__':
 
 	db = dataBase()
 	conf = Config()
 	db.create(conf)
 	del db
-	'''
+	
 	Receive_4 = Receive('127.0.0.1','50004', conf)
 	Re_4 = mp.Process(target=Receive_4.listen_other)
 	Re_4.start()
@@ -240,7 +225,7 @@ if __name__ == '__main__':
 	Receive_6 = Receive('::1','50004', conf)
 	Re_6 = mp.Process(target=Receive_6.listen_other)
 	Re_6.start()
-	'''
+	
 	pktid = 'COR3BEWPI98CHFOP'
 	ip = '172.016.008.004|fc00:0000:0000:0000:0000:0000:0008:0004'
 	door = '50004'
@@ -251,3 +236,4 @@ if __name__ == '__main__':
 
 	th_QUER = Thread_quer('127.0.0.1', '::1', '50003', string_request)
 	th_QUER.start()
+'''

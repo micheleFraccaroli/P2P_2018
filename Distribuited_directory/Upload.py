@@ -8,8 +8,7 @@ from File_system import File_system
 
 class Upload:
 
-    def __init__(self, ipp2p_A, pp2p_A):
-        self.ipp2p_A = ipp2p_A
+    def __init__(self, pp2p_A):
         self.pp2p_A = pp2p_A
 
         #chunk veriables
