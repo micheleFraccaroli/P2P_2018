@@ -13,8 +13,9 @@ class Vicini:
 		nears = db.retrieveNeighborhood()
 
 		for near in nears:
+
 			data = Util.ip_deformatting(near[0],near[1],None)
-			
+
 			connRoot = Conn(data[0],data[1],data[2])
 			connRoot.connection()
 			connRoot.s.send(self.pack.encode())
@@ -33,5 +34,5 @@ if __name__=='__main__':
 		
 		connRoot = Conn(data[0],data[1],data[2])
 		connRoot.connection()
-		connRoot.sed(self.pack.encode())
+		connRoot.s.send(self.pack.encode())
 		connRoot.deconnection()

@@ -20,7 +20,9 @@ class ThreadNEAR(th.Thread):
 		self.ipRequest = str(ipRequest)
 
 	def run(self):
+
 		db = dataBase()
+
 		if self.ttl > 0: # Inoltro richiesta ai vicini
 
 			self.ttl = str(self.ttl-1).zfill(2)
@@ -39,11 +41,11 @@ class ThreadNEAR(th.Thread):
 						self.con.s.send(self.pack.encode())
 						self.con.deconnection()
 					except IOError as e:
-						print('Connection error. '+e)
+						print(e)
 						exit()
 
 		# Risposta diretta
-
+		print('\nrisposta diretta...\n')
 		self.pack = 'ANEA'+self.pid+self.myIPP
 		self.con = Conn(self.ipv4,self.ipv6,self.port)
 		try:

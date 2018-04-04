@@ -20,7 +20,9 @@ class Central_Thread(th.Thread):
 		peersocket.listen(20)
 
 		while True:
+			print('\nIN ATTESA...\n')
 			other_peersocket, addr = peersocket.accept()
+
 			recv_type = other_peersocket.recv(4)
 
 			self.bytes_read = len(recv_type)
@@ -28,10 +30,9 @@ class Central_Thread(th.Thread):
 				recv_type += other_peersocket.recv(4 - self.bytes_read)
 				self.bytes_read = len(recv_type)
 
-				# NEAR ------
+			# NEAR ------
 			if(recv_type.decode() == "NEAR"):
 				recv_packet = other_peersocket.recv(78) # 82 - 4
-
 				self.bytes_read = len(recv_packet)
 				while (self.bytes_read < 78):
 					recv_packet += other_peersocket.recv(78 - self.bytes_read)
@@ -48,7 +49,7 @@ class Central_Thread(th.Thread):
 
 				self.bytes_read = len(recv_packet)
 				while (self.bytes_read < 98):
-					recv_packet += other_peersocket.recv(98 - self.bytes_read)
+					recv_packet += other_peersocket.recv(98 - self.bytes_read).decode()
 					self.bytes_read = len(recv_packet)
 
 				# lancio il thread per l'ascolto delle richieste di contenuti

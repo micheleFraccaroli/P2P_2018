@@ -45,39 +45,39 @@ print("\n------------------------\n")
 #near=Vicini(c)
 
 while True:
-    # background thread
-    central_thread = Central_Thread(c)
-    central_thread.start()
+	# background thread
+	central_thread = Central_Thread(c)
+	central_thread.start()
 
-    name_search = input("Insert file to search into net: ")
-    port = ra.randint(50000, 59999)
-    search = Ricerca(c.selfV4, c.selfV6, port, c.ttl, c.timeResearch, name_search)
-    pktid = search.query(c)
-    print("\n------| New research launched |------\n")
+	name_search = input("Insert file to search into net: ")
+	port = ra.randint(50000, 59999)
+	search = Ricerca(c.selfV4, c.selfV6, port, c.ttl, c.timeResearch, name_search)
+	pktid = search.query(c)
+	print("\n------| New research launched |------\n")
 
-    for i in tqdm(range(c.timeResearch), desc="\033[94mLoading\033[0m"):
-        time.sleep(1)
+	for i in tqdm(range(c.timeResearch), desc="\033[94mLoading\033[0m"):
+		time.sleep(1)
 
-    print("Research termined\nResult for " + pktid)
-    print("[select with the number the file to download]")
-    
-    res = db.retrieveResponses(pktid)
-    
-    if(len(res) == 0):
-    	print("File not found")
+	print("Research termined\nResult for " + pktid)
+	print("[select with the number the file to download]")
+	
+	res = db.retrieveResponses(pktid)
+	
+	if(len(res) == 0):
+		print("File not found")
 
 	else:
-	    choice_list = []
-	    i = 1
-	    for row in res:
-	        print(str(i) + ") " + "ip: " + row[1] + "  port: " + row[2] + "  md5: " + row[3] + "  file: " + row[4])
-	        choice_list.append(row)
-	        i = i + 1
+		choice_list = []
+		i = 1
+		for row in res:
+			print(str(i) + ") " + "ip: " + row[1] + "  port: " + row[2] + "  md5: " + row[3] + "  file: " + row[4])
+			choice_list.append(row)
+			i = i + 1
 
-	    choice = input(">> ")
-	    peer = choice_list[int(choice)-1]
-	    ipv4,ipv6 = peer[1].split('|')
-	    download = Download(ipv4,ipv6,peer[2],peer[2],peer[4])
-	    download.download()
+		choice = input(">> ")	
+		peer = choice_list[int(choice)-1]
+		ipv4,ipv6 = peer[1].split('|')
+		download = Download(ipv4,ipv6,peer[2],peer[2],peer[4])
+		download.download()
 
 del db

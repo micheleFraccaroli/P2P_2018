@@ -26,6 +26,7 @@ class Ricerca:
         self.search = search
 
     def query(self, config):
+
         db = dataBase()
         pktid = ''.join(random.choice(string.ascii_uppercase+string.digits) for _ in range(16))
         
@@ -41,6 +42,7 @@ class Ricerca:
         th_near.join()
         
         db.insertRequest(pktid, ipp2p_pp2p[:55], time.time())
+
         self.research = "QUER" + pktid + ipp2p_pp2p + str(self.ttl).zfill(2) + (self.search+(' '*(20-len(self.search))))
 
         # retrieve neighbors from database
