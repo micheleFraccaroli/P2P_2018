@@ -23,7 +23,7 @@ class ThreadNEAR(th.Thread):
 
 		db = dataBase()
 
-		if self.ttl > 0: # Inoltro richiesta ai vicini
+		if self.ttl > 1: # Inoltro richiesta ai vicini
 
 			self.ttl = str(self.ttl-1).zfill(2)
 			self.pack=''.join((self.pack[:80],self.ttl))
