@@ -59,18 +59,12 @@ class Upload:
 
     def upload(self):
         dict = {}
-        if(str(ipaddr.ip_address(self.ipp2p_A)).find('.') != -1): #ha trovato il punto, quindi ipv4
-            peersocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            peersocket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-            peersocket.bind((self.ipp2p_A, self.pp2p_A))
-        
-        else:
-            peersocket = socket.socket(socket.AF_INET6, socket.SOCK_STREAM)
-            peersocket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-            peersocket.bind((str(ipaddr.ip_address(self.ipp2p_A)), self.pp2p_A))
-        
-        peersocket.listen(5)
+        peersocket = socket.socket(socket.AF_INET6, socket.SOCK_STREAM)
+        peersocket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        peersocket.bind(('', self.pp2p_A))
 
+        peersocket.listen(10)
+        
         while True:
             other_peersocket, addr = peersocket.accept()
 
@@ -86,7 +80,7 @@ class Upload:
                 try:
                     file_to_send = self.dict[self.from_peer[4:36].decode()]
                     print(file_to_send)
-                    f = open(file_to_send, "rb")
+                    f = open('img/'+file_to_send, "rb")
                     print(f)
                     self.data_to_send, self.nchunk = self.chunking(f, file_to_send, self.chunk_size)
 
