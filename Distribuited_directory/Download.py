@@ -66,27 +66,23 @@ class Download:
         self.con.deconnection()
 
         path_file = "img/" + self.filename
-        check_file = Path(self.filename)
-        print(check_file)
+        check_file = Path(path_file)
 
         if (check_file.is_file()):
-            choice = input("\nIl file esiste già nel tuo file system, vuoi sovrascriverlo? (Y,n): ")
-            if(choice == "Y"):
+            choice_file = input("\nIl file esiste già nel tuo file system, vuoi sovrascriverlo? (Y,n): ")
+            if(choice_file == "Y"):
                 os.remove(path_file)
                 file_recv = open(path_file, "ab")
                 for i in self.data_recv:
                     file_recv.write(i)
+                file_recv.close()
             else:
                 return
         else:
             file_recv = open(path_file,"ab")
             for i in self.data_recv:
                 file_recv.write(i)
-
-        f = open(path_file,"rb")
-        r = f.read()
-        f.close()
-        print("\n--- FILE DOWNLOADED ---\n")
+            file_recv.close()
 
 '''
 if __name__ == "__main__":

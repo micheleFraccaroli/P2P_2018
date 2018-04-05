@@ -17,11 +17,10 @@ class Vicini_res(th.Thread):
         peersocket.settimeout(20)
         peersocket.listen(20)
 
-        while True:
-            try:
+        try:
+            while True:
                 other_peersocket, addr = peersocket.accept()
                 recv_packet = other_peersocket.recv(80)
-            
 
                 self.bytes_read = len(recv_packet)
                 while(self.bytes_read < 80):
@@ -34,6 +33,7 @@ class Vicini_res(th.Thread):
                     db.insertResponse(recv_packet[4:20].decode(), recv_packet[20:75].decode(), recv_packet[75:80].decode())
                     db.insertNeighborhood(recv_packet[20:75].decode(), recv_packet[75:80].decode())
                     lock.release()
-            except:
-                print("Ascolto dei vicini terminato")
+        except:
+            pass
+
         del db

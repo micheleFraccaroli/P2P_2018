@@ -98,11 +98,6 @@ class Upload:
             #signal.signal(signal.SIGINT,handler)
             #signal.signal(signal.SIGTSTP,handler)
 
-
-
-
-
-
 '''
 if __name__ == '__main__':
     dict = {}

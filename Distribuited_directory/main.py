@@ -22,14 +22,12 @@ class bcolors:
     FAIL = '\033[91m'
     ENDC = '\033[0m'
 
-
 print(bcolors.MAGENTA + "____________________________      ________   ______   " + bcolors.ENDC)
 print(bcolors.MAGENTA + "\______   \_____  \______   \    /  _____/  /  __  \  " + bcolors.ENDC)
 print(bcolors.OKBLUE + " |     ___//  ____/|     ___/   /   \  ___  >      <  " + bcolors.ENDC)
 print(bcolors.OKBLUE + " |    |   /       \|    |       \    \_\  \/   --   \ " + bcolors.ENDC)
 print(bcolors.CYAN + " |____|   \_______ \____|        \______  /\______  / " + bcolors.ENDC)
 print(bcolors.CYAN + "                  \/                    \/        \/  " + bcolors.ENDC)
-print("\n\n")
 
 #for i in tqdm(range(4), desc="Loading: "):
 time.sleep(2)
@@ -38,20 +36,21 @@ db = dataBase()
 db.create(c)
 #del db
 
-print("\n--- Configurations ---\n")
+print("--- Configurations ---\n")
 print('ttl: ',c.ttl)
 print('maxNear: ',c.maxNear)
 print('timeResearch: ',c.timeResearch)
 print('timeIdPacket: ',c.timeIdPacket)
-print("\n------------------------\n")
+print("\n----------------------\n")
 #near=Vicini(c)
 
-# background thread
+# background thread for NEAR and QUER
 central_thread = Central_Thread(c)
 central_thread.start()
 
 while True:
-	name_search = input("Insert file to search into net: ")
+	name_search = input(bcolors.OKBLUE + "Search >> " + bcolors.ENDC)
+	print("...peers searching...")
 	port = ra.randint(50000, 59999)
 	search = Ricerca(c.selfV4, c.selfV6, port, c.ttl, c.timeResearch, name_search)
 	pktid = search.query(c)
@@ -76,13 +75,12 @@ while True:
 			choice_list.append(row)
 			i = i + 1
 
-		choice = input(">> ")
+		choice = input(bcolors.OKBLUE + ">> " + bcolors.ENDC)
 		peer = choice_list[int(choice)-1]
-		ipv4,ipv6 = peer[1].split('|')
+		
 		addr = Util.ip_deformatting(peer[1], peer[2], None)
 		ip6 = ipad.ip_address(peer[1][16:])
 
 		down = Download(str(addr[0]),str(ip6),peer[2],peer[3],peer[4])
 		down.download()
-
-del db
+		print("\n--- FILE DOWNLOADED ---\n")
