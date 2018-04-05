@@ -1,5 +1,7 @@
+import sys
 import Util
 import time
+import ipaddress as ipad
 import random as ra
 from Config import Config
 from Vicini import Vicini
@@ -44,11 +46,11 @@ print('timeIdPacket: ',c.timeIdPacket)
 print("\n------------------------\n")
 #near=Vicini(c)
 
-while True:
-	# background thread
-	central_thread = Central_Thread(c)
-	central_thread.start()
+# background thread
+central_thread = Central_Thread(c)
+central_thread.start()
 
+while True:
 	name_search = input("Insert file to search into net: ")
 	port = ra.randint(50000, 59999)
 	search = Ricerca(c.selfV4, c.selfV6, port, c.ttl, c.timeResearch, name_search)
@@ -74,10 +76,13 @@ while True:
 			choice_list.append(row)
 			i = i + 1
 
-		choice = input(">> ")	
+		choice = input(">> ")
 		peer = choice_list[int(choice)-1]
 		ipv4,ipv6 = peer[1].split('|')
-		download = Download(ipv4,ipv6,peer[2],peer[2],peer[4])
-		download.download()
+		addr = Util.ip_deformatting(peer[1], peer[2], None)
+		ip6 = ipad.ip_address(peer[1][16:])
+
+		down = Download(str(addr[0]),str(ip6),peer[2],peer[3],peer[4])
+		down.download()
 
 del db

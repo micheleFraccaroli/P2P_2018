@@ -8,12 +8,16 @@ import random as ran
 class Config:
     
     def __init__(self):
-        
+        '''
         whiteList = {'general':{'ttl':self.validateInt,'maxNear':self.validateInt,'timeResearch':self.validateInt,'timeIdPacket':self.validateInt},
                      'self':{'selfV4':self.validateIP,'selfV6':self.validateIP,'selfP':self.validateInt},
                      'roots':{'root1V4':self.validateIP,'root1V6':self.validateIP,'root1P':self.validateInt,'root2V4':self.validateIP,'root2V6':self.validateIP,'root2P':self.validateInt}
                     }
-
+        '''
+        whiteList = {'general':{'ttl':self.validateInt,'maxNear':self.validateInt,'timeResearch':self.validateInt,'timeIdPacket':self.validateInt},
+                     'self':{'selfV4':self.validateIP,'selfV6':self.validateIP,'selfP':self.validateInt},
+                     'roots':{'root1V4':self.validateIP,'root1V6':self.validateIP,'root1P':self.validateInt}
+                    }
         print('\nLoading config file......\n')
         time.sleep(2)
         data = config.ConfigParser() # Parser del file di configurazione

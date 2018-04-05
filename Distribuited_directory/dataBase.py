@@ -25,11 +25,11 @@ class dataBase:
 			pass
 
 		root1 = ip_formatting(config.root1V4,config.root1V6,config.root1P)
-		root2 = ip_formatting(config.root2V4,config.root2V6,config.root2P)
+		#root2 = ip_formatting(config.root2V4,config.root2V6,config.root2P)
 		
 		try:
 			c.execute('INSERT INTO neighborhood VALUES (1,?,?)',(root1[:55],root1[55:]))
-			c.execute('INSERT INTO neighborhood VALUES (2,?,?)',(root2[:55],root2[55:]))
+			#c.execute('INSERT INTO neighborhood VALUES (2,?,?)',(root2[:55],root2[55:]))
 			con.commit()
 		except:
 			pass
@@ -65,12 +65,13 @@ class dataBase:
 		
 		if 1 not in resId:
 			resId[0] = 1
+		'''
 		if 2 not in resId:
 			resId[1] = 2
-		
+		'''
 		resId=tuple(resId)
 		
-		c.execute('DELETE FROM neighborhood WHERE id NOT IN '+str(resId))
+		#c.execute('DELETE FROM neighborhood WHERE id NOT IN '+str(resId))
 
 		con.commit()
 		con.close()
