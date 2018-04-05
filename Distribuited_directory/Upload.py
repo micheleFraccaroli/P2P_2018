@@ -10,7 +10,7 @@ class Upload:
 
     def __init__(self, pp2p_A):
         self.pp2p_A = pp2p_A
-
+        print(self.pp2p_A)
         #chunk veriables
         self.data_to_send = []
         self.chunk_size = 1024
@@ -22,8 +22,8 @@ class Upload:
         sys.exit(0)
 
     def chunking(self, file_obj, file_name, chunk_size):
-        list_of_chunk = []
-        info = os.stat(file_name)
+        list_of_chunk = []        
+        info = os.stat('img/'+file_name)
         dim_file = info.st_size
 
         nchunk = math.modf(dim_file / chunk_size)[1] + 1  # numero di chunk
@@ -77,14 +77,10 @@ class Upload:
 
             if (self.from_peer[:4].decode() == "RETR"):
                 try:
-                    file_to_send = self.dict[self.from_peer[4:36].decode()]
-                    print(file_to_send)
+                    file_to_send = str(self.dict[self.from_peer[4:36].decode()])
                     f = open('img/'+file_to_send, "rb")
-                    print(f)
                     self.data_to_send, self.nchunk = self.chunking(f, file_to_send, self.chunk_size)
-
                     nchunk = int(self.nchunk)
-
                     first_response = "ARET" + str(nchunk).zfill(6)
                     other_peersocket.send(first_response.encode('ascii'))
                     for i in self.data_to_send:
