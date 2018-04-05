@@ -12,6 +12,7 @@ from tqdm import tqdm
 from Download import Download
 from Central_Thread import Central_Thread
 
+
 class bcolors:
     HEADER = '\033[95m'
     OKBLUE = '\033[94m'
@@ -22,12 +23,14 @@ class bcolors:
     FAIL = '\033[91m'
     ENDC = '\033[0m'
 
+
 print(bcolors.MAGENTA + "____________________________      ________   ______   " + bcolors.ENDC)
 print(bcolors.MAGENTA + "\______   \_____  \______   \    /  _____/  /  __  \  " + bcolors.ENDC)
 print(bcolors.OKBLUE + " |     ___//  ____/|     ___/   /   \  ___  >      <  " + bcolors.ENDC)
 print(bcolors.OKBLUE + " |    |   /       \|    |       \    \_\  \/   --   \ " + bcolors.ENDC)
 print(bcolors.CYAN + " |____|   \_______ \____|        \______  /\______  / " + bcolors.ENDC)
 print(bcolors.CYAN + "                  \/                    \/        \/  " + bcolors.ENDC)
+
 
 #for i in tqdm(range(4), desc="Loading: "):
 time.sleep(2)
@@ -50,6 +53,7 @@ central_thread.start()
 
 while True:
 	name_search = input(bcolors.OKBLUE + "Search >> " + bcolors.ENDC)
+	#name_search = input("Search >> ")
 	print("...peers searching...")
 	port = ra.randint(50000, 59999)
 	search = Ricerca(c.selfV4, c.selfV6, port, c.ttl, c.timeResearch, name_search)
@@ -66,7 +70,7 @@ while True:
 	
 	if(len(res) == 0):
 		print("File not found")
-
+		
 	else:
 		choice_list = []
 		i = 1
@@ -76,6 +80,7 @@ while True:
 			i = i + 1
 
 		choice = input(bcolors.OKBLUE + ">> " + bcolors.ENDC)
+		#choice = input(">> ")
 		peer = choice_list[int(choice)-1]
 		
 		addr = Util.ip_deformatting(peer[1], peer[2], None)

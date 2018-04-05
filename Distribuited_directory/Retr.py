@@ -23,4 +23,4 @@ class Retr(th.Thread):
                 thread = thread_Response(other_peersocket)
                 thread.start()
             except OSError as e:
-                exit(0)
+                pass

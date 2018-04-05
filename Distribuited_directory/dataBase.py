@@ -65,13 +65,13 @@ class dataBase:
 		
 		if 1 not in resId:
 			resId[0] = 1
-		'''
+		
 		if 2 not in resId:
 			resId[1] = 2
-		'''
+		
 		resId=tuple(resId)
 		
-		#c.execute('DELETE FROM neighborhood WHERE id NOT IN '+str(resId))
+		c.execute('DELETE FROM neighborhood WHERE id NOT IN '+str(resId))
 
 		con.commit()
 		con.close()

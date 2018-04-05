@@ -54,8 +54,11 @@ class Ricerca:
         retr.start()
 
         #sending query to roots and neighbors
+        print(self.neighbors)
         for n in self.neighbors:
+            print("Vicino ")
             addr = Util.ip_deformatting(n[0], n[1], self.ttl)
+            print(addr)
             
             #ip4 = ipad.ip_address(n[0][:15])
             ip6 = ipad.ip_address(n[0][16:])
