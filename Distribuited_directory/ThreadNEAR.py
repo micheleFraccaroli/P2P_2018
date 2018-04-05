@@ -5,9 +5,11 @@ from dataBase import dataBase
 import Util
 from Conn import Conn
 
+lock = th.Lock()
+
 class ThreadNEAR(th.Thread):
 
-	def __init__(self,pack,ipv4,ipv6,port,ipRequest):
+	def __init__(self,pack,ipv4,ipv6,port,ipRequest,lock):
 
 		th.Thread.__init__(self)
 		self.myIPP     = Util.ip_formatting(ipv4,ipv6,port)
@@ -19,6 +21,7 @@ class ThreadNEAR(th.Thread):
 		self.port      = info[2]
 		self.ttl       = info[3]
 		self.ipRequest = ipRequest
+		self.lock      = lock
 
 	def run(self):
 
@@ -26,8 +29,9 @@ class ThreadNEAR(th.Thread):
 
 		if(db.retrivenSearch(self.pid,self.pack[20:75]) == 0): # Richiesta già conosciuta
 			print("\nEseguo near...\n")
+			self.lock.acquire()
 			db.insertRequest(self.pid,self.pack[20:75],time.time())
-
+			self.lock.release()
 			if self.ttl > 1: # Inoltro richiesta ai vicini
 
 				self.ttl = str(self.ttl-1).zfill(2)

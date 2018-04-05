@@ -19,6 +19,8 @@ class Central_Thread(th.Thread):
 
 		peersocket.listen(20)
 
+		NEARlock = th.Lock()
+
 		while True:
 			other_peersocket, addr = peersocket.accept()
 			if addr[0][:2] == "::":
@@ -45,7 +47,7 @@ class Central_Thread(th.Thread):
 				print('\nFINITO LETTURA NEAR, AVVIO THREAD NEAR\n')
 				# lancio il thread per l'ascolto delle richieste di near
 				pkt = recv_type+recv_packet
-				th_NEAR =  ThreadNEAR(pkt.decode(),self.ipv4,self.ipv6,self.port,addrPack)
+				th_NEAR =  ThreadNEAR(pkt.decode(),self.ipv4,self.ipv6,self.port,addrPack,NEARlock)
 				th_NEAR.start()
 
 			# QUER ------

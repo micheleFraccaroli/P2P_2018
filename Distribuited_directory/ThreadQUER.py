@@ -100,7 +100,7 @@ class ThreadQUER(th.Thread):
 			self.con = Conn(addr[0], str(ip6), addr[2])
 			try:
 				self.con.connection()
-				if((addr[0] != ip_request) and (ip6 != ip_request)):
+				if((addr[0] != ip_request) and (str(ip6) != ip_request) and new_quer[20:35] != addr[0]):
 					self.con.s.send(new_quer.encode())
 					print('inoltro richiesta a :\n')
 					print(str(addr[0]))
