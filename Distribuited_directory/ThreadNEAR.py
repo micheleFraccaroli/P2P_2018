@@ -1,3 +1,4 @@
+import time
 import socket
 import threading as th
 from dataBase import dataBase
@@ -17,39 +18,43 @@ class ThreadNEAR(th.Thread):
 		self.ipv6      = info[1]
 		self.port      = info[2]
 		self.ttl       = info[3]
-		self.ipRequest = str(ipRequest)
+		self.ipRequest = ipRequest
 
 	def run(self):
 
 		db = dataBase()
 
-		if self.ttl > 1: # Inoltro richiesta ai vicini
+		if db.retrivenSearch(self.pid,self.pack[20:75]) == 0: # Richiesta già conosciuta
 
-			self.ttl = str(self.ttl-1).zfill(2)
-			self.pack=''.join((self.pack[:80],self.ttl))
+			db.insertRequest(self.pid,self.pack[20:75],time.time())
 
-			neighborhood = db.retrieveNeighborhood()
+			if self.ttl > 1: # Inoltro richiesta ai vicini
 
-			for neighbor in neighborhood:
+				self.ttl = str(self.ttl-1).zfill(2)
+				self.pack=''.join((self.pack[:80],self.ttl))
 
-				params = Util.ip_deformatting(neighbor[0],neighbor[1],None)
-				
-				if params[0] != self.ipRequest and params[1] != self.ipRequest:
-					self.con = Conn(params[0],params[1],params[2])
-					try:
-						self.con.connection()
-						self.con.s.send(self.pack.encode())
-						self.con.deconnection()
-					except IOError as e:
-						print(e)
-						exit()
+				neighborhood = db.retrieveNeighborhood()
 
-		self.pack = 'ANEA'+self.pid+self.myIPP
-		self.con = Conn(self.ipv4,self.ipv6,self.port)
-		try:
-			self.con.connection()
-			self.con.s.send(self.pack.encode())
-			self.con.deconnection()
-		except IOError as e:
-			print('Connection error. '+e)
-			exit()
+				for neighbor in neighborhood:
+
+					params = Util.ip_deformatting(neighbor[0],neighbor[1],None)
+					
+					if params[0] != self.ipRequest and params[1] != self.ipRequest:
+						self.con = Conn(params[0],params[1],params[2])
+						try:
+							self.con.connection()
+							self.con.s.send(self.pack.encode())
+							self.con.deconnection()
+						except IOError as e:
+							print(e)
+							exit()
+
+			self.pack = 'ANEA'+self.pid+self.myIPP
+			self.con = Conn(self.ipv4,self.ipv6,self.port)
+			try:
+				self.con.connection()
+				self.con.s.send(self.pack.encode())
+				self.con.deconnection()
+			except IOError as e:
+				print('Connection error. '+e)
+				exit()

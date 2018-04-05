@@ -33,8 +33,4 @@ print(bcolors.HEADER + "\nRISPOSTE |--------------------------------------------
 for row in c.execute("SELECT * FROM responses"):
     print(row)
 
-print(bcolors.FAIL + "\nERRORI |------------------------------------------------\n" + bcolors.ENDC)
-for row in c.execute("SELECT * FROM errors"):
-    print(row)
-
 con.close()

@@ -95,73 +95,7 @@ class Config:
             for section in whiteList:
                 for par in whiteList[section]:
                     Util.printError("Missing parameter \'"+par+"\' in section \'"+section+"\'.")
-        '''
-        try:
-            self.selfV4 = str(ip_address(data['self']['selfV4']))
-        except ValueError as e:
-            printError('Parametro selfV4 non valido')
-            errors = True
-        try:
-            self.selfV6 = str(ip_address(data['self']['selfV6']))
-        except ValueError as e:
-            printError('Parametro selfV6 non valido')
-            errors = True
-        try:
-            self.selfP  = data.getint('self','selfP')
-        except ValueError as e:
-            printError('Parametro selfP non valido')
-            errors = True
-        try:
-            self.root1V4 = str(ip_address(data['roots']['root1V4']))
-        except ValueError as e:
-            printError('Parametro root1V4 non valido')
-            errors = True
-        try:
-            self.root1V6 = str(ip_address(data['roots']['root1V6']))
-        except ValueError as e:
-            printError('Parametro root1V6 non valido')
-            errors = True
-        try:
-            self.root1P  = data.getint('roots','root1P')
-        except ValueError as e:
-            printError('Parametro root1P non valido')
-            errors = True
-        try:
-            self.root2V4 = str(ip_address(data['roots']['root2V4']))
-        except ValueError as e:
-            printError('Parametro root2V4 non valido')
-            errors = True
-        try:
-            self.root2V6 = str(ip_address(data['roots']['root2V6']))
-        except ValueError as e:
-            printError('Parametro root2V6 non valido')
-            errors = True
-        try:
-            self.root2P  = data.getint('roots','root2P')
-        except ValueError as e:
-            printError('Parametro root2P non valido')
-            errors = True
-        try:
-            self.ttl = data.getint('general','ttl')
-        except ValueError as e:
-            printError('Parametro ttl non valido')
-            errors = True
-        try:
-            self.maxNear = data.getint('general','maxNear')
-        except ValueError as e:
-            printError('Parametro maxNear non valido')
-            errors = True
-        try:
-            self.timeResearch = data.getint('general','timeResearch')
-        except ValueError as e:
-            printError('Parametro timeResearch non valido')
-            errors = True
-        try:
-            self.timeIdPacket = data.getint('general','timeIdPacket')
-        except ValueError as e:
-            printError('Parametro timeIdPacket non valido')
-            errors = True
-        '''
+        
         if errors == 1:
             print("\n\nConfiguration loading failed. Errors detected. Please check the file \'errors.log\' for more details.")
             exit()

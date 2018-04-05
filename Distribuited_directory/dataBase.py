@@ -7,22 +7,13 @@ import time
 class dataBase:
 
 	def create(self,config):
-
-		errors=self.set()
 		
 		con = sqlite3.connect('P2P.db')
 		c = con.cursor()
 
-		c.execute('CREATE TABLE IF NOT EXISTS errors (errno INTEGER, errStr VARCHAR(255) NOT NULL, PRIMARY KEY(errno))')
 		c.execute('CREATE TABLE IF NOT EXISTS requests (pid VARCHAR(16), ip VARCHAR(55), timeOperation FLOAT NOT NULL,PRIMARY KEY(pid,ip))')
 		c.execute('CREATE TABLE IF NOT EXISTS responses (id INTEGER,pid VARCHAR(16) NOT NULL, ip VARCHAR(55) NOT NULL, port VARCHAR(5) NOT NULL, md5 VARCHAR(32), name VARCHAR(100), PRIMARY KEY(id))')
 		c.execute('CREATE TABLE IF NOT EXISTS neighborhood (id INTEGER, ip VARCHAR(55) NOT NULL, port VARCHAR(5) NOT NULL, PRIMARY KEY(id))')
-		
-		try:
-			c.executemany('INSERT INTO errors VALUES (?,?)',errors)
-			c.commit()
-		except:
-			pass
 
 		root1 = ip_formatting(config.root1V4,config.root1V6,config.root1P)
 		root2 = ip_formatting(config.root2V4,config.root2V6,config.root2P)
@@ -37,21 +28,10 @@ class dataBase:
 	
 	def destroy(self):
 
-		os.system('rm P2P.db')
-
-	def set(self):
-		return	[
-					(2,'File non trovato'),
-					(13,'Accesso negato alla risorsa')
-				]
-
-	def retrievErrno(self,errno):
-
-		con = sqlite3.connect('P2P.db')
-		c = con.cursor()
-
-		c.execute('SELECT errStr FROM errors WHERE errno = '+str(errno))
-		return c.fetchone()[0]
+		try:
+			os.system('rm P2P.db')
+		except:
+			pass
 
 	def retrieveNeighborhood(self):
 
@@ -65,13 +45,13 @@ class dataBase:
 		
 		if 1 not in resId:
 			resId[0] = 1
-		'''
+		
 		if 2 not in resId:
 			resId[1] = 2
-		'''
+		
 		resId=tuple(resId)
 		
-		#c.execute('DELETE FROM neighborhood WHERE id NOT IN '+str(resId))
+		c.execute('DELETE FROM neighborhood WHERE id NOT IN '+str(resId))
 
 		con.commit()
 		con.close()

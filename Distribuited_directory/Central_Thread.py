@@ -21,7 +21,12 @@ class Central_Thread(th.Thread):
 
 		while True:
 			other_peersocket, addr = peersocket.accept()
-
+			if addr[0][:2] == "::":
+				addrPack = addr[0][7:]
+				print("\n\nEcco l'IP: ",addrPack,"\n\n")
+			else:
+				addrPack=addr[0]
+				print("\n\nEcco l'IP: ",addr[0],"\n\n")
 			recv_type = other_peersocket.recv(4)
 
 			self.bytes_read = len(recv_type)
@@ -31,6 +36,7 @@ class Central_Thread(th.Thread):
 
 			# NEAR ------
 			if(recv_type.decode() == "NEAR"):
+				print('NEAR')
 				recv_packet = other_peersocket.recv(78) # 82 - 4
 				self.bytes_read = len(recv_packet)
 				while (self.bytes_read < 78):
@@ -39,11 +45,12 @@ class Central_Thread(th.Thread):
 
 				# lancio il thread per l'ascolto delle richieste di near
 				pkt = recv_type+recv_packet
-				th_NEAR =  ThreadNEAR(pkt.decode(),self.ipv4,self.ipv6,self.port,addr[0])
+				th_NEAR =  ThreadNEAR(pkt.decode(),self.ipv4,self.ipv6,self.port,addrPack)
 				th_NEAR.start()
 
 			# QUER ------
 			elif(recv_type.decode() == "QUER"):
+				print('QUER')
 				recv_packet = other_peersocket.recv(98)# 102 - 4
 
 				self.bytes_read = len(recv_packet)
