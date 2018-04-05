@@ -89,7 +89,9 @@ class ThreadQUER(th.Thread):
 
 	#ricerca dei vicini
 	def search_neighbors(self, db, ip_request, new_quer):
+		print(str(len(new_quer))+'\n')
 		self.neighbors = db.retrieveNeighborhood() #mi tiro giù i vicini
+		print('richiesta da: '+ip_request+'\n')
 		for n in self.neighbors:
 			addr = Util.ip_deformatting(n[0], n[1], None)
 				
@@ -113,10 +115,10 @@ class ThreadQUER(th.Thread):
 	def new_ttl(self, ttl):
 		new_ttl = ttl - 1
 		if(new_ttl>9):
-			str(new_ttl)
+			c = str(new_ttl)
 		else:
-			str(new_ttl).rjust(2, '0')
-		return str(new_ttl)
+			c = str(new_ttl).rjust(2, '0')
+		return c
 
 	#funzione principale
 
@@ -147,7 +149,7 @@ class ThreadQUER(th.Thread):
 				self.answer(file_found, self.pktid, self.ip, self.ipv4, self.ipv6, str(self.new_port), self.door)
 				if(self.ttl>1):
 					self.ttl_new = self.new_ttl(self.ttl)
-					self.new_quer = "QUER"+self.pktid+self.ip+self.door+self.ttl_new+self.string
+					self.new_quer = "QUER"+self.pktid+self.ip+self.door+self.ttl_new+self.from_peer[82:]
 					self.search_neighbors(db, self.ip_request, self.new_quer)
 				del db
 				up = Upload(self.new_port)
@@ -157,7 +159,7 @@ class ThreadQUER(th.Thread):
 				print("andrò ad eseguire l'inoltro ai vicini della richiesta\n")
 				#vado a decrementare il ttl di uno e costruisco la nuova query da inviare ai vicini
 				self.ttl_new = self.new_ttl(self.ttl)
-				self.new_quer = "QUER"+self.pktid+self.ip+self.door+self.ttl_new+self.string
+				self.new_quer = "QUER"+self.pktid+self.ip+self.door+self.ttl_new+self.from_peer[82:]
 				self.search_neighbors(db, self.ip_request, self.new_quer)
 
 			del db
@@ -186,7 +188,7 @@ class ThreadQUER(th.Thread):
 					self.answer(file_found, self.pktid, self.ip, self.ipv4, self.ipv6, str(self.new_port), self.door)
 					if(self.ttl>1):
 						self.ttl_new = self.new_ttl(self.ttl)
-						self.new_quer = "QUER"+self.pktid+self.ip+self.door+self.ttl_new+self.string
+						self.new_quer = "QUER"+self.pktid+self.ip+self.door+self.ttl_new+self.from_peer[82:]
 						self.search_neighbors(db, self.ip_request, self.new_quer)
 					del db
 					up = Upload(self.new_port)
@@ -196,7 +198,7 @@ class ThreadQUER(th.Thread):
 					print("andrò ad eseguire l'inoltro ai vicini della richiesta 2\n")
 					#vado a decrementare il ttl di uno e costruisco la nuova query da inviare ai vicini
 					self.ttl_new = self.new_ttl(self.ttl)
-					self.new_quer = "QUER"+self.pktid+self.ip+self.door+self.ttl_new+self.string
+					self.new_quer = "QUER"+self.pktid+self.ip+self.door+self.ttl_new+self.from_peer[82:]
 					self.search_neighbors(db, self.ip_request, self.new_quer)
 
 				del db

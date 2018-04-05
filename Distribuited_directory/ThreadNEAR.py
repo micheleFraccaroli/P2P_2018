@@ -24,8 +24,8 @@ class ThreadNEAR(th.Thread):
 
 		db = dataBase()
 
-		if db.retrivenSearch(self.pid,self.pack[20:75]) == 0: # Richiesta già conosciuta
-
+		if(db.retrivenSearch(self.pid,self.pack[20:75]) == 0): # Richiesta già conosciuta
+			print("\nEseguo near...\n")
 			db.insertRequest(self.pid,self.pack[20:75],time.time())
 
 			if self.ttl > 1: # Inoltro richiesta ai vicini
@@ -39,12 +39,13 @@ class ThreadNEAR(th.Thread):
 
 					params = Util.ip_deformatting(neighbor[0],neighbor[1],None)
 					
-					if params[0] != self.ipRequest and params[1] != self.ipRequest:
+					if params[0] != self.ipRequest and params[1] != self.ipRequest and params[0] != self.ipv4:
 						self.con = Conn(params[0],params[1],params[2])
 						try:
 							self.con.connection()
 							self.con.s.send(self.pack.encode())
 							self.con.deconnection()
+							print("vicino near: ",params[0])
 						except IOError as e:
 							print(e)
 							exit()
