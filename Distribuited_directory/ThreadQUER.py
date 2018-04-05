@@ -26,7 +26,7 @@ class ThreadQUER(th.Thread):
 		self.my_door = int(my_door)
 		self.bytes_read = 0
 		self.from_peer = quer_pkt
-		self.ip_request = str(ip_request)
+		self.ip_request = ip_request
 		self.ipv4 = ipv4
 		self.ipv6 = ipv6
 	
@@ -62,7 +62,7 @@ class ThreadQUER(th.Thread):
 		return dict_list
 
 	#risponde al peer che ha effettuato una ricerca, incompleta
-	def answer(self, file_list, pktid, ip, my_ip, my_port, portB):
+	def answer(self, file_list, pktid, ip, my_ipv4, my_ipv6, my_port, portB):
 		dict_list = self.convert_md5(file_list)
 		#stabilisco una connessione con il peer che ha iniziato
 		addr = Util.ip_deformatting(ip, portB, None)
@@ -73,13 +73,13 @@ class ThreadQUER(th.Thread):
 
 		#self.con = Conn(addr[0], addr[1], addr[2])
 		
-		#my_ip = "172.016.008.004|fc00:0000:0000:0000:0000:0000:0008:0004"
+		my_ip_port = Util.ip_formatting(my_ipv4, my_ipv6, my_port)
 
 		try:
 			self.con.connection()
 			for md5 in dict_list:
 				file_name = dict_list[md5].ljust(100,' ')
-				answer = "AQUE"+pktid+my_ip+my_port+md5+file_name
+				answer = "AQUE"+pktid+my_ip_port+md5+file_name
 				self.con.s.send(answer.encode())
 			self.con.deconnection()
 		except IOError as expt:
@@ -95,12 +95,13 @@ class ThreadQUER(th.Thread):
 				
 			#ip4 = ipad.ip_address(n[0][:15])
 			ip6 = ipad.ip_address(n[0][16:])
-
 			self.con = Conn(addr[0], str(ip6), addr[2])
 			try:
 				self.con.connection()
 				if((addr[0] != ip_request) and (ip6 != ip_request)):
 					self.con.s.send(new_quer.encode())
+					print('inoltro richiesta a :\n')
+					print(str(addr[0]))
 				self.con.deconnection()
 			except IOError as expt:
 				print("Errore di connessione")
@@ -128,7 +129,7 @@ class ThreadQUER(th.Thread):
 		self.string = self.from_peer[82:].rstrip()
 		db = dataBase()
 		res = db.retrivenSearch(self.pktid, self.ip)
-		self.my_ip = str(self.ipv4)+"|"+str(self.ipv6)
+		#self.my_ip = str(self.ipv4)+"|"+str(self.ipv6)
 
 		if(res == 0):
 
@@ -143,7 +144,7 @@ class ThreadQUER(th.Thread):
 			if(len(file_found) != 0):
 				#rispondo e apro l'upload
 				self.new_port = ra.randint(50010, 59999)
-				self.answer(file_found, self.pktid, self.ip, self.my_ip, str(self.new_port), self.door)
+				self.answer(file_found, self.pktid, self.ip, self.ipv4, self.ipv6, str(self.new_port), self.door)
 				if(self.ttl>1):
 					self.ttl_new = self.new_ttl(self.ttl)
 					self.new_quer = "QUER"+self.pktid+self.ip+self.door+self.ttl_new+self.string
@@ -182,7 +183,7 @@ class ThreadQUER(th.Thread):
 				if(len(file_found) != 0):
 					#rispondo e apro l'upload
 					self.new_port = ra.randint(50010, 59999)
-					self.answer(file_found, self.pktid, self.ip, self.my_ip, str(self.new_port), self.door)
+					self.answer(file_found, self.pktid, self.ip, self.ipv4, self.ipv6, str(self.new_port), self.door)
 					if(self.ttl>1):
 						self.ttl_new = self.new_ttl(self.ttl)
 						self.new_quer = "QUER"+self.pktid+self.ip+self.door+self.ttl_new+self.string
