@@ -45,7 +45,9 @@ class Ricerca:
         db.insertRequest(pktid, ipp2p_pp2p[:55], time.time())
 
         self.research = "QUER" + pktid + ipp2p_pp2p + str(self.ttl).zfill(2) + (self.search+(' '*(20-len(self.search))))
-
+        print("QUER --------------------------------")
+        print(self.research)
+        print(len(self.research))
         # retrieve neighbors from database
         self.neighbors = db.retrieveNeighborhood()
         
@@ -56,9 +58,7 @@ class Ricerca:
         #sending query to roots and neighbors
         print(self.neighbors)
         for n in self.neighbors:
-            print("Vicino ")
             addr = Util.ip_deformatting(n[0], n[1], self.ttl)
-            print(addr)
             
             #ip4 = ipad.ip_address(n[0][:15])
             ip6 = ipad.ip_address(n[0][16:])

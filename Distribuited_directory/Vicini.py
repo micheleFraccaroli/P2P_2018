@@ -11,11 +11,13 @@ class Vicini:
 
 		db = dataBase()
 		nears = db.retrieveNeighborhood()
-
+		
 		for near in nears:
-
+			print("NEAR ------")
+			print(near)
+			print(self.pack)
+			print("-----------")
 			data = Util.ip_deformatting(near[0],near[1],None)
-
 			connRoot = Conn(data[0],data[1],data[2])
 			connRoot.connection()
 			connRoot.s.send(self.pack.encode())
