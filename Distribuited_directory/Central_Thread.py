@@ -42,7 +42,7 @@ class Central_Thread(th.Thread):
 				while (self.bytes_read < 78):
 					recv_packet += other_peersocket.recv(78 - self.bytes_read)
 					self.bytes_read = len(recv_packet)
-
+				print('\nFINITO LETTURA NEAR, AVVIO THREAD NEAR\n')
 				# lancio il thread per l'ascolto delle richieste di near
 				pkt = recv_type+recv_packet
 				th_NEAR =  ThreadNEAR(pkt.decode(),self.ipv4,self.ipv6,self.port,addrPack)
@@ -58,6 +58,7 @@ class Central_Thread(th.Thread):
 					recv_packet += other_peersocket.recv(98 - self.bytes_read)
 					self.bytes_read = len(recv_packet)
 
+				print('\nFINITO LETTURA QUER, AVVIO THREAD QUER\n')
 				# lancio il thread per l'ascolto delle richieste di contenuti
 				pkt = recv_type+recv_packet
 				
