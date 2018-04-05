@@ -21,12 +21,14 @@ from File_system import File_system
 
 #inizializzo il thread
 class ThreadQUER(th.Thread):
-	def __init__(self, my_door, quer_pkt, ip_request):
+	def __init__(self, my_door, quer_pkt, ip_request, ipv4, ipv6):
 		th.Thread.__init__(self)
 		self.my_door = int(my_door)
 		self.bytes_read = 0
 		self.from_peer = quer_pkt
 		self.ip_request = str(ip_request)
+		self.ipv4 = ipv4
+		self.ipv6 = ipv6
 	
 	#insersce un nuovo record nella lista dei packet id
 
@@ -60,7 +62,7 @@ class ThreadQUER(th.Thread):
 		return dict_list
 
 	#risponde al peer che ha effettuato una ricerca, incompleta
-	def answer(self, file_list, pktid, ip, my_port, portB):
+	def answer(self, file_list, pktid, ip, my_ip, my_port, portB):
 		dict_list = self.convert_md5(file_list)
 		#stabilisco una connessione con il peer che ha iniziato
 		addr = Util.ip_deformatting(ip, portB, None)
@@ -71,17 +73,39 @@ class ThreadQUER(th.Thread):
 
 		#self.con = Conn(addr[0], addr[1], addr[2])
 		
+		#my_ip = "172.016.008.004|fc00:0000:0000:0000:0000:0000:0008:0004"
+
 		try:
 			self.con.connection()
 			for md5 in dict_list:
 				file_name = dict_list[md5].ljust(100,' ')
-				answer = "AQUE"+pktid+ip+my_port+md5+file_name
+				answer = "AQUE"+pktid+my_ip+my_port+md5+file_name
 				self.con.s.send(answer.encode())
 			self.con.deconnection()
 		except IOError as expt:
 			print("Errore di connessione")
 			print(expt)
 			sys.exit(0)
+
+	#ricerca dei vicini
+	def search_neighbors(self, db, ip_request, new_quer):
+		self.neighbors = db.retrieveNeighborhood() #mi tiro giù i vicini
+		for n in self.neighbors:
+			addr = Util.ip_deformatting(n[0], n[1], None)
+				
+			#ip4 = ipad.ip_address(n[0][:15])
+			ip6 = ipad.ip_address(n[0][16:])
+
+			self.con = Conn(addr[0], str(ip6), addr[2])
+			try:
+				self.con.connection()
+				if((addr[0] != ip_request) and (ip6 != ip_request)):
+					self.con.s.send(new_quer.encode())
+				self.con.deconnection()
+			except IOError as expt:
+				print("Errore di connessione")
+				print(expt)
+				sys.exit(0)
 
 	#vado a calcolare il nuovo ttl
 
@@ -104,10 +128,13 @@ class ThreadQUER(th.Thread):
 		self.string = self.from_peer[82:].rstrip()
 		db = dataBase()
 		res = db.retrivenSearch(self.pktid, self.ip)
+		self.my_ip = str(self.ipv4)+"|"+str(self.ipv6)
 
 		if(res == 0):
 
 			file_found = []
+			self.timestamp = time.time()
+			db.insertSearch(self.pktid, self.ip, self.timestamp)
 
 			for file in os.listdir("img"):
 				if re.search(self.string, file, re.IGNORECASE):
@@ -115,8 +142,13 @@ class ThreadQUER(th.Thread):
 
 			if(len(file_found) != 0):
 				#rispondo e apro l'upload
-				self.new_port = ra.randint(50000, 59999)
-				self.answer(file_found, self.pktid, self.ip, str(self.new_port), self.door)
+				self.new_port = ra.randint(50010, 59999)
+				self.answer(file_found, self.pktid, self.ip, self.my_ip, str(self.new_port), self.door)
+				if(self.ttl>1):
+					self.ttl_new = self.new_ttl(self.ttl)
+					self.new_quer = "QUER"+self.pktid+self.ip+self.door+self.ttl_new+self.string
+					self.search_neighbors(db, self.ip_request, self.new_quer)
+				del db
 				up = Upload(self.new_port)
 				up.upload()
 				
@@ -125,27 +157,7 @@ class ThreadQUER(th.Thread):
 				#vado a decrementare il ttl di uno e costruisco la nuova query da inviare ai vicini
 				self.ttl_new = self.new_ttl(self.ttl)
 				self.new_quer = "QUER"+self.pktid+self.ip+self.door+self.ttl_new+self.string
-
-				self.neighbors = db.retrieveNeighborhood() #mi tiro giù i vicini
-				for n in self.neighbors:
-					addr = Util.ip_deformatting(n[0], n[1], self.ttl)
-						
-					#ip4 = ipad.ip_address(n[0][:15])
-					ip6 = ipad.ip_address(n[0][16:])
-
-					self.con = Conn(addr[0], str(ip6), addr[2])
-					try:
-						self.con.connection()
-						if((addr[0] != self.ip_request) and (ip6 != self.ip_request)):
-							self.con.s.send(self.new_quer.encode())
-						self.con.deconnection()
-					except IOError as expt:
-						print("Errore di connessione")
-						print(expt)
-						sys.exit(0)
-
-			self.timestamp = time.time()
-			db.insertSearch(self.pktid, self.ip, self.timestamp)
+				self.search_neighbors(db, self.ip_request, self.new_quer)
 
 			del db
 
@@ -159,8 +171,9 @@ class ThreadQUER(th.Thread):
 				print('non faccio nulla perchè ho già elaborato la richiesta\n')
 				del db
 			else:
-
 				file_found = []
+				self.timestamp = time.time()
+				db.updateTimestamp(self.pktid, self.ip)
 
 				for file in os.listdir("img"):
 					if re.search(self.string, file, re.IGNORECASE):
@@ -168,38 +181,24 @@ class ThreadQUER(th.Thread):
 
 				if(len(file_found) != 0):
 					#rispondo e apro l'upload
-					self.new_port = ra.randint(50000, 59999)
-					self.answer(file_found, self.pktid, self.ip, str(self.new_port), self.door)
+					self.new_port = ra.randint(50010, 59999)
+					self.answer(file_found, self.pktid, self.ip, self.my_ip, str(self.new_port), self.door)
+					if(self.ttl>1):
+						self.ttl_new = self.new_ttl(self.ttl)
+						self.new_quer = "QUER"+self.pktid+self.ip+self.door+self.ttl_new+self.string
+						self.search_neighbors(db, self.ip_request, self.new_quer)
+					del db
 					up = Upload(self.new_port)
 					up.upload()
-
+					
 				elif(self.ttl>1):
-					print("andrò ad eseguire l'inoltro ai vicini della richiesta\n")
+					print("andrò ad eseguire l'inoltro ai vicini della richiesta 2\n")
+					#vado a decrementare il ttl di uno e costruisco la nuova query da inviare ai vicini
 					self.ttl_new = self.new_ttl(self.ttl)
 					self.new_quer = "QUER"+self.pktid+self.ip+self.door+self.ttl_new+self.string
+					self.search_neighbors(db, self.ip_request, self.new_quer)
 
-					self.neighbors = db.retrieveNeighborhood() #mi tiro giù i vicini
-					for n in self.neighbors:
-						addr = Util.ip_deformatting(n[0], n[1], self.ttl)
-							
-						#ip4 = ipad.ip_address(n[0][:15])
-						ip6 = ipad.ip_address(n[0][16:])
-
-						self.con = Conn(addr[0], str(ip6), addr[2])
-						try:
-							self.con.connection()
-							if((addr[0] != self.ip_request) and (ip6 != self.ip_request)):
-								self.con.s.send(self.new_quer.encode())
-							self.con.deconnection()
-						except IOError as expt:
-							print("Errore di connessione")
-							print(expt)
-							sys.exit(0)
-
-					db.updateTimestamp(self.pktid, self.ip)
-
-				del db				
-
+				del db
 
 '''
 if __name__ == '__main__':
