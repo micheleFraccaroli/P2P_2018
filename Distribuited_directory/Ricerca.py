@@ -33,7 +33,7 @@ class Ricerca:
         ipp2p_pp2p = Util.ip_formatting(self.ipv4, self.ipv6, self.port)
         
         # richiesta vicini
-        near = Vicini(config)
+        near = Vicini(config, self.port)
         # thread per ascolto di riposta dei vicini
         
         th_near = Vicini_res(self.port, self.lock)

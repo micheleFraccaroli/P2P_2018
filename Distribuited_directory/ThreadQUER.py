@@ -102,7 +102,7 @@ class ThreadQUER(th.Thread):
 				self.con.connection()
 				if((addr[0] != ip_request) and (str(ip6) != ip_request) and (new_quer[20:35] != addr[0])):
 					self.con.s.send(new_quer.encode())
-					Util.printLog('QUER: inoltro richiesta a : ', str(addr[0]))
+					Util.printLog('QUER: inoltro richiesta a : ' + str(addr[0]))
 					#Util.printLog(str(addr[0]))
 				self.con.deconnection()
 			except IOError as expt:

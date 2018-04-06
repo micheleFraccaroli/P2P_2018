@@ -3,9 +3,9 @@ from Conn import Conn
 from dataBase import dataBase
 
 class Vicini:
-	def __init__(self,config):
+	def __init__(self,config, port):
 		rand=Util.ip_packet16()
-		self.pack = 'NEAR' + rand + Util.ip_formatting(config.selfV4,config.selfV6,config.selfP) + str(config.ttl).zfill(2)
+		self.pack = 'NEAR' + rand + Util.ip_formatting(config.selfV4,config.selfV6,port) + str(config.ttl).zfill(2)
 
 	def searchNeighborhood(self):
 
@@ -23,6 +23,7 @@ class Vicini:
 			connRoot.s.send(self.pack.encode())
 			connRoot.deconnection()
 
+'''
 if __name__=='__main__':
 
 	dataBase = dataBase()
@@ -38,3 +39,4 @@ if __name__=='__main__':
 		connRoot.connection()
 		connRoot.s.send(self.pack.encode())
 		connRoot.deconnection()
+'''

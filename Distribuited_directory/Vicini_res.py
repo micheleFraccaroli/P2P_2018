@@ -28,7 +28,7 @@ class Vicini_res(th.Thread):
                 while(self.bytes_read < 80):
                     recv_packet += self.other_peersocket.recv(80 - self.bytes_read)
                     self.bytes_read = len(recv_packet)
-
+                    
                 Util.printLog("ANEAR da: " + addr[0])
                 # retrieving data from near research
                 Util.printLog(recv_packet)
