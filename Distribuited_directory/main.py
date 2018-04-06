@@ -34,7 +34,7 @@ print(bcolors.CYAN + "                  \/                    \/        \/  " + 
 
 
 #for i in tqdm(range(4), desc="Loading: "):
-time.sleep(2)
+#time.sleep(2)
 c=Config() #istanza delle configurazioni
 db = dataBase()
 db.destroy()
@@ -57,7 +57,6 @@ central_thread.start()
 
 while True:
 	name_search = input(bcolors.OKBLUE + "Search >> " + bcolors.ENDC)
-	#name_search = input("Search >> ")
 	print("...peers searching...")
 	port = ra.randint(50000, 59999)
 	search = Ricerca(c.selfV4, c.selfV6, port, c.ttl, c.timeResearch, name_search, lock)
@@ -84,7 +83,7 @@ while True:
 			i = i + 1
 
 		choice = input(bcolors.OKBLUE + ">> " + bcolors.ENDC)
-		#choice = input(">> ")
+		
 		peer = choice_list[int(choice)-1]
 		
 		addr = Util.ip_deformatting(peer[1], peer[2], None)
