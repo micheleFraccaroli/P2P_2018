@@ -1,6 +1,6 @@
 import sqlite3
 import os
-from Util
+import Util
 from Config import Config
 import time
 import subprocess as sub
