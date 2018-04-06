@@ -19,9 +19,10 @@ import threading as th
 import random as ra
 from File_system import File_system
 
+
 #inizializzo il thread
 class ThreadQUER(th.Thread):
-	def __init__(self, my_door, quer_pkt, ip_request, ipv4, ipv6):
+	def __init__(self, my_door, quer_pkt, ip_request, ipv4, ipv6, lock):
 		th.Thread.__init__(self)
 		self.my_door = int(my_door)
 		self.bytes_read = 0
@@ -29,6 +30,7 @@ class ThreadQUER(th.Thread):
 		self.ip_request = ip_request
 		self.ipv4 = ipv4
 		self.ipv6 = ipv6
+		self.lock = lock
 	
 	#insersce un nuovo record nella lista dei packet id
 
@@ -136,8 +138,9 @@ class ThreadQUER(th.Thread):
 
 			file_found = []
 			self.timestamp = time.time()
+			self.lock.acquire()
 			db.insertSearch(self.pktid, self.ip, self.timestamp)
-
+			self.lock.release()
 			for file in os.listdir("img"):
 				if re.search(self.string, file, re.IGNORECASE):
 					file_found.append(file)
@@ -175,8 +178,9 @@ class ThreadQUER(th.Thread):
 			else:
 				file_found = []
 				self.timestamp = time.time()
+				self.lock.acquire()
 				db.updateTimestamp(self.pktid, self.ip)
-
+				self.lock.release()
 				for file in os.listdir("img"):
 					if re.search(self.string, file, re.IGNORECASE):
 						file_found.append(file)

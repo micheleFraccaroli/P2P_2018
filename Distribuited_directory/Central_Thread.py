@@ -64,4 +64,5 @@ class Central_Thread(th.Thread):
 				pkt = recv_type+recv_packet
 				
 				th_QUER = ThreadQUER(self.port,pkt.decode(), addrPack, self.ipv4, self.ipv6, self.lock)
+
 				th_QUER.start()
