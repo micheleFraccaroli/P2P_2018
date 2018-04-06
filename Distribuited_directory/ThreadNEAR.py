@@ -49,8 +49,8 @@ class ThreadNEAR(th.Thread):
 							self.con.deconnection()
 							Util.printLog("vicino inoltro NEAR: "+params[0])
 						except IOError as e:
-							print(e)
-							exit()
+							print("Inoltro vicino fallito")
+							
 							
 			self.pack = 'ANEA'+self.pid+self.myIPP
 			Util.printLog('ANEA a: '+str(self.pack))
@@ -62,7 +62,7 @@ class ThreadNEAR(th.Thread):
 				self.con.s.send(self.pack.encode())
 				self.con.deconnection()
 			except IOError as e:
-				print(e)
-				exit()
+				print("Risposta diretta fallita")
+				
 		else:
 			Util.printLog("NEAR per: "+self.ipRequest+". Già eseguita")
