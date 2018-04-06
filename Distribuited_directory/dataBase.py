@@ -80,7 +80,7 @@ class dataBase:
 		con = sqlite3.connect('P2P.db')
 		c = con.cursor()
 
-		c.execute('SELECT * FROM neighborhood WHERE ip =?',(ip))
+		c.execute('SELECT * FROM neighborhood WHERE ip=?',(ip,))
 		res = c.fetchone()
 
 		if res == None:

@@ -133,16 +133,16 @@ class ThreadQUER(th.Thread):
 		db = dataBase()
 		self.lock.acquire()
 		res = db.retrivenSearch(self.pktid, self.ip)
-		self.lock.release()
 		#self.my_ip = str(self.ipv4)+"|"+str(self.ipv6)
 
 		if(res == 0):
 
 			file_found = []
 			self.timestamp = time.time()
-			self.lock.acquire()
+
 			db.insertSearch(self.pktid, self.ip, self.timestamp)
 			self.lock.release()
+			
 			for file in os.listdir("img"):
 				if re.search(self.string, file, re.IGNORECASE):
 					file_found.append(file)
@@ -174,7 +174,7 @@ class ThreadQUER(th.Thread):
 
 		else:
 			Util.printLog("QUER: già presente un pacchetto con questo pktid\n")
-			self.lock.acquire()
+			
 			before = db.retriveSearch(self.pktid, self.ip)
 			self.lock.release()
 			now = time.time()

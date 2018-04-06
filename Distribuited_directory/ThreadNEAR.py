@@ -27,7 +27,7 @@ class ThreadNEAR(th.Thread):
 		db = dataBase()
 
 		self.lock.acquire()
-		
+
 		res = db.retrivenSearch(self.pid,self.pack[20:75])
 		if( res == 0): # Richiesta già conosciuta
 			Util.printLog("Eseguo NEAR per: "+self.ipRequest)
@@ -69,4 +69,5 @@ class ThreadNEAR(th.Thread):
 				print("Risposta diretta fallita")
 				
 		else:
+			self.lock.release()
 			Util.printLog("NEAR per: "+self.ipRequest+". Già eseguita")
