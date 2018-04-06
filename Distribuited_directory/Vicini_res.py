@@ -19,7 +19,6 @@ class Vicini_res(th.Thread):
         peersocket.settimeout(20)
         peersocket.listen(20)
 
-        
         while True:
             other_peersocket, addr = peersocket.accept()
             recv_packet = other_peersocket.recv(80)
