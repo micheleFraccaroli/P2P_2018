@@ -1,6 +1,6 @@
 import sqlite3
 import os
-from Util import *
+from Util
 from Config import Config
 import time
 import subprocess as sub
@@ -16,8 +16,8 @@ class dataBase:
 		c.execute('CREATE TABLE IF NOT EXISTS responses (id INTEGER,pid VARCHAR(16) NOT NULL, ip VARCHAR(55) NOT NULL, port VARCHAR(5) NOT NULL, md5 VARCHAR(32), name VARCHAR(100), PRIMARY KEY(id))')
 		c.execute('CREATE TABLE IF NOT EXISTS neighborhood (ip VARCHAR(55) NOT NULL, port VARCHAR(5) NOT NULL, PRIMARY KEY(ip))')
 
-		root1 = ip_formatting(config.root1V4,config.root1V6,config.root1P)
-		root2 = ip_formatting(config.root2V4,config.root2V6,config.root2P)
+		root1 = Util.ip_formatting(config.root1V4,config.root1V6,config.root1P)
+		root2 = Util.ip_formatting(config.root2V4,config.root2V6,config.root2P)
 		
 		try:
 			c.execute('INSERT INTO neighborhood VALUES (null,?,?)',(root1[:55],root1[55:]))
