@@ -51,7 +51,7 @@ print("\n----------------------\n")
 lock = th.Lock()
 
 # background thread for NEAR and QUER
-central_thread = Central_Thread(c)
+central_thread = Central_Thread(c, lock)
 central_thread.start()
 
 while True:
