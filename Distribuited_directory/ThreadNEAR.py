@@ -7,7 +7,7 @@ from Conn import Conn
 
 class ThreadNEAR(th.Thread):
 
-	def __init__(self,pack,ipv4,ipv6,port,ipRequest,lock):
+	def __init__(self,pack,ipv4,ipv6,port,ipRequest,lock,config):
 
 		th.Thread.__init__(self)
 		self.myIPP     = Util.ip_formatting(ipv4,ipv6,port)
@@ -20,6 +20,7 @@ class ThreadNEAR(th.Thread):
 		self.ttl       = info[3]
 		self.ipRequest = ipRequest
 		self.lock      = lock
+		self.config    = config
 
 	def run(self):
 
@@ -35,7 +36,7 @@ class ThreadNEAR(th.Thread):
 				self.ttl = str(self.ttl-1).zfill(2)
 				self.pack=''.join((self.pack[:80],self.ttl))
 
-				neighborhood = db.retrieveNeighborhood()
+				neighborhood = db.retrieveNeighborhood(self.config)
 
 				for neighbor in neighborhood:
 

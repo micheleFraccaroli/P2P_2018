@@ -13,6 +13,7 @@ class Central_Thread(th.Thread):
 		self.ipv6 = config.selfV6
 		self.bytes_read = 0
 		self.lock = lock
+		self.config = config
 
 	def run(self):
 		peersocket = socket.socket(socket.AF_INET6, socket.SOCK_STREAM)
@@ -47,7 +48,7 @@ class Central_Thread(th.Thread):
 				Util.printLog("FINITO LETTURA NEAR, AVVIO THREAD NEAR")
 				# lancio il thread per l'ascolto delle richieste di near
 				pkt = recv_type+recv_packet
-				th_NEAR =  ThreadNEAR(pkt.decode(),self.ipv4,self.ipv6,self.port,addrPack,self.lock)
+				th_NEAR =  ThreadNEAR(pkt.decode(),self.ipv4,self.ipv6,self.port,addrPack,self.lock,self.config)
 				th_NEAR.start()
 
 			# QUER ------
@@ -64,5 +65,5 @@ class Central_Thread(th.Thread):
 				# lancio il thread per l'ascolto delle richieste di contenuti
 				pkt = recv_type+recv_packet
 				
-				th_QUER = ThreadQUER(self.port,pkt.decode(), addrPack, self.ipv4, self.ipv6, self.lock)
+				th_QUER = ThreadQUER(self.port,pkt.decode(), addrPack, self.ipv4, self.ipv6, self.lock,self.config)
 				th_QUER.start()
