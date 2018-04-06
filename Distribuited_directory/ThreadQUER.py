@@ -102,8 +102,8 @@ class ThreadQUER(th.Thread):
 				self.con.connection()
 				if((addr[0] != ip_request) and (str(ip6) != ip_request) and (new_quer[20:35] != addr[0])):
 					self.con.s.send(new_quer.encode())
-					Util.printLog('inoltro richiesta QUER a : ')
-					Util.printLog(str(addr[0]))
+					Util.printLog('QUER: inoltro richiesta a : ', str(addr[0]))
+					#Util.printLog(str(addr[0]))
 				self.con.deconnection()
 			except IOError as expt:
 				print("Errore di connessione")
@@ -157,7 +157,7 @@ class ThreadQUER(th.Thread):
 				up.upload()
 				
 			elif(self.ttl>1):
-				Util.printLog("andrò ad eseguire l'inoltro ai vicini della richiesta\n")
+				Util.printLog("QUER: eseguo l'inoltro ai vicini della richiesta\n")
 				#vado a decrementare il ttl di uno e costruisco la nuova query da inviare ai vicini
 				self.ttl_new = self.new_ttl(self.ttl)
 				self.new_quer = "QUER"+self.pktid+self.ip+self.door+self.ttl_new+self.from_peer[82:]
@@ -166,13 +166,13 @@ class ThreadQUER(th.Thread):
 			del db
 
 		else:
-			Util.printLog("E' già presente un pacchetto con questo pktid\n")
+			Util.printLog("QUER: già presente un pacchetto con questo pktid\n")
 
 			before = db.retriveSearch(self.pktid, self.ip)
 			now = time.time()
 
 			if((now - before) < 30):
-				Util.printLog('non faccio nulla perchè ho già elaborato la richiesta\n')
+				Util.printLog('QUER: non faccio nulla perchè ho già elaborato la richiesta\n')
 				del db
 			else:
 				file_found = []
@@ -197,7 +197,7 @@ class ThreadQUER(th.Thread):
 					up.upload()
 					
 				elif(self.ttl>1):
-					Util.printLog("andrò ad eseguire l'inoltro ai vicini della richiesta 2\n")
+					Util.printLog("QUER: eseguo l'inoltro ai vicini della richiesta 2\n")
 					#vado a decrementare il ttl di uno e costruisco la nuova query da inviare ai vicini
 					self.ttl_new = self.new_ttl(self.ttl)
 					self.new_quer = "QUER"+self.pktid+self.ip+self.door+self.ttl_new+self.from_peer[82:]
