@@ -26,9 +26,12 @@ class ThreadNEAR(th.Thread):
 
 		db = dataBase()
 
-		if(db.retrivenSearch(self.pid,self.pack[20:75]) == 0): # Richiesta già conosciuta
+		self.lock.acquire()
+		
+		res = db.retrivenSearch(self.pid,self.pack[20:75])
+		if( res == 0): # Richiesta già conosciuta
 			Util.printLog("Eseguo NEAR per: "+self.ipRequest)
-			self.lock.acquire()
+			
 			db.insertRequest(self.pid,self.pack[20:75],time.time())
 			self.lock.release()
 			if self.ttl > 1: # Inoltro richiesta ai vicini

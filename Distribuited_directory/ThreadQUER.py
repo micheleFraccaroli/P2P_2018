@@ -131,7 +131,9 @@ class ThreadQUER(th.Thread):
 		self.ttl = int(self.from_peer[80:82])
 		self.string = self.from_peer[82:].rstrip()
 		db = dataBase()
+		self.lock.acquire()
 		res = db.retrivenSearch(self.pktid, self.ip)
+		self.lock.release()
 		#self.my_ip = str(self.ipv4)+"|"+str(self.ipv6)
 
 		if(res == 0):
@@ -152,7 +154,9 @@ class ThreadQUER(th.Thread):
 				if(self.ttl>1):
 					self.ttl_new = self.new_ttl(self.ttl)
 					self.new_quer = "QUER"+self.pktid+self.ip+self.door+self.ttl_new+self.from_peer[82:]
+					self.lock.acquire()
 					self.search_neighbors(db, self.ip_request, self.new_quer)
+					self.lock.release()
 				del db
 				up = Upload(self.new_port)
 				up.upload()
@@ -162,14 +166,17 @@ class ThreadQUER(th.Thread):
 				#vado a decrementare il ttl di uno e costruisco la nuova query da inviare ai vicini
 				self.ttl_new = self.new_ttl(self.ttl)
 				self.new_quer = "QUER"+self.pktid+self.ip+self.door+self.ttl_new+self.from_peer[82:]
+				self.lock.acquire()
 				self.search_neighbors(db, self.ip_request, self.new_quer)
+				self.lock.release()
 
 			del db
 
 		else:
 			Util.printLog("QUER: già presente un pacchetto con questo pktid\n")
-
+			self.lock.acquire()
 			before = db.retriveSearch(self.pktid, self.ip)
+			self.lock.release()
 			now = time.time()
 
 			if((now - before) < 30):
@@ -192,7 +199,9 @@ class ThreadQUER(th.Thread):
 					if(self.ttl>1):
 						self.ttl_new = self.new_ttl(self.ttl)
 						self.new_quer = "QUER"+self.pktid+self.ip+self.door+self.ttl_new+self.from_peer[82:]
+						self.lock.acquire()
 						self.search_neighbors(db, self.ip_request, self.new_quer)
+						self.lock.release()
 					del db
 					up = Upload(self.new_port)
 					up.upload()
@@ -202,8 +211,9 @@ class ThreadQUER(th.Thread):
 					#vado a decrementare il ttl di uno e costruisco la nuova query da inviare ai vicini
 					self.ttl_new = self.new_ttl(self.ttl)
 					self.new_quer = "QUER"+self.pktid+self.ip+self.door+self.ttl_new+self.from_peer[82:]
+					self.lock.acquire()
 					self.search_neighbors(db, self.ip_request, self.new_quer)
-
+					self.lock.release()
 				del db
 
 '''
