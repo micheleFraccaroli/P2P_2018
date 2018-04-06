@@ -5,8 +5,6 @@ from dataBase import dataBase
 import Util
 from Conn import Conn
 
-lock = th.Lock()
-
 class ThreadNEAR(th.Thread):
 
 	def __init__(self,pack,ipv4,ipv6,port,ipRequest,lock):
