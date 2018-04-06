@@ -14,7 +14,7 @@ from Download import Download
 lock = th.Lock()
 
 class thread_Response(th.Thread):
-    def __init__(self, other_peersocket, lock): # dict_src è una lista di paket id che ho generato con la ricerca
+    def __init__(self, other_peersocket,lock): # dict_src è una lista di paket id che ho generato con la ricerca
         th.Thread.__init__(self) # thread istance second level
         self.bytes_read = 0
         self.other_peersocket = other_peersocket
