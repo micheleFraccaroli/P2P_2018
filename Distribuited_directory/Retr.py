@@ -5,10 +5,11 @@ import threading as th
 from Response import thread_Response
 
 class Retr(th.Thread):
-    def __init__(self, port, config):
+    def __init__(self, port, config, lock):
         th.Thread.__init__(self) # thread istance first level
         self.port = port
         self.time = config.timeResearch
+        self.lock = lock
 
     def run(self):
         peersocket = socket.socket(socket.AF_INET6, socket.SOCK_STREAM)
@@ -20,7 +21,7 @@ class Retr(th.Thread):
         while True:
             try:
                 other_peersocket, addr = peersocket.accept()
-                thread = thread_Response(other_peersocket)
+                thread = thread_Response(other_peersocket, self.lock)
                 thread.start()
             except OSError as e:
                 pass

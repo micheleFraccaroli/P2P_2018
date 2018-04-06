@@ -16,8 +16,8 @@ from Vicini_res import Vicini_res
 from Config import *
 
 class Ricerca:
-    def __init__(self, ipv4, ipv6, port, ttl, time_res, search):
-    
+    def __init__(self, ipv4, ipv6, port, ttl, time_res, search, lock):
+        self.lock =  lock
         self.ipv4 = ipv4
         self.ipv6 = ipv6
         self.port = port
@@ -36,7 +36,7 @@ class Ricerca:
         near = Vicini(config)
         # thread per ascolto di riposta dei vicini
         
-        th_near = Vicini_res(self.port)
+        th_near = Vicini_res(self.port, self.lock)
         th_near.start()
         # partenza richiesta dei vicini
         near.searchNeighborhood()
@@ -50,7 +50,7 @@ class Ricerca:
         self.neighbors = db.retrieveNeighborhood()
         
         #thread in ascolto per ogni ricerca
-        retr = Retr(self.port, config)
+        retr = Retr(self.port, config, self.lock)
         retr.start()
 
         #sending query to roots and neighbors
@@ -62,11 +62,11 @@ class Ricerca:
 
             self.con = Conn(addr[0], str(ip6), addr[2])
             try:
-                print("QUER --------------------------------")
-                print(self.research)
-                print(len(self.research))
-                print(addr[0])
-                print("-------------------------------------")
+                Util.printLog("QUER --------------------------------")
+                Util.printLog(self.research)
+                Util.printLog(len(self.research))
+                Util.printLog(addr[0])
+                Util.printLog("-------------------------------------")
                 self.con.connection()
                 self.con.s.send(self.research.encode())
                 self.con.deconnection()

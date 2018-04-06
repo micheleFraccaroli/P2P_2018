@@ -14,10 +14,11 @@ from Download import Download
 lock = th.Lock()
 
 class thread_Response(th.Thread):
-    def __init__(self, other_peersocket): # dict_src è una lista di paket id che ho generato con la ricerca
+    def __init__(self, other_peersocket, lock): # dict_src è una lista di paket id che ho generato con la ricerca
         th.Thread.__init__(self) # thread istance second level
         self.bytes_read = 0
         self.other_peersocket = other_peersocket
+        self.lock = lock
 
     def run(self):
         db = dataBase()
@@ -31,9 +32,9 @@ class thread_Response(th.Thread):
 
             # retrieving data from file research
             if(recv_packet[:4].decode() == "AQUE"):
-                lock.acquire()
+                self.lock.acquire()
                 db.insertResponse(recv_packet[4:20].decode(), recv_packet[20:75].decode(), recv_packet[75:80].decode(), recv_packet[80:112].decode(), recv_packet[112:212].decode())
-                lock.release()
+                self.lock.release()
 
             #self.other_peersocket.close()
             del db

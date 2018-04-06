@@ -56,7 +56,7 @@ while True:
 	#name_search = input("Search >> ")
 	print("...peers searching...")
 	port = ra.randint(50000, 59999)
-	search = Ricerca(c.selfV4, c.selfV6, port, c.ttl, c.timeResearch, name_search)
+	search = Ricerca(c.selfV4, c.selfV6, port, c.ttl, c.timeResearch, name_search, lock)
 	pktid = search.query(c)
 	print("\n------| New research launched |------\n")
 
