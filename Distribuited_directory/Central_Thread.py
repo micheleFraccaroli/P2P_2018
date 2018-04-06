@@ -5,12 +5,13 @@ from  ThreadNEAR import ThreadNEAR
 from ThreadQUER import ThreadQUER
 
 class Central_Thread(th.Thread):
-	def __init__(self, config):
+	def __init__(self, config, lock):
 		th.Thread.__init__(self)
 		self.port = config.selfP
 		self.ipv4 = config.selfV4
 		self.ipv6 = config.selfV6
 		self.bytes_read = 0
+		self.lock = lock
 
 	def run(self):
 		peersocket = socket.socket(socket.AF_INET6, socket.SOCK_STREAM)
@@ -18,9 +19,6 @@ class Central_Thread(th.Thread):
 		peersocket.bind(('', self.port))
 
 		peersocket.listen(20)
-
-		NEARlock = th.Lock()
-		QUERlock = th.Lock()
 
 		while True:
 			other_peersocket, addr = peersocket.accept()
@@ -48,7 +46,7 @@ class Central_Thread(th.Thread):
 				print('\nFINITO LETTURA NEAR, AVVIO THREAD NEAR\n')
 				# lancio il thread per l'ascolto delle richieste di near
 				pkt = recv_type+recv_packet
-				th_NEAR =  ThreadNEAR(pkt.decode(),self.ipv4,self.ipv6,self.port,addrPack,NEARlock)
+				th_NEAR =  ThreadNEAR(pkt.decode(),self.ipv4,self.ipv6,self.port,addrPack,self.lock)
 				th_NEAR.start()
 
 			# QUER ------
