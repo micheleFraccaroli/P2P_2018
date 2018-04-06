@@ -64,7 +64,7 @@ class Ricerca:
             try:
                 Util.printLog("QUER --------------------------------")
                 Util.printLog(self.research)
-                Util.printLog(len(self.research))
+                Util.printLog(str(len(self.research)))
                 Util.printLog(addr[0])
                 Util.printLog("-------------------------------------")
                 self.con.connection()

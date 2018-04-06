@@ -14,7 +14,7 @@ class Vicini:
 		
 		for near in nears:
 			Util.printLog("NEAR ------")
-			Util.printLog(near)
+			Util.printLog(str(near))
 			Util.printLog(self.pack)
 			Util.printLog("-----------")
 			data = Util.ip_deformatting(near[0],near[1],None)
@@ -30,9 +30,9 @@ if __name__=='__main__':
 	nears = dataBase.retrieveNeighborhood()
 
 	for near in nears:
-		print(near[0])
+		Util.printLog(str(near[0]))
 		data = ip_deformatting(near[0],near[1],None)
-		print(data)
+		Util.printLog(str(data))
 		
 		connRoot = Conn(data[0],data[1],data[2])
 		connRoot.connection()

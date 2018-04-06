@@ -25,10 +25,10 @@ class Central_Thread(th.Thread):
 			other_peersocket, addr = peersocket.accept()
 			if addr[0][:2] == "::":
 				addrPack = addr[0][7:]
-				Util.printLog(addrPack)
+				Util.printLog("Richiesta in arrivo da: "+addrPack)
 			else:
 				addrPack=addr[0]
-				Util.printLog(addrPack)
+				Util.printLog("Richiesta in arrivo da: "+addrPack)
 			recv_type = other_peersocket.recv(4)
 
 			self.bytes_read = len(recv_type)
@@ -38,7 +38,7 @@ class Central_Thread(th.Thread):
 
 			# NEAR ------
 			if(recv_type.decode() == "NEAR"):
-				print('NEAR')
+				Util.printLog('Ricevo NEAR da: '+addrPack)
 				recv_packet = other_peersocket.recv(78) # 82 - 4
 				self.bytes_read = len(recv_packet)
 				while (self.bytes_read < 78):
@@ -52,7 +52,7 @@ class Central_Thread(th.Thread):
 
 			# QUER ------
 			elif(recv_type.decode() == "QUER"):
-				print('QUER')
+				Util.printLog('Ricevo QUER da: '+addrPack)
 				recv_packet = other_peersocket.recv(98)# 102 - 4
 
 				self.bytes_read = len(recv_packet)
