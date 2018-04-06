@@ -3,6 +3,7 @@ import os
 from Util import *
 from Config import Config
 import time
+import subprocess as sub
 
 class dataBase:
 
@@ -29,7 +30,7 @@ class dataBase:
 	def destroy(self):
 
 		try:
-			os.system('rm P2P.db')
+			sub.call(['rm','-f','P2P.db'])
 		except:
 			pass
 
