@@ -10,7 +10,7 @@ class Upload:
 
     def __init__(self, pp2p_A):
         self.pp2p_A = pp2p_A
-        print(self.pp2p_A)
+        #print(self.pp2p_A)
         #chunk veriables
         self.data_to_send = []
         self.chunk_size = 1024

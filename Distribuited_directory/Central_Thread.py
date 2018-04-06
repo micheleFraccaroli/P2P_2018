@@ -60,7 +60,7 @@ class Central_Thread(th.Thread):
 					recv_packet += other_peersocket.recv(98 - self.bytes_read)
 					self.bytes_read = len(recv_packet)
 
-				Util.printLog("FINITO LETTURA QUER, AVVIO THREAD QUER")
+				#Util.printLog("FINITO LETTURA QUER, AVVIO THREAD QUER")
 				# lancio il thread per l'ascolto delle richieste di contenuti
 				pkt = recv_type+recv_packet
 				

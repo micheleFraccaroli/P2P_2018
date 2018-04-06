@@ -54,6 +54,7 @@ class ThreadNEAR(th.Thread):
 
 			self.pack = 'ANEA'+self.pid+self.myIPP
 			self.con = Conn(self.ipv4,self.ipv6,self.port)
+			print('Con ANEA ', self.ipv4, self.ipv6, self.port)
 			try:
 				self.con.connection()
 				self.con.s.send(self.pack.encode())
