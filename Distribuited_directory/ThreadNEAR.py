@@ -28,7 +28,7 @@ class ThreadNEAR(th.Thread):
 		db = dataBase()
 
 		if(db.retrivenSearch(self.pid,self.pack[20:75]) == 0): # Richiesta già conosciuta
-			print("\nEseguo near...\n")
+			Util.printLog("\nEseguo near...\n")
 			self.lock.acquire()
 			db.insertRequest(self.pid,self.pack[20:75],time.time())
 			self.lock.release()
@@ -49,7 +49,7 @@ class ThreadNEAR(th.Thread):
 							self.con.connection()
 							self.con.s.send(self.pack.encode())
 							self.con.deconnection()
-							print("vicino near: ",params[0])
+							Util.printLog("vicino near: ",params[0])
 						except IOError as e:
 							print(e)
 							exit()

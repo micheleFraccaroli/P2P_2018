@@ -71,6 +71,16 @@ def initializeFiles():
     f.write('#### Error file launched on {:%d-%m-%Y %H:%M:%S} ####'.format(datetime.now())+'\n\n')
     f.close()
 
+    f = open('logs.log','w')
+    f.write('#### Log file launched on {:%d-%m-%Y %H:%M:%S} ####'.format(datetime.now())+'\n\n')
+    f.close()
+
+def printLog(desc):
+
+    f = open('logs.log','a')
+    f.write('Timestamp: {:%d-%m-%Y %H:%M:%S} #### '.format(datetime.now())+desc+'\n')
+    f.close()
+
 def printError(desc):
 
     f = open('errors.log','a')

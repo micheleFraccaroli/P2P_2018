@@ -31,6 +31,9 @@ class Vicini_res(th.Thread):
                 if(recv_packet[:4].decode() == "ANEA"):
                     lock.acquire()
                     db.insertResponse(recv_packet[4:20].decode(), recv_packet[20:75].decode(), recv_packet[75:80].decode())
+                    lock.release()
+                    
+                    lock.acquire()
                     db.insertNeighborhood(recv_packet[20:75].decode(), recv_packet[75:80].decode())
                     lock.release()
         except:

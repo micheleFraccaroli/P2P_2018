@@ -1,5 +1,6 @@
 import socket
 import os
+import Util
 import threading as th
 from  ThreadNEAR import ThreadNEAR
 from ThreadQUER import ThreadQUER
@@ -25,10 +26,10 @@ class Central_Thread(th.Thread):
 			other_peersocket, addr = peersocket.accept()
 			if addr[0][:2] == "::":
 				addrPack = addr[0][7:]
-				print("\n\nEcco l'IP: ",addrPack,"\n\n")
+				Util.printLog(addrPack)
 			else:
 				addrPack=addr[0]
-				print("\n\nEcco l'IP: ",addr[0],"\n\n")
+				Util.printLog(addrPack)
 			recv_type = other_peersocket.recv(4)
 
 			self.bytes_read = len(recv_type)
@@ -44,7 +45,7 @@ class Central_Thread(th.Thread):
 				while (self.bytes_read < 78):
 					recv_packet += other_peersocket.recv(78 - self.bytes_read)
 					self.bytes_read = len(recv_packet)
-				print('\nFINITO LETTURA NEAR, AVVIO THREAD NEAR\n')
+				Util.printLog("FINITO LETTURA NEAR, AVVIO THREAD NEAR")
 				# lancio il thread per l'ascolto delle richieste di near
 				pkt = recv_type+recv_packet
 				th_NEAR =  ThreadNEAR(pkt.decode(),self.ipv4,self.ipv6,self.port,addrPack,NEARlock)
@@ -60,7 +61,7 @@ class Central_Thread(th.Thread):
 					recv_packet += other_peersocket.recv(98 - self.bytes_read)
 					self.bytes_read = len(recv_packet)
 
-				print('\nFINITO LETTURA QUER, AVVIO THREAD QUER\n')
+				Util.printLog("FINITO LETTURA QUER, AVVIO THREAD QUER")
 				# lancio il thread per l'ascolto delle richieste di contenuti
 				pkt = recv_type+recv_packet
 				

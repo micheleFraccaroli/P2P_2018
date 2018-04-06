@@ -34,7 +34,7 @@ class ThreadQUER(th.Thread):
 
 	def remove_record(self, pktid_dict, key):
 		del pktid_dict[str(key)]
-		print(pktid_dict[str(key)])
+		Util.printLog(pktid_dict[str(key)])
 		return pktid_dict
 
 
@@ -42,7 +42,7 @@ class ThreadQUER(th.Thread):
 
 	def insert_record(self, pktid_dict, key):
 		pktid_dict[str(key)] = datetime.datetime.fromtimestamp(time.time())
-		print(pktid_dict[str(key)])
+		Util.printLog(pktid_dict[str(key)])
 		return pktid_dict
 
 	#calcolo l'md5 dei file della ricerca
@@ -90,7 +90,7 @@ class ThreadQUER(th.Thread):
 	#ricerca dei vicini
 	def search_neighbors(self, db, ip_request, new_quer):
 		self.neighbors = db.retrieveNeighborhood() #mi tiro giù i vicini
-		print('richiesta da: '+ip_request+'\n')
+		Util.printLog('richiesta da: '+ip_request+'\n')
 		for n in self.neighbors:
 			addr = Util.ip_deformatting(n[0], n[1], None)
 				
@@ -101,8 +101,8 @@ class ThreadQUER(th.Thread):
 				self.con.connection()
 				if((addr[0] != ip_request) and (str(ip6) != ip_request) and (new_quer[20:35] != addr[0])):
 					self.con.s.send(new_quer.encode())
-					print('inoltro richiesta a :\n')
-					print(str(addr[0]))
+					Util.printLog('inoltro richiesta a :\n')
+					Util.printLog(str(addr[0]))
 				self.con.deconnection()
 			except IOError as expt:
 				print("Errore di connessione")
@@ -155,7 +155,7 @@ class ThreadQUER(th.Thread):
 				up.upload()
 				
 			elif(self.ttl>1):
-				print("andrò ad eseguire l'inoltro ai vicini della richiesta\n")
+				Util.printLog("andrò ad eseguire l'inoltro ai vicini della richiesta\n")
 				#vado a decrementare il ttl di uno e costruisco la nuova query da inviare ai vicini
 				self.ttl_new = self.new_ttl(self.ttl)
 				self.new_quer = "QUER"+self.pktid+self.ip+self.door+self.ttl_new+self.from_peer[82:]
@@ -164,13 +164,13 @@ class ThreadQUER(th.Thread):
 			del db
 
 		else:
-			print("E' già presente un pacchetto con questo pktid\n")
+			Util.printLog("E' già presente un pacchetto con questo pktid\n")
 
 			before = db.retriveSearch(self.pktid, self.ip)
 			now = time.time()
 
 			if((now - before) < 30):
-				print('non faccio nulla perchè ho già elaborato la richiesta\n')
+				Util.printLog('non faccio nulla perchè ho già elaborato la richiesta\n')
 				del db
 			else:
 				file_found = []
@@ -194,7 +194,7 @@ class ThreadQUER(th.Thread):
 					up.upload()
 					
 				elif(self.ttl>1):
-					print("andrò ad eseguire l'inoltro ai vicini della richiesta 2\n")
+					Util.printLog("andrò ad eseguire l'inoltro ai vicini della richiesta 2\n")
 					#vado a decrementare il ttl di uno e costruisco la nuova query da inviare ai vicini
 					self.ttl_new = self.new_ttl(self.ttl)
 					self.new_quer = "QUER"+self.pktid+self.ip+self.door+self.ttl_new+self.from_peer[82:]
