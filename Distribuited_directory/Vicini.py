@@ -6,11 +6,12 @@ class Vicini:
 	def __init__(self,config, port):
 		rand=Util.ip_packet16()
 		self.pack = 'NEAR' + rand + Util.ip_formatting(config.selfV4,config.selfV6,port) + str(config.ttl).zfill(2)
+		self.config = config
 
 	def searchNeighborhood(self):
 
 		db = dataBase()
-		nears = db.retrieveNeighborhood()
+		nears = db.retrieveNeighborhood(self.config)
 		
 		for near in nears:
 			Util.printLog("NEAR ------")

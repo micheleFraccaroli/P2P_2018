@@ -47,7 +47,7 @@ class Ricerca:
         self.research = "QUER" + pktid + ipp2p_pp2p + str(self.ttl).zfill(2) + (self.search+(' '*(20-len(self.search))))
 
         # retrieve neighbors from database
-        self.neighbors = db.retrieveNeighborhood()
+        self.neighbors = db.retrieveNeighborhood(config)
         
         #thread in ascolto per ogni ricerca
         retr = Retr(self.port, config, self.lock)
