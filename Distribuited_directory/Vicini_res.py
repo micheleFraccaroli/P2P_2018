@@ -3,10 +3,11 @@ import threading as th
 from dataBase import dataBase
 
 class Vicini_res(th.Thread):
-    def __init__(self, port):
+    def __init__(self, port,lock):
         th.Thread.__init__(self)
         self.bytes_read = 0
         self.port = port
+        self.lock = lock
 
     def run(self):
         db = dataBase()
@@ -29,10 +30,10 @@ class Vicini_res(th.Thread):
 
                 # retrieving data from near research
                 if(recv_packet[:4].decode() == "ANEA"):
-                    lock.acquire()
+                    self.lock.acquire()
                     db.insertResponse(recv_packet[4:20].decode(), recv_packet[20:75].decode(), recv_packet[75:80].decode())
                     db.insertNeighborhood(recv_packet[20:75].decode(), recv_packet[75:80].decode())
-                    lock.release()
+                    self.lock.release()
         except:
             pass
 

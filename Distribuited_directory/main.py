@@ -11,6 +11,7 @@ from dataBase import dataBase
 from tqdm import tqdm
 from Download import Download
 from Central_Thread import Central_Thread
+import threading as th
 
 
 class bcolors:
@@ -46,6 +47,8 @@ print('timeResearch: ',c.timeResearch)
 print('timeIdPacket: ',c.timeIdPacket)
 print("\n----------------------\n")
 #near=Vicini(c)
+
+lock = th.Lock()
 
 # background thread for NEAR and QUER
 central_thread = Central_Thread(c)
