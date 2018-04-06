@@ -20,8 +20,8 @@ class dataBase:
 		root2 = ip_formatting(config.root2V4,config.root2V6,config.root2P)
 		
 		try:
-			c.execute('INSERT INTO neighborhood VALUES (1,?,?)',(root1[:55],root1[55:]))
-			c.execute('INSERT INTO neighborhood VALUES (2,?,?)',(root2[:55],root2[55:]))
+			c.execute('INSERT INTO neighborhood VALUES (null,?,?)',(root1[:55],root1[55:]))
+			c.execute('INSERT INTO neighborhood VALUES (null,?,?)',(root2[:55],root2[55:]))
 			con.commit()
 		except:
 			pass
@@ -39,7 +39,7 @@ class dataBase:
 		con = sqlite3.connect('P2P.db')
 		c = con.cursor()
 
-		c.execute('SELECT ip, port FROM neighborhood ORDER BY random() LIMIT 4')
+		c.execute('SELECT id, ip, port FROM neighborhood ORDER BY random() LIMIT 4')
 		res = c.fetchall()
 		
 		resId = list(res[0] for res in res)
@@ -53,6 +53,7 @@ class dataBase:
 		resId=tuple(resId)
 		
 		c.execute('DELETE FROM neighborhood WHERE id NOT IN '+str(resId))
+		c.execute('SELECT ip, port FROM neighborhood')
 
 		con.commit()
 		con.close()
@@ -151,14 +152,15 @@ if __name__ == '__main__':
 	c=dataBase()
 	c.destroy()
 	c.create(config)
-	
-	errno=c.retrievErrno(13)
-	print(errno)
+
 	c.insertNeighborhood('192.168.1.3',5600)
 	c.insertNeighborhood('192.168.1.4',5601)
 	c.insertNeighborhood('192.168.1.5',5602)
 	c.insertNeighborhood('192.168.1.6',5603)
-	
+	c.insertNeighborhood('192.168.1.7',5604)
+	c.insertNeighborhood('192.168.1.8',5605)
+	c.insertNeighborhood('192.168.1.9',5606)
+	c.insertNeighborhood('192.168.1.10',5607)
 	print('\n\n\n')
 	vicini=c.retrieveAll()
 	for vicino in vicini:
@@ -171,13 +173,3 @@ if __name__ == '__main__':
 	vicini=c.retrieveAll()
 	for vicino in vicini:
 		print('id ',vicino[0],' ip ',vicino[1],' porta ',vicino[2])
-
-	c.insertRequest('qywterdf3546rteg', '172.16.8.3|fc00::8:3', 50003, 301.46)
-	c.insertResponse('qywterdf3546rteg', '172.16.8.3|fc00::8:3', 50003,'1ewr34etdfcgvscedret45362718uytr', 'file.jpg')
-	
-	responses = c.retrieveResponses('qywterdf3546rteg')
-
-	for res in responses:
-    		print("pid: " + res[0] + " ip: " + res[1] + " port: " + str(res[2]) + " md5: " + res[3] + " name: " + res[4])
-	
-	del c
