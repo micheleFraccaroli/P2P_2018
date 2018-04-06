@@ -19,28 +19,28 @@ class Vicini_res(th.Thread):
         peersocket.settimeout(20)
         peersocket.listen(20)
 
-        try:
-            while True:
-                other_peersocket, addr = peersocket.accept()
-                recv_packet = other_peersocket.recv(80)
-
+        
+        while True:
+            other_peersocket, addr = peersocket.accept()
+            recv_packet = other_peersocket.recv(80)
+            print(recv_packet.decode())
+            self.bytes_read = len(recv_packet)
+            print(self.bytes_read)
+            while(self.bytes_read < 80):
+                print("e qui??")
+                recv_packet += other_peersocket.recv(80 - self.bytes_read)
                 self.bytes_read = len(recv_packet)
-                while(self.bytes_read < 80):
-                    recv_packet += self.other_peersocket.recv(80 - self.bytes_read)
-                    self.bytes_read = len(recv_packet)
-                    
-                Util.printLog("ANEAR da: " + addr[0])
-                # retrieving data from near research
-                Util.printLog(recv_packet)
-                if(recv_packet[:4].decode() == "ANEA"):
-                    self.lock.acquire()
-                    db.insertResponse(recv_packet[4:20].decode(), recv_packet[20:75].decode(), recv_packet[75:80].decode())
-                    self.lock.release()
-                    
-                    self.lock.acquire()
-                    db.insertNeighborhood(recv_packet[20:75].decode(), recv_packet[75:80].decode())
-                    self.lock.release()
-        except:
-            pass
+                print(str(len(recv_packet)))
+
+            Util.printLog("ANEAR da: " + addr[0])
+            # retrieving data from near research
+            Util.printLog("pacchetto ====> " + str(recv_packet.decode()))
+
+            if(recv_packet[:4].decode() == "ANEA"):
+                self.lock.acquire()
+                db.insertResponse(recv_packet[4:20].decode(), recv_packet[20:75].decode(), recv_packet[75:80].decode(),"null", "null")
+                db.insertNeighborhood(recv_packet[20:75].decode(), recv_packet[75:80].decode())
+                self.lock.release()
+    
 
         del db
