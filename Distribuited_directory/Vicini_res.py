@@ -1,4 +1,5 @@
 import socket
+import Util
 import threading as th
 from dataBase import dataBase
 
@@ -28,7 +29,9 @@ class Vicini_res(th.Thread):
                     recv_packet += self.other_peersocket.recv(80 - self.bytes_read)
                     self.bytes_read = len(recv_packet)
 
+                Util.printLog("ANEAR da: " + addr[0])
                 # retrieving data from near research
+                Util.printLog(recv_packet)
                 if(recv_packet[:4].decode() == "ANEA"):
                     self.lock.acquire()
                     db.insertResponse(recv_packet[4:20].decode(), recv_packet[20:75].decode(), recv_packet[75:80].decode())

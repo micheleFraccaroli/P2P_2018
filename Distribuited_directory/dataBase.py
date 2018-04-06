@@ -54,6 +54,7 @@ class dataBase:
 		
 		c.execute('DELETE FROM neighborhood WHERE id NOT IN '+str(resId))
 		c.execute('SELECT ip, port FROM neighborhood')
+		res = c.fetchall()
 
 		con.commit()
 		con.close()
