@@ -23,11 +23,10 @@ class Vicini_res(th.Thread):
             try:
                 other_peersocket, addr = peersocket.accept()
                 recv_packet = other_peersocket.recv(80)
-                print(recv_packet.decode())
+                
                 self.bytes_read = len(recv_packet)
-                print(self.bytes_read)
+                
                 while(self.bytes_read < 80):
-                    print("e qui??")
                     recv_packet += other_peersocket.recv(80 - self.bytes_read)
                     self.bytes_read = len(recv_packet)
 

@@ -90,6 +90,6 @@ while True:
 		addr = Util.ip_deformatting(peer[1], peer[2], None)
 		ip6 = ipad.ip_address(peer[1][16:])
 
-		down = Download(str(addr[0]),str(ip6),peer[2],peer[3],peer[4])
+		down = Download(str(addr[0]),str(ip6),peer[2],peer[3],peer[4].rstrip())
 		down.download()
 		print("\n--- FILE DOWNLOADED ---\n")

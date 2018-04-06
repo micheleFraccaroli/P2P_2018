@@ -35,6 +35,3 @@ class thread_Response(th.Thread):
                 self.lock.acquire()
                 db.insertResponse(recv_packet[4:20].decode(), recv_packet[20:75].decode(), recv_packet[75:80].decode(), recv_packet[80:112].decode(), recv_packet[112:212].decode())
                 self.lock.release()
-
-            #self.other_peersocket.close()
-            del db
