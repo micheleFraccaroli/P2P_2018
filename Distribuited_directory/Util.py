@@ -11,7 +11,6 @@ def ip_formatting(ipv4,ipv6,port):
     # formattazione ipv6
     ip6 = ipa.ip_address(ipv6)
     ipv6 = ip6.exploded
-    #ip_6 = '0000:0000:0000:0000:0000:0000:0000:0001'
 
     # formattazione ipv4
     split_ip_4 = ipv4.split(".")
@@ -40,25 +39,6 @@ def ip_deformatting(ip,port,ttl):
 
     return f_ipv4, f_ipv6, f_port, f_ttl
 
-# DA CONFIGURARE COL DATABASE
-'''
-def ip_packet16_validation(packet16,packetWait):
-
-    res = ip_packet16_is_known(packet16)
-    if res:
-        #print(int(time()) - ipPacket16[packet16])
-        return ((int(time()) - ipPacket16[packet16]) > packetWait)
-    else:
-        return True
-
-def ip_packet16_is_known(packet16):
-
-    if packet16 in ipPacket16: # PacketId già presente in memoria
-        return True
-    else:
-        ipPacket16[packet16]=int(time())
-        return False
-'''
 def ip_packet16():
 
     # Per 16 volte scelgo un char casuale tra lower_case, upper_case o digit
