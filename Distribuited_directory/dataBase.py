@@ -79,11 +79,14 @@ class dataBase:
 
 		con = sqlite3.connect('P2P.db')
 		c = con.cursor()
-		#try:
-		c.execute('INSERT INTO neighborhood VALUES (?,?)',(ip,port))
-		#except:
-		#	pass
-		con.commit()
+
+		c.execute('SELECT * FROM neighborhood WHERE ip =?',(ip))
+		res = c.fetchone()
+
+		if res == None:
+			c.execute('INSERT INTO neighborhood VALUES (?,?)',(ip,port))
+			con.commit()
+
 		con.close()
 
 	def insertSearch(self, pktid, ip, timestamp):
