@@ -14,7 +14,7 @@ class dataBase:
 
 		c.execute('CREATE TABLE IF NOT EXISTS requests (pid VARCHAR(16), ip VARCHAR(55), timeOperation FLOAT NOT NULL,PRIMARY KEY(pid,ip))')
 		c.execute('CREATE TABLE IF NOT EXISTS responses (id INTEGER,pid VARCHAR(16) NOT NULL, ip VARCHAR(55) NOT NULL, port VARCHAR(5) NOT NULL, md5 VARCHAR(32), name VARCHAR(100), PRIMARY KEY(id))')
-		c.execute('CREATE TABLE IF NOT EXISTS neighborhood (id INTEGER, ip VARCHAR(55) NOT NULL, port VARCHAR(5) NOT NULL, PRIMARY KEY(id))')
+		c.execute('CREATE TABLE IF NOT EXISTS neighborhood (ip VARCHAR(55) NOT NULL, port VARCHAR(5) NOT NULL, PRIMARY KEY(ip))')
 
 		root1 = ip_formatting(config.root1V4,config.root1V6,config.root1P)
 		root2 = ip_formatting(config.root2V4,config.root2V6,config.root2P)
@@ -34,25 +34,28 @@ class dataBase:
 		except:
 			pass
 
-	def retrieveNeighborhood(self):
+	def retrieveNeighborhood(self,config):
 
 		con = sqlite3.connect('P2P.db')
 		c = con.cursor()
 
-		c.execute('SELECT id, ip, port FROM neighborhood ORDER BY random() LIMIT 4')
+		c.execute('SELECT ip, port FROM neighborhood ORDER BY random() LIMIT 4')
 		res = c.fetchall()
 		
-		resId = list(res[0] for res in res)
+		resIp = list(resp[0] for resp in res)
 		
-		if 1 not in resId:
-			resId[0] = 1
+		root1 = Util.ip_formatting(config.root1V4, config.root1V6, config.root1P)
+		root2 = Util.ip_formatting(config.root2V4, config.root2V6, config.root2P)
+
+		if root1[:len(root1)-5] not in resIp:
+			resIp[0] = root1[:len(root1)-5]
 		
-		if 2 not in resId:
-			resId[1] = 2
+		if root2[:len(root1)-5] not in resIp:
+			resIp[1] = root2[:len(root1)-5]
 		
 		resId=tuple(resId)
 		
-		c.execute('DELETE FROM neighborhood WHERE id NOT IN '+str(resId))
+		c.execute('DELETE FROM neighborhood WHERE ip NOT IN '+resIp)
 		c.execute('SELECT ip, port FROM neighborhood')
 		res = c.fetchall()
 
@@ -76,7 +79,7 @@ class dataBase:
 		con = sqlite3.connect('P2P.db')
 		c = con.cursor()
 
-		c.execute('INSERT INTO neighborhood VALUES (null,?,?)',(ip,port))
+		c.execute('INSERT INTO neighborhood VALUES (?,?)',(ip,port))
 
 		con.commit()
 		con.close()
