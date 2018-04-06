@@ -92,7 +92,6 @@ class ThreadQUER(th.Thread):
 	#ricerca dei vicini
 	def search_neighbors(self, db, ip_request, new_quer):
 		self.neighbors = db.retrieveNeighborhood() #mi tiro giù i vicini
-		Util.printLog('richiesta da: '+ip_request+'\n')
 		for n in self.neighbors:
 			addr = Util.ip_deformatting(n[0], n[1], None)
 				
@@ -103,7 +102,7 @@ class ThreadQUER(th.Thread):
 				self.con.connection()
 				if((addr[0] != ip_request) and (str(ip6) != ip_request) and (new_quer[20:35] != addr[0])):
 					self.con.s.send(new_quer.encode())
-					Util.printLog('inoltro richiesta a :\n')
+					Util.printLog('inoltro richiesta QUER a :\n')
 					Util.printLog(str(addr[0]))
 				self.con.deconnection()
 			except IOError as expt:
