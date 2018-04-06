@@ -51,13 +51,17 @@ class ThreadNEAR(th.Thread):
 						except IOError as e:
 							print(e)
 							exit()
-
+							
 			self.pack = 'ANEA'+self.pid+self.myIPP
+			Util.printLog('ANEA a: '+str(self.pack))
+			Util.printLog('ANEA CONN: '+self.ipv4+self.ipv6+str(self.port))
 			self.con = Conn(self.ipv4,self.ipv6,self.port)
 			try:
 				self.con.connection()
 				self.con.s.send(self.pack.encode())
 				self.con.deconnection()
 			except IOError as e:
-				print('Connection error. '+e)
+				print(e)
 				exit()
+		else:
+			Util.printLog("NEAR per: "+self.ipRequest+". Già eseguita")
