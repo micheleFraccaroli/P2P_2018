@@ -22,7 +22,7 @@ from File_system import File_system
 
 #inizializzo il thread
 class ThreadQUER(th.Thread):
-	def __init__(self, my_door, quer_pkt, ip_request, ipv4, ipv6, lock):
+	def __init__(self, my_door, quer_pkt, ip_request, ipv4, ipv6, lock, config):
 		th.Thread.__init__(self)
 		self.my_door = int(my_door)
 		self.bytes_read = 0
@@ -31,6 +31,7 @@ class ThreadQUER(th.Thread):
 		self.ipv4 = ipv4
 		self.ipv6 = ipv6
 		self.lock = lock
+		self.config = config
 	
 	#insersce un nuovo record nella lista dei packet id
 
@@ -91,7 +92,7 @@ class ThreadQUER(th.Thread):
 
 	#ricerca dei vicini
 	def search_neighbors(self, db, ip_request, new_quer):
-		self.neighbors = db.retrieveNeighborhood() #mi tiro giù i vicini
+		self.neighbors = db.retrieveNeighborhood(self.config) #mi tiro giù i vicini
 		for n in self.neighbors:
 			addr = Util.ip_deformatting(n[0], n[1], None)
 				
