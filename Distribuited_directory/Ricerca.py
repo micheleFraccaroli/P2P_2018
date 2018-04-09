@@ -8,6 +8,7 @@ import ipaddress as ipad
 import threading as th
 import random as ra
 import time
+import Util
 from Conn import Conn
 from Retr import Retr
 from Vicini import Vicini
@@ -48,10 +49,11 @@ class Ricerca:
 
         # retrieve neighbors from database
         self.neighbors = db.retrieveNeighborhood(config)
-        
+        Util.printLog("SONO NELLA RICERCA PRIMA DI RETR")
         #thread in ascolto per ogni ricerca
         retr = Retr(self.port, config, self.lock)
         retr.start()
+        Util.printLog("SONO NELLA RICERCA DOPO RETR")
 
         #sending query to roots and neighbors
         for n in self.neighbors:
