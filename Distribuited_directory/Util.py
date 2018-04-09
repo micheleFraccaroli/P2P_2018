@@ -55,6 +55,9 @@ def initializeFiles():
     f.write('#### Log file launched on {:%d-%m-%Y %H:%M:%S} ####'.format(datetime.now())+'\n\n')
     f.close()
 
+    file = open('File_System.txt', "w")
+    file.close()
+
 def printLog(desc):
 
     f = open('logs.log','a')

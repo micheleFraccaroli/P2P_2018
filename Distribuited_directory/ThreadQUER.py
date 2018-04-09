@@ -52,16 +52,19 @@ class ThreadQUER(th.Thread):
 
 	def convert_md5(self, file_list):
 		dict_list = {}
+		index = 0
 		for file in file_list:
+			#index = ra.randint(50000, 59999)
 			open_file = open('img/'+file, 'rb')
 			contenuto = open_file.read()
 			FileHash = hashlib.md5()
 			FileHash.update(contenuto)
-			dict_list[FileHash.hexdigest()] = file
+			dict_list[index] = FileHash.hexdigest()+file
 			#il file File_System viene utilizzato come appoggio alla funzione di upload
 			file_write = File_system(FileHash.hexdigest(), file)
 			file_write.write()
 			open_file.close()
+			index = index +1
 		return dict_list
 
 	#risponde al peer che ha effettuato una ricerca, incompleta
@@ -73,17 +76,17 @@ class ThreadQUER(th.Thread):
 		ip6 = ipad.ip_address(ip[16:])
 
 		self.con = Conn(addr[0], str(ip6), addr[2])
-
-		#self.con = Conn(addr[0], addr[1], addr[2])
 		
 		my_ip_port = Util.ip_formatting(my_ipv4, my_ipv6, my_port)
 
 		try:
 			self.con.connection()
-			for md5 in dict_list:
-				file_name = dict_list[md5].ljust(100,' ')
-				answer = "AQUE"+pktid+my_ip_port+md5+file_name
+			for index in dict_list:
+				md5_file_name = dict_list[index].ljust(132,' ')
+				answer = "AQUE"+pktid+my_ip_port+md5_file_name
 				self.con.s.send(answer.encode())
+				#print(str(answer.encode())+"\n")
+				#print(str(len(answer.encode()))+"\n")
 			self.con.deconnection()
 		except IOError as expt:
 			print("Errore di connessione")
@@ -134,6 +137,7 @@ class ThreadQUER(th.Thread):
 		self.lock.acquire()
 		res = db.retrivenSearch(self.pktid, self.ip)
 		#self.my_ip = str(self.ipv4)+"|"+str(self.ipv6)
+		Util.printLog('Avvio il thread QUER')
 
 		if(res == 0):
 
@@ -219,27 +223,27 @@ class ThreadQUER(th.Thread):
 '''
 if __name__ == '__main__':
 
-	db = dataBase()
-	conf = Config()
-	db.create(conf)
-	del db
+	#db = dataBase()
+	#conf = Config()
+	#db.create(conf)
+	#del db
 	
-	Receive_4 = Receive('127.0.0.1','50004', conf)
-	Re_4 = mp.Process(target=Receive_4.listen_other)
-	Re_4.start()
+	#Receive_4 = Receive('127.0.0.1','50004', conf)
+	#Re_4 = mp.Process(target=Receive_4.listen_other)
+	#Re_4.start()
 
-	Receive_6 = Receive('::1','50004', conf)
-	Re_6 = mp.Process(target=Receive_6.listen_other)
-	Re_6.start()
-	
+	#Receive_6 = Receive('::1','50004', conf)
+	#Re_6 = mp.Process(target=Receive_6.listen_other)
+	#Re_6.start()
+	lock = th.Lock()
 	pktid = 'COR3BEWPI98CHFOP'
 	ip = '172.016.008.004|fc00:0000:0000:0000:0000:0000:0008:0004'
 	door = '50004'
 	ttl = '02'
-	ricerca = 'CrAs'
+	ricerca = 'bu'
 	ricerca_20 = ricerca.ljust(20,' ')
 	string_request = "QUER"+pktid+ip+door+ttl+ricerca_20
 
-	th_QUER = Thread_quer('127.0.0.1', '::1', '50003', string_request)
+	th_QUER = ThreadQUER('50003', string_request, "172.16.8.2", "172.16.8.5", "fc00::8:5", lock, "config")
 	th_QUER.start()
 '''
