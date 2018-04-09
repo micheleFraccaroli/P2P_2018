@@ -22,7 +22,7 @@ from File_system import File_system
 
 #inizializzo il thread
 class ThreadQUER(th.Thread):
-	def __init__(self, my_door, quer_pkt, ip_request, ipv4, ipv6, lock, config):
+	def __init__(self, my_door, quer_pkt, ip_request, ipv4, ipv6, lock, config, up_port):
 		th.Thread.__init__(self)
 		self.my_door = int(my_door)
 		self.bytes_read = 0
@@ -32,6 +32,7 @@ class ThreadQUER(th.Thread):
 		self.ipv6 = ipv6
 		self.lock = lock
 		self.config = config
+		self.new_port = up_port
 	
 	#insersce un nuovo record nella lista dei packet id
 
@@ -146,14 +147,13 @@ class ThreadQUER(th.Thread):
 
 			db.insertSearch(self.pktid, self.ip, self.timestamp)
 			self.lock.release()
-			
 			for file in os.listdir("img"):
 				if re.search(self.string, file, re.IGNORECASE):
 					file_found.append(file)
 
 			if(len(file_found) != 0):
-				#rispondo e apro l'upload
-				self.new_port = ra.randint(50010, 59999)
+				#rispondo
+				
 				self.answer(file_found, self.pktid, self.ip, self.ipv4, self.ipv6, str(self.new_port), self.door)
 				if(self.ttl>1):
 					self.ttl_new = self.new_ttl(self.ttl)
@@ -161,9 +161,9 @@ class ThreadQUER(th.Thread):
 					self.lock.acquire()
 					self.search_neighbors(db, self.ip_request, self.new_quer)
 					self.lock.release()
-				del db
-				up = Upload(self.new_port)
-				up.upload()
+				#del db
+				#up = Upload(self.new_port)
+				#up.upload()
 				
 			elif(self.ttl>1):
 				Util.printLog("QUER: eseguo l'inoltro ai vicini della richiesta\n")
@@ -173,7 +173,6 @@ class ThreadQUER(th.Thread):
 				self.lock.acquire()
 				self.search_neighbors(db, self.ip_request, self.new_quer)
 				self.lock.release()
-
 			del db
 
 		else:
@@ -198,7 +197,7 @@ class ThreadQUER(th.Thread):
 
 				if(len(file_found) != 0):
 					#rispondo e apro l'upload
-					self.new_port = ra.randint(50010, 59999)
+					
 					self.answer(file_found, self.pktid, self.ip, self.ipv4, self.ipv6, str(self.new_port), self.door)
 					if(self.ttl>1):
 						self.ttl_new = self.new_ttl(self.ttl)
@@ -206,9 +205,9 @@ class ThreadQUER(th.Thread):
 						self.lock.acquire()
 						self.search_neighbors(db, self.ip_request, self.new_quer)
 						self.lock.release()
-					del db
-					up = Upload(self.new_port)
-					up.upload()
+					#del db
+					#up = Upload(self.new_port)
+					#up.upload()
 					
 				elif(self.ttl>1):
 					Util.printLog("QUER: eseguo l'inoltro ai vicini della richiesta 2\n")
