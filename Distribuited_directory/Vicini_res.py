@@ -39,7 +39,7 @@ class Vicini_res(th.Thread):
                 db.insertResponse(recv_packet[4:20].decode(), recv_packet[20:75].decode(), recv_packet[75:80].decode(),"null", "null")
                 db.insertNeighborhood(recv_packet[20:75].decode(), recv_packet[75:80].decode())
                 self.lock.release()
-           # except:
+            #except:
             #    pass
 
         del db

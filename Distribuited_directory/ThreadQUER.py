@@ -97,14 +97,16 @@ class ThreadQUER(th.Thread):
 	#ricerca dei vicini
 	def search_neighbors(self, db, ip_request, new_quer):
 		self.neighbors = db.retrieveNeighborhood(self.config) #mi tiro giù i vicini
+		Util.printLog("------------------------- Sono tornato nel threadQuer ------------------------")
 		for n in self.neighbors:
 			addr = Util.ip_deformatting(n[0], n[1], None)
-				
+			Util.printLog("------------- Dentro al for di threadQUER -----------------------")
 			#ip4 = ipad.ip_address(n[0][:15])
 			ip6 = ipad.ip_address(n[0][16:])
 			self.con = Conn(addr[0], str(ip6), addr[2])
 			try:
 				self.con.connection()
+				Util.printLog("-----------------Dentro alla connection threadQUER --------------")
 				if((addr[0] != ip_request) and (str(ip6) != ip_request) and (new_quer[20:35] != addr[0])):
 					self.con.s.send(new_quer.encode())
 					Util.printLog('QUER: inoltro richiesta a : ' + str(addr[0]))
