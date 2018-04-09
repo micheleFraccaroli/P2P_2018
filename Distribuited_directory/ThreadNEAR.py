@@ -23,7 +23,7 @@ class ThreadNEAR(th.Thread):
 		self.config    = config
 
 	def run(self):
-
+		Util.printLog('\n\nApertura thread NEAR\n\n')
 		db = dataBase()
 
 		self.lock.acquire()
@@ -71,3 +71,4 @@ class ThreadNEAR(th.Thread):
 		else:
 			self.lock.release()
 			Util.printLog("NEAR per: "+self.ipRequest+". Già eseguita")
+		Util.printLog('\n\nChiusura thread NEAR\n\n')
