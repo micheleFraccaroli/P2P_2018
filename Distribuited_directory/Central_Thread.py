@@ -23,6 +23,8 @@ class Central_Thread(th.Thread):
 		peersocket.listen(20)
 
 		while True:
+			Util.printLog("IN ATTESA DI UNA RICHISTA")
+
 			other_peersocket, addr = peersocket.accept()
 			if addr[0][:2] == "::":
 				addrPack = addr[0][7:]
@@ -67,3 +69,4 @@ class Central_Thread(th.Thread):
 				
 				th_QUER = ThreadQUER(self.port,pkt.decode(), addrPack, self.ipv4, self.ipv6, self.lock,self.config)
 				th_QUER.start()
+		Util.printLog("CENTRAL THREAD CHIUSO")

@@ -2,13 +2,13 @@ import signal
 import os
 import math
 import socket
-import multiprocessing as mp
+import threading as th
 import ipaddress as ipaddr
 from File_system import File_system
 
-class Upload:
-
+class Upload(th.Thread):
     def __init__(self, pp2p_A):
+        th.Thread.__init__(self):
         self.pp2p_A = pp2p_A
         #print(self.pp2p_A)
         #chunk veriables
@@ -56,7 +56,7 @@ class Upload:
         return dict
 
 
-    def upload(self):
+    def run(self):
         dict = {}
         peersocket = socket.socket(socket.AF_INET6, socket.SOCK_STREAM)
         peersocket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)

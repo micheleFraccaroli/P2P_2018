@@ -3,6 +3,7 @@ import Util
 import time
 import ipaddress as ipad
 import random as ra
+import threading as th
 from Config import Config
 from Vicini import Vicini
 from Ricerca import Ricerca
@@ -11,8 +12,7 @@ from dataBase import dataBase
 from tqdm import tqdm
 from Download import Download
 from Central_Thread import Central_Thread
-import threading as th
-
+from Upload import Upload
 
 class bcolors:
     HEADER = '\033[95m'
@@ -55,10 +55,13 @@ lock = th.Lock()
 central_thread = Central_Thread(c, lock)
 central_thread.start()
 
+upl = Upload(c.selfP+10)
+upl.start()
+
 while True:
 	name_search = input(bcolors.OKBLUE + "Search >> " + bcolors.ENDC)
 	print("...peers searching...")
-	port = ra.randint(50000, 59999)
+	port = ra.randint(50010, 60000)
 	search = Ricerca(c.selfV4, c.selfV6, port, c.ttl, c.timeResearch, name_search, lock)
 	pktid = search.query(c)
 	print("\n------| New research launched |------\n")
