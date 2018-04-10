@@ -66,9 +66,9 @@ while True:
 	pktid = search.query(c)
 	print("\n------| New research launched |------\n")
 
-	#for i in tqdm(range(c.timeResearch), desc="\033[94mLoading\033[0m"):
-	#	time.sleep(1)
-	print("...reading response from other peers...")
+	for i in tqdm(range(c.timeResearch), desc="\033[94mLoading\033[0m"):
+		time.sleep(1)
+	#print("...reading response from other peers...")
 
 	print("Research termined\nResult for " + pktid)
 	print("[select with the number the file to download]")
