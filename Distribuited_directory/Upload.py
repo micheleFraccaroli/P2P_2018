@@ -8,7 +8,7 @@ from File_system import File_system
 
 class Upload(th.Thread):
     def __init__(self, pp2p_A):
-        th.Thread.__init__(self):
+        th.Thread.__init__(self)
         self.pp2p_A = pp2p_A
         #print(self.pp2p_A)
         #chunk veriables

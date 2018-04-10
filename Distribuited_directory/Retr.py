@@ -19,12 +19,12 @@ class Retr(th.Thread):
         peersocket.listen(5)
         Util.printLog("THREAD LIVELLO UNO ----> RETR")
 
-        while True:
-            try:
+        try:
+            while True:
                 other_peersocket, addr = peersocket.accept()
                 thread = thread_Response(other_peersocket, self.lock)
                 thread.start()
             
-            except OSError as e:
-                pass
+        except OSError as e:
+            pass
         Util.printLog("CHIUDO THREAD LIVELLO UNO")
