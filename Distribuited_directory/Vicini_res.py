@@ -40,6 +40,6 @@ class Vicini_res(th.Thread):
                 db.insertNeighborhood(recv_packet[20:75].decode(), recv_packet[75:80].decode())
                 self.lock.release()
             #except:
-            #    pass
+            #    Util.printLog("...fine lettura vicini...")
 
         del db

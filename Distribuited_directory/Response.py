@@ -18,19 +18,16 @@ class thread_Response(th.Thread):
         th.Thread.__init__(self) # thread istance second level
         self.bytes_read = 0
         self.other_peersocket = other_peersocket
-        self.other_peersocket.setblocking(0)
+        #self.other_peersocket.setblocking(0)
         self.lock = lock
 
     def run(self):
         db = dataBase()
         while True:
-            try:
-                Util.printLog("--------INIZIO LETTURA SECONDO LIVELLO-------")
-                recv_packet = self.other_peersocket.recv(212)
-                Util.printLog("--------FINE LETTURA SECONDO LIVELLO ---------")
-            except:
-                Util.printLog("NIENTE DA LEGGERE LIVELLO DUE.. ESCO E TORNO A LIV UNO" + str(self.other_peersocket))
-                sys.exit()
+            
+            Util.printLog("--------INIZIO LETTURA SECONDO LIVELLO-------")
+            recv_packet = self.other_peersocket.recv(212)
+            Util.printLog("--------FINE LETTURA SECONDO LIVELLO ---------")
 
             Util.printLog("THREAD SECONDO LIVELLO -----> RESPONSE")
             self.bytes_read = len(recv_packet)
