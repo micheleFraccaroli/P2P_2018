@@ -95,6 +95,7 @@ class ThreadQUER(th.Thread):
 			print("Errore di connessione")
 			print(expt)
 			sys.exit(0)
+		Util.printLog('QUER:fine answer')
 
 	#ricerca dei vicini
 	def search_neighbors(self, db, ip_request, new_quer):
@@ -114,10 +115,12 @@ class ThreadQUER(th.Thread):
 					Util.printLog('QUER: inoltro richiesta a : ' + str(addr[0]))
 					#Util.printLog(str(addr[0]))
 				self.con.deconnection()
+				Util.printLog('QUER:deconection neighbors')
 			except IOError as expt:
 				print("Errore di connessione")
 				print(expt)
 				sys.exit(0)
+		Util.printLog('QUER:fine neighbors')
 
 	#vado a calcolare il nuovo ttl
 
@@ -157,19 +160,9 @@ class ThreadQUER(th.Thread):
 
 			if(len(file_found) != 0):
 				#rispondo
-				
 				self.answer(file_found, self.pktid, self.ip, self.ipv4, self.ipv6, str(self.new_port), self.door)
-				if(self.ttl>1):
-					self.ttl_new = self.new_ttl(self.ttl)
-					self.new_quer = "QUER"+self.pktid+self.ip+self.door+self.ttl_new+self.from_peer[82:]
-					self.lock.acquire()
-					self.search_neighbors(db, self.ip_request, self.new_quer)
-					self.lock.release()
-				#del db
-				#up = Upload(self.new_port)
-				#up.upload()
 				
-			elif(self.ttl>1):
+			if(self.ttl>1):
 				Util.printLog("QUER: eseguo l'inoltro ai vicini della richiesta\n")
 				#vado a decrementare il ttl di uno e costruisco la nuova query da inviare ai vicini
 				self.ttl_new = self.new_ttl(self.ttl)
@@ -201,19 +194,9 @@ class ThreadQUER(th.Thread):
 
 				if(len(file_found) != 0):
 					#rispondo e apro l'upload
-					
 					self.answer(file_found, self.pktid, self.ip, self.ipv4, self.ipv6, str(self.new_port), self.door)
-					if(self.ttl>1):
-						self.ttl_new = self.new_ttl(self.ttl)
-						self.new_quer = "QUER"+self.pktid+self.ip+self.door+self.ttl_new+self.from_peer[82:]
-						self.lock.acquire()
-						self.search_neighbors(db, self.ip_request, self.new_quer)
-						self.lock.release()
-					#del db
-					#up = Upload(self.new_port)
-					#up.upload()
 					
-				elif(self.ttl>1):
+				if(self.ttl>1):
 					Util.printLog("QUER: eseguo l'inoltro ai vicini della richiesta 2\n")
 					#vado a decrementare il ttl di uno e costruisco la nuova query da inviare ai vicini
 					self.ttl_new = self.new_ttl(self.ttl)
@@ -222,7 +205,7 @@ class ThreadQUER(th.Thread):
 					self.search_neighbors(db, self.ip_request, self.new_quer)
 					self.lock.release()
 				del db
-
+		Util.printLog('QUER: ultima riga\n')
 '''
 if __name__ == '__main__':
 
