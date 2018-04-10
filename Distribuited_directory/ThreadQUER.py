@@ -85,6 +85,7 @@ class ThreadQUER(th.Thread):
 			for index in dict_list:
 				md5_file_name = dict_list[index].ljust(132,' ')
 				answer = "AQUE"+pktid+my_ip_port+md5_file_name
+				#print(answer)
 				self.con.s.send(answer.encode())
 				#print(str(answer.encode())+"\n")
 				#print(str(len(answer.encode()))+"\n")
