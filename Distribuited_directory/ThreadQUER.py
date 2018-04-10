@@ -87,6 +87,7 @@ class ThreadQUER(th.Thread):
 				answer = "AQUE"+pktid+my_ip_port+md5_file_name
 				#print(answer)
 				self.con.s.send(answer.encode())
+				Util.printLog(answer)
 				#print(str(answer.encode())+"\n")
 				#print(str(len(answer.encode()))+"\n")
 			self.con.deconnection()
