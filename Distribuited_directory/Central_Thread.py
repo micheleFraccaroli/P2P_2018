@@ -67,6 +67,6 @@ class Central_Thread(th.Thread):
 				# lancio il thread per l'ascolto delle richieste di contenuti
 				pkt = recv_type+recv_packet
 				
-				th_QUER = ThreadQUER(self.port,pkt.decode(), addrPack, self.ipv4, self.ipv6, self.lock,self.config, self.up_port+10)
+				th_QUER = ThreadQUER(self.port,pkt.decode(), addrPack, self.ipv4, self.ipv6, self.lock,self.config, self.port+10)
 				th_QUER.start()
 
