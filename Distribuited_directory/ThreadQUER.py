@@ -108,13 +108,13 @@ class ThreadQUER(th.Thread):
 			ip6 = ipad.ip_address(n[0][16:])
 			self.con = Conn(addr[0], str(ip6), addr[2])
 			try:
-				self.con.connection()
 				Util.printLog("-----------------Dentro alla connection threadQUER --------------")
 				if((addr[0] != ip_request) and (str(ip6) != ip_request) and (new_quer[20:35] != addr[0])):
+					self.con.connection()
 					self.con.s.send(new_quer.encode())
 					Util.printLog('QUER: inoltro richiesta a : ' + str(addr[0]))
+					self.con.deconnection()
 					#Util.printLog(str(addr[0]))
-				self.con.deconnection()
 				Util.printLog('QUER:deconection neighbors')
 			except IOError as expt:
 				print("Errore di connessione")

@@ -24,6 +24,7 @@ class Retr(th.Thread):
                 other_peersocket, addr = peersocket.accept()
                 thread = thread_Response(other_peersocket, self.lock)
                 thread.start()
+                Util.printLog("PRE JOIN POSSIBILE INVIO DI CAZZATE 2")
                 thread.join()
             
         except OSError as e:

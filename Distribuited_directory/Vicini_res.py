@@ -5,12 +5,12 @@ import threading as th
 from dataBase import dataBase
 
 class Vicini_res(th.Thread):
-    def __init__(self, port,lock, stop_event):
+    def __init__(self, port,lock):
         th.Thread.__init__(self)
         self.bytes_read = 0
         self.port = port
         self.lock = lock
-        self.stop_event = stop_event
+        #self.stop_event = stop_event
 
     def run(self):
         db = dataBase()
@@ -18,10 +18,10 @@ class Vicini_res(th.Thread):
         peersocket = socket.socket(socket.AF_INET6, socket.SOCK_STREAM)
         peersocket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         peersocket.bind(('', self.port))
-        #peersocket.settimeout(20)
+        peersocket.settimeout(20)
         peersocket.listen(20)
 
-        while (not self.stop_event.is_set()):
+        while True:
             try:
                 other_peersocket, addr = peersocket.accept()
                 recv_packet = other_peersocket.recv(80)
@@ -43,5 +43,5 @@ class Vicini_res(th.Thread):
                     self.lock.release()
             except:
                 sys.exit()
-
+            
         del db

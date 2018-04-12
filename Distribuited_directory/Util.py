@@ -61,7 +61,7 @@ def initializeFiles():
 def printLog(desc):
 
     f = open('logs.log','a')
-    f.write('Timestamp: {:%d-%m-%Y %H:%M:%S} #### '.format(datetime.now())+desc+'\n')
+    f.write('{:%d-%m-%Y %H:%M:%S.%f} #### '.format(datetime.now())+desc+'\n')
     f.close()
 
 def printError(desc):

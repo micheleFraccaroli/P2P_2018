@@ -37,14 +37,15 @@ class Ricerca:
         near = Vicini(config, self.port)
         # thread per ascolto di riposta dei vicini
         
-        th_near_stop = th.Event()
-        th_near = Vicini_res(self.port, self.lock, th_near_stop)
+        #th_near_stop = th.Event()
+        th_near = Vicini_res(self.port, self.lock)
         th_near.start()
 
         # partenza richiesta dei vicini
         near.searchNeighborhood()
-        time.sleep(20)
-        th_near_stop.set()
+        
+        #th_near_stop.set()
+        Util.printLog("PRE JOIN POSSIBILE INVIO DI CAZZATE")
         th_near.join()
         
         db.insertRequest(pktid, ipp2p_pp2p[:55], time.time())
