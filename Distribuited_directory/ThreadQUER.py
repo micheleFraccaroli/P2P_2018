@@ -179,7 +179,7 @@ class ThreadQUER(th.Thread):
 			self.lock.release()
 			now = time.time()
 
-			if((now - before) < 30):
+			if((now - before) < 20):
 				Util.printLog('QUER: non faccio nulla perchè ho già elaborato la richiesta\n')
 				del db
 			else:

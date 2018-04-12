@@ -37,10 +37,14 @@ class Ricerca:
         near = Vicini(config, self.port)
         # thread per ascolto di riposta dei vicini
         
-        th_near = Vicini_res(self.port, self.lock)
+        th_near_stop = th.Event()
+        th_near = Vicini_res(self.port, self.lock, th_near_stop)
         th_near.start()
+
         # partenza richiesta dei vicini
         near.searchNeighborhood()
+        time.sleep(20)
+        th_near_stop.set()
         th_near.join()
         
         db.insertRequest(pktid, ipp2p_pp2p[:55], time.time())
@@ -52,7 +56,9 @@ class Ricerca:
         Util.printLog("SONO NELLA RICERCA PRIMA DI RETR")
         #thread in ascolto per ogni ricerca
         retr = Retr(self.port, config, self.lock)
+        #th_quer_stop = th.Event()
         retr.start()
+
         Util.printLog("SONO NELLA RICERCA DOPO RETR")
 
         #sending query to roots and neighbors
