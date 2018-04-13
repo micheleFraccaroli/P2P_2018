@@ -12,7 +12,7 @@ class dataBase:
 		con = sqlite3.connect('P2P.db')
 		c = con.cursor()
 		c.execute('CREATE TABLE IF NOT EXISTS login (ip VARCHAR(55)NOT NULL, idSession NOT NULL,PRIMARY KEY(ip))')
-		c.execute('CREATE TABLE IF NOT EXISTS file (md5 VARCHAR(32) NOT NULL, name VARCHAR(100) NOT NULL,PRIMARY KEY(md5,name))')
+		c.execute('CREATE TABLE IF NOT EXISTS file (Sessionid VARCHAR(16), md5 VARCHAR(32) NOT NULL, name VARCHAR(100) NOT NULL,PRIMARY KEY(Sessionid, md5))')
 		c.execute('CREATE TABLE IF NOT EXISTS requests (pid VARCHAR(16), ip VARCHAR(55), timeOperation FLOAT NOT NULL,PRIMARY KEY(pid,ip))')
 		c.execute('CREATE TABLE IF NOT EXISTS responses (id INTEGER,pid VARCHAR(16) NOT NULL, ip VARCHAR(55) NOT NULL, port VARCHAR(5) NOT NULL, md5 VARCHAR(32), name VARCHAR(100), PRIMARY KEY(id))')
 		c.execute('CREATE TABLE IF NOT EXISTS neighborhood (ip VARCHAR(55) NOT NULL, port VARCHAR(5) NOT NULL, PRIMARY KEY(ip))')
@@ -173,14 +173,56 @@ class dataBaseSuper(dataBase):
 		
 		con.commit()
 		con.close()
-	
+
+	def insert_file(self, Sessionid, md5, filename):
+
+		con = sqlite3.connect('P2P.db')
+		c = con.cursor()
+
+		res = c.execute('INSERT INTO file VALUES(?,?,?)', (Sessionid, md5, filename))
+
+		con.commit()
+		con.close()
+
+	def retrive_file(self, Sessionid, md5):
+
+		con = sqlite3.connect('P2P.db')
+		c = con.cursor()
+
+		c.execute('SELECT count(*) FROM file WHERE Sessionid=? AND md5=?',(Sessionid, md5))
+		res = c.fetchone()
+		con.close()
+
+		return res[0]
+
+	def update_file(self, filename, md5):
+
+		con = sqlite3.connect('P2P.db')
+		c = con.cursor()
+
+		c.execute('UPDATE file SET name = ? WHERE md5 = ?', (filename, md5))
+
+		con.commit()
+		con.close()
+
+	def delete_file(self, Sessionid, md5):
+
+		con = sqlite3.connect('P2P.db')
+		c = con.cursor()
+
+		c.execute('DELETE FROM file WHERE Sessionid = ? AND md5 = ?', (Sessionid, md5))
+
+		con.commit()
+		con.close()
+
+'''	
 if __name__ == '__main__':
 	print("faccio")
 	config=Config()
 	c=dataBaseSuper()
 	c.destroy()
 	c.create(config)
-	'''
+	
 	c.insertNeighborhood('192.168.1.3',5600)
 	c.insertNeighborhood('192.168.1.4',5601)
 	c.insertNeighborhood('192.168.1.5',5602)
@@ -201,7 +243,7 @@ if __name__ == '__main__':
 	vicini=c.retrieveAll()
 	for vicino in vicini:
 		print('id ',vicino[0],' ip ',vicino[1],' porta ',vicino[2])
-	'''
+	
 	for i in range(4):
 		res = c.retrieveID('172.168.1.1')
 		if not res:
@@ -209,3 +251,4 @@ if __name__ == '__main__':
 			c.insertID('172.168.1.1','111100001')
 		else:
 			print('ID ::: ',res)
+'''
