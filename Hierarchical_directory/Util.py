@@ -84,3 +84,9 @@ if __name__ == '__main__':
 
     for res in resB:
         print(res)
+
+    a = ip_formatting('172.16.8.1','fc00::8:1',50)
+    b = ip_formatting('172.16.8.1','::1',50)
+
+    print(a)
+    print(b)

@@ -7,22 +7,23 @@ import subprocess as sub
 
 class dataBase:
 
-	def create(self,config):
+	def create(self, config):
 		
 		con = sqlite3.connect('P2P.db')
 		c = con.cursor()
 		c.execute('CREATE TABLE IF NOT EXISTS login (ip VARCHAR(55)NOT NULL, idSession NOT NULL,PRIMARY KEY(ip))')
 		c.execute('CREATE TABLE IF NOT EXISTS file (md5 VARCHAR(32) NOT NULL, name VARCHAR(100) NOT NULL,PRIMARY KEY(md5,name))')
 		c.execute('CREATE TABLE IF NOT EXISTS requests (pid VARCHAR(16), ip VARCHAR(55), timeOperation FLOAT NOT NULL,PRIMARY KEY(pid,ip))')
-		c.execute('CREATE TABLE IF NOT EXISTS responses (id INTEGER,pid VARCHAR(16) NOT NULL, ip VARCHAR(55) NOT NULL, port VARCHAR(5) NOT NULL, md5 VARCHAR(32), name VARCHAR(100), PRIMARY KEY(id))')
-		c.execute('CREATE TABLE IF NOT EXISTS neighborhood (ip VARCHAR(55) NOT NULL, port VARCHAR(5) NOT NULL, PRIMARY KEY(ip))')
+		c.execute('CREATE TABLE IF NOT EXISTS responses (id INTEGER,pid VARCHAR(16) NOT NULL, ip VARCHAR(55) NOT NULL, port VARCHAR(5) NOT NULL, md5 VARCHAR(32), name VARCHAR(100), timeResponse FLOAT NOT NULL, PRIMARY KEY(id))')
+		c.execute('CREATE TABLE IF NOT EXISTS peers (ip VARCHAR(55) NOT NULL, port VARCHAR(5) NOT NULL, PRIMARY KEY(ip))')
+		c.execute('CREATE TABLE IF NOT EXISTS superPeers (ip VARCHAR(55) NOT NULL, port VARCHAR(5) NOT NULL, PRIMARY KEY(ip))')
 
 		root1 = Util.ip_formatting(config.root1V4,config.root1V6,config.root1P)
 		root2 = Util.ip_formatting(config.root2V4,config.root2V6,config.root2P)
 		
 		try:
-			c.execute('INSERT INTO neighborhood VALUES (?,?)',(root1[:55],root1[55:]))
-			c.execute('INSERT INTO neighborhood VALUES (?,?)',(root2[:55],root2[55:]))
+			c.execute('INSERT INTO peers VALUES (?,?)',(root1[:55],root1[55:]))
+			c.execute('INSERT INTO peers VALUES (?,?)',(root2[:55],root2[55:]))
 			con.commit()
 		except:
 			pass
@@ -35,30 +36,55 @@ class dataBase:
 		except:
 			pass
 
-	def retrieveNeighborhood(self,config):
+	def insertPeers(self, ip, port):
 
 		con = sqlite3.connect('P2P.db')
 		c = con.cursor()
 
-		c.execute('SELECT ip, port FROM neighborhood ORDER BY random() LIMIT ?'(config.maxNear,))
+		c.execute('SELECT * FROM peers WHERE ip=?',(ip,))
+		res = c.fetchone()
+
+		if res == None:
+			c.execute('INSERT INTO peers VALUES (?,?)',(ip,port))
+			con.commit()
+
+		con.close()
+
+	def retrievePeers(self, config):
+
+		con = sqlite3.connect('P2P.db')
+		c = con.cursor()
+
+		c.execute('SELECT * FROM peers')
 		res = c.fetchall()
 		
-		resIp = list(resp[0] for resp in res)
-		
-		root1 = Util.ip_formatting(config.root1V4, config.root1V6, config.root1P)
-		root2 = Util.ip_formatting(config.root2V4, config.root2V6, config.root2P)
+		con.close()
 
-		if root1[:len(root1)-5] not in resIp:
-			resIp[0] = root1[:len(root1)-5]
-		
-		if root2[:len(root1)-5] not in resIp:
-			resIp[1] = root2[:len(root1)-5]
-		
-		resIp=tuple(resIp)
+		return res
+
+	def updatePeers(self):
 		
 
-		c.execute('DELETE FROM neighborhood WHERE ip NOT IN '+ str(resIp))
-		c.execute('SELECT ip, port FROM neighborhood')
+	def insertSuperPeers(self, ip, port):
+
+		con = sqlite3.connect('P2P.db')
+		c = con.cursor()
+
+		try:
+			c.execute('INSERT INTO superPeers VALUES(?,?)',(ip,port))
+		except:
+			pass
+
+	def retrieveSuperPeers(self):
+
+		con = sqlite3.connect('P2P.db')
+		c = con.cursor()
+
+		c.execute('SELECT * FROM superPeers ORDER BY random() LIMIT ?',(config.maxNear,))
+		res = c.fetchall()
+
+		c.execute('DELETE FROM superPeers WHERE ip NOT IN ?',(str(res),))
+		c.execute('SELECT * FROM superPeers')
 		res = c.fetchall()
 
 		con.commit()
@@ -71,51 +97,12 @@ class dataBase:
 		con = sqlite3.connect('P2P.db')
 		c = con.cursor()
 
-		c.execute('SELECT * FROM neighborhood')
+		c.execute('SELECT * FROM peers')
 		res = c.fetchall()
+		
 		c.close()
+		
 		return res
-
-	def insertNeighborhood(self,ip,port):
-
-		con = sqlite3.connect('P2P.db')
-		c = con.cursor()
-
-		c.execute('SELECT * FROM neighborhood WHERE ip=?',(ip,))
-		res = c.fetchone()
-
-		if res == None:
-			c.execute('INSERT INTO neighborhood VALUES (?,?)',(ip,port))
-			con.commit()
-
-		con.close()
-
-	def retriveCounterRequest(self, pktid, ip):
-
-		con = sqlite3.connect('P2P.db')
-		c = con.cursor()
-		c.execute('SELECT count(*) FROM requests WHERE pid=? AND ip=?',(pktid, ip))
-		res = c.fetchone()
-		con.close()
-		return res[0]
-
-	def retriveSearch(self, pktid, ip):
-
-		con = sqlite3.connect('P2P.db')
-		c = con.cursor()
-		c.execute('SELECT timeOperation FROM requests WHERE pid=? AND ip=?',(pktid, ip))
-		res = c.fetchone()
-		con.close()
-		return res[0]
-
-	def updateTimestamp(self, pktid, ip):
-
-		con = sqlite3.connect('P2P.db')
-		c = con.cursor()
-		new_timestamp = time.time()
-		c.execute('UPDATE requests SET timeOperation = ? WHERE pid = ? AND ip = ?', (new_timestamp, pktid, ip))
-		con.commit()
-		con.close()
 
 	def insertRequest(self, pktid, ip, timeOp):
 
@@ -126,24 +113,57 @@ class dataBase:
 
 		con.commit()
 		con.close()
-	
-	def insertResponse(self, pktid, ip, port, md5, name):
+
+	def retriveCounterRequest(self, pktid, ip):
+
+		con = sqlite3.connect('P2P.db')
+		c = con.cursor()
+		c.execute('SELECT count(*) FROM requests WHERE pid = ? AND ip = ?',(pktid, ip))
+		res = c.fetchone()
+		
+		con.close()
+		
+		return res[0]
+
+	def retrieveRequestTimestamp(self, pktid, ip):
+
+		con = sqlite3.connect('P2P.db')
+		c = con.cursor()
+		c.execute('SELECT timeOperation FROM requests WHERE pid = ? AND ip = ?',(pktid, ip))
+		res = c.fetchone()
+
+		con.close()
+
+		return res[0]
+
+	def updateTimestamp(self, pktid, ip):
+
+		con = sqlite3.connect('P2P.db')
+		c = con.cursor()
+		new_timestamp = time.time()
+		c.execute('UPDATE requests SET timeOperation = ? WHERE pid = ? AND ip = ?', (new_timestamp, pktid, ip))
+
+		con.commit()
+		con.close()
+
+	def insertResponse(self, pktid, ip, port, md5, name, timeResp):
 
 		con = sqlite3.connect('P2P.db')
 		c = con.cursor()
 
-		c.execute('INSERT INTO responses VALUES (null,?,?,?,?,?)', (pktid, ip, port, md5, name))
+		c.execute('INSERT INTO responses VALUES (null,?,?,?,?,?,?)', (pktid, ip, port, md5, name, timeResp))
 
 		con.commit()
 		con.close()
 	
-	def retrieveResponses(self, pid):
+	def retrieveResponse(self, pid):
 
 			con = sqlite3.connect('P2P.db')
 			c = con.cursor()
 
-			res = c.execute('SELECT pid, ip, port, md5, name FROM responses where pid = ?', (pid,))
+			res = c.execute('SELECT pid, ip, port, md5, name, timeResp FROM responses where pid = ?', (pid,))
 			res = c.fetchall()
+	
 			c.close()
 
 			return res
@@ -157,6 +177,7 @@ class dataBaseSuper(dataBase):
 
 		res = c.execute('SELECT idSession FROM login WHERE ip = ?', (ip,))
 		res = c.fetchone()
+		
 		con.close()
 
 		if res:
@@ -181,20 +202,20 @@ if __name__ == '__main__':
 	c.destroy()
 	c.create(config)
 	'''
-	c.insertNeighborhood('192.168.1.3',5600)
-	c.insertNeighborhood('192.168.1.4',5601)
-	c.insertNeighborhood('192.168.1.5',5602)
-	c.insertNeighborhood('192.168.1.6',5603)
-	c.insertNeighborhood('192.168.1.7',5604)
-	c.insertNeighborhood('192.168.1.8',5605)
-	c.insertNeighborhood('192.168.1.9',5606)
-	c.insertNeighborhood('192.168.1.10',5607)
+	c.insertPeers('192.168.1.3',5600)
+	c.insertPeers('192.168.1.4',5601)
+	c.insertPeers('192.168.1.5',5602)
+	c.insertPeers('192.168.1.6',5603)
+	c.insertPeers('192.168.1.7',5604)
+	c.insertPeers('192.168.1.8',5605)
+	c.insertPeers('192.168.1.9',5606)
+	c.insertPeers('192.168.1.10',5607)
 	print('\n\n\n')
 	vicini=c.retrieveAll()
 	for vicino in vicini:
 		print('id ',vicino[0],' ip ',vicino[1],' porta ',vicino[2])
 	print('\n\n\n')
-	vicini=c.retrieveNeighborhood()
+	vicini=c.retrievePeers()
 	for vicino in vicini:
 		print('id ',vicino[0],' ip ',vicino[1],' porta ')
 	print('\n\n\n')
