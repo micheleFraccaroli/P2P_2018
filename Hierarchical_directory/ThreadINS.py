@@ -10,7 +10,7 @@ import threading as th
 
 #thread che si occupa della gestione dell'aggiunta di un file da parte di un peer
 
-class threadINS(th.Thread):
+class ThreadINS(th.Thread):
     def init(self, pkt_ins):
         th.Thread.__init__(self)
         self.pkt_ins = pkt_ins
