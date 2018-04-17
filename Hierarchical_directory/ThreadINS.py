@@ -26,7 +26,8 @@ class threadINS(th.Thread):
         if(find == 0):
             db.insert_file(self.sessionid, self.md5, self.filename)
             db.update_file(self.filename, self.md5)
+            Util.printLog("ADFF: l'utente con il seguente SessionID: "+self.sessionid+"ha aggiunto il file: "+self.filename)
         else:
             db.update_file(self.filename, self.md5)
-
+            Util.printLog("ADFF: aggiornato nome file in : "+self.filename)
         del db
