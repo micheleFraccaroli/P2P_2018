@@ -14,8 +14,8 @@ from Download import Download
 lock = th.Lock()
 
 class thread_Response(th.Thread):
-    def __init__(self, other_peersocket,lock): 
-        th.Thread.__init__(self) # thread istance second level
+    def __init__(self, other_peersocket, lock): 
+        th.Thread.__init__(self) # thread instance second level
         self.bytes_read = 0
         self.other_peersocket = other_peersocket
         #self.other_peersocket.setblocking(0)
@@ -29,7 +29,6 @@ class thread_Response(th.Thread):
             self.bytes_read = len(recv_packet)
 
             if(self.bytes_read == 0):
-                Util.printLog("ESCO DAL SECONDO LIVELLO DAVVERO")
                 sys.exit()
 
             while(self.bytes_read < 212):
