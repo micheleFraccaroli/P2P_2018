@@ -6,6 +6,9 @@ from time import time
 from datetime import datetime
 from threading import Lock
 
+# Variabili globali
+mode = None # Modalità di utilizzo del programma: 'normal', 'super', 'update'
+
 def ip_formatting(ipv4,ipv6,port):
 
     # formattazione ipv6

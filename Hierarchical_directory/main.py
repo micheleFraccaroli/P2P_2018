@@ -32,9 +32,9 @@ elif len(sys.argv) == 2:
 		print('Parameter \"' + sys.argv[1] + '\" undefined...')
 		exit()
 	else:
-		mode = 1
+		Util.mode = 'super'
 else:
-	mode = 0
+	Util.mode = 'normal'
 
 print(bcolors.MAGENTA + "____________________________      ________   ______   " + bcolors.ENDC)
 print(bcolors.MAGENTA + "\______   \_____  \______   \    /  _____/  /  __  \  " + bcolors.ENDC)
@@ -62,13 +62,14 @@ print('ttl: ',c.ttl)
 print('maxNear: ',c.maxNear)
 print('timeResearch: ',c.timeResearch)
 print('timeIdPacket: ',c.timeIdPacket)
+print('mode: ',Util.mode)
 print("\n----------------------\n")
 #near=Vicini(c)
-
+'''
 lock = th.Lock()
 
 # background thread for requests
-central_thread = Central_Thread(c, lock, mode)
+central_thread = Central_Thread(c, lock)
 central_thread.start()
 
 while True:
@@ -107,3 +108,4 @@ while True:
 		down = Download(str(addr[0]),str(ip6),peer[2],peer[3],peer[4].rstrip())
 		down.download()
 		print("\n--- FILE DOWNLOADED ---\n")
+'''

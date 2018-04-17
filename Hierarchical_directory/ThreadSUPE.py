@@ -7,7 +7,7 @@ from Conn import Conn
 
 class ThreadSUPE(th.Thread):
 
-	def __init__(self,pack,ipv4,ipv6,port,ipRequest,lock,config):
+	def __init__(self, pack, ipv4, ipv6, port, ipRequest, lock, config):
 
 		th.Thread.__init__(self)
 		self.myIPP     = Util.ip_formatting(ipv4,ipv6,port)
@@ -28,18 +28,22 @@ class ThreadSUPE(th.Thread):
 
 		self.lock.acquire()
 
-		res = db.retriveCounterRequest(self.pid,self.pack[20:75])
+		res = db.retrieveCounterRequest(self.pid,self.pack[20:75])
 		if( res == 0): # Richiesta già conosciuta
 			Util.printLog("Eseguo SUPE per: "+self.ipRequest)
 			
 			db.insertRequest(self.pid,self.pack[20:75],time.time())
-			self.lock.release()
+			
 			if self.ttl > 1: # Inoltro richiesta ai vicini
+
+				neighborhood = db.retrieveSuperPeers(self.config.maxNear) # Dati sulla tabella anche se c'è un aggiornamento in corso
+				
+				mode = Util.mode # Prelevo la modalità attuale
+
+				self.lock.release()
 
 				self.ttl = str(self.ttl-1).zfill(2)
 				self.pack=''.join((self.pack[:80],self.ttl))
-
-				neighborhood = db.retrieveNeighborhood(self.config)
 
 				for neighbor in neighborhood:
 
@@ -54,7 +58,9 @@ class ThreadSUPE(th.Thread):
 							Util.printLog("vicino inoltro SUPE: "+params[0])
 						except IOError as e:
 							print("Inoltro vicino fallito")
-							
+			else:
+
+				self.lock.release() # Non devo inoltrare, ma devo comunque rilasciare la lock
 							
 			self.pack = 'ASUP'+self.pid+self.myIPP
 			Util.printLog('ASUP ::: '+str(self.pack))

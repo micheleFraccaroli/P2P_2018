@@ -14,7 +14,7 @@ class dataBase:
 		c.execute('CREATE TABLE IF NOT EXISTS login (ip VARCHAR(55)NOT NULL, idSession NOT NULL,PRIMARY KEY(ip))')
 		c.execute('CREATE TABLE IF NOT EXISTS file (Sessionid VARCHAR(16), md5 VARCHAR(32) NOT NULL, name VARCHAR(100) NOT NULL,PRIMARY KEY(Sessionid, md5))')
 		c.execute('CREATE TABLE IF NOT EXISTS requests (pid VARCHAR(16), ip VARCHAR(55), timeOperation FLOAT NOT NULL,PRIMARY KEY(pid,ip))')
-		c.execute('CREATE TABLE IF NOT EXISTS responses (id INTEGER,pid VARCHAR(16) NOT NULL, ip VARCHAR(55) NOT NULL, port VARCHAR(5) NOT NULL, md5 VARCHAR(32), name VARCHAR(100), timeResponse FLOAT NOT NULL, PRIMARY KEY(id))')
+		c.execute('CREATE TABLE IF NOT EXISTS responses (id INTEGER,pid VARCHAR(16) NOT NULL, ip VARCHAR(55) NOT NULL, port VARCHAR(5) NOT NULL, md5 VARCHAR(32), name VARCHAR(100), timeResp FLOAT NOT NULL, PRIMARY KEY(id))')
 		c.execute('CREATE TABLE IF NOT EXISTS peers (ip VARCHAR(55) NOT NULL, port VARCHAR(5) NOT NULL, PRIMARY KEY(ip))')
 		c.execute('CREATE TABLE IF NOT EXISTS superPeers (ip VARCHAR(55) NOT NULL, port VARCHAR(5) NOT NULL, PRIMARY KEY(ip))')
 
@@ -62,8 +62,15 @@ class dataBase:
 
 		return res
 
-	def updatePeers(self):
+	def deletePeers(self):
 		
+		con = sqlite3.connect('P2P.db')
+		c = con.cursor()
+
+		c.execute('DELETE FROM peers')
+
+		con.commit()
+		con.close()
 
 	def insertSuperPeers(self, ip, port):
 
@@ -72,21 +79,25 @@ class dataBase:
 
 		try:
 			c.execute('INSERT INTO superPeers VALUES(?,?)',(ip,port))
+			con.commit()
 		except:
 			pass
+		con.close()
 
-	def retrieveSuperPeers(self):
-
+	def retrieveSuperPeers(self, maxNear):
+		print(maxNear)
 		con = sqlite3.connect('P2P.db')
 		c = con.cursor()
 
-		c.execute('SELECT * FROM superPeers ORDER BY random() LIMIT ?',(config.maxNear,))
+		c.execute('SELECT * FROM superPeers')# ORDER BY random() LIMIT ?',(maxNear,))
 		res = c.fetchall()
 
-		c.execute('DELETE FROM superPeers WHERE ip NOT IN ?',(str(res),))
+		resIp = tuple(resp[0] for resp in res)
+		print('l ---->',len(res))
+		c.execute('DELETE FROM superPeers WHERE ip NOT IN ' + str(resIp))
 		c.execute('SELECT * FROM superPeers')
 		res = c.fetchall()
-
+		print('------> ',len(res))
 		con.commit()
 		con.close()
 
@@ -114,7 +125,7 @@ class dataBase:
 		con.commit()
 		con.close()
 
-	def retriveCounterRequest(self, pktid, ip):
+	def retrieveCounterRequest(self, pktid, ip):
 
 		con = sqlite3.connect('P2P.db')
 		c = con.cursor()
@@ -156,12 +167,12 @@ class dataBase:
 		con.commit()
 		con.close()
 	
-	def retrieveResponse(self, pid):
+	def retrieveResponse(self, pid, validTime): # validTime è config.timeResearch
 
 			con = sqlite3.connect('P2P.db')
 			c = con.cursor()
 
-			res = c.execute('SELECT pid, ip, port, md5, name, timeResp FROM responses where pid = ?', (pid,))
+			res = c.execute('SELECT pid, ip, port, md5, name, timeResp FROM responses where pid = ? AND timeResp < ?', (pid, validTime))
 			res = c.fetchall()
 	
 			c.close()
@@ -242,7 +253,7 @@ if __name__ == '__main__':
 	c=dataBaseSuper()
 	c.destroy()
 	c.create(config)
-
+	'''
 	c.insertPeers('192.168.1.3',5600)
 	c.insertPeers('192.168.1.4',5601)
 	c.insertPeers('192.168.1.5',5602)
@@ -272,4 +283,35 @@ if __name__ == '__main__':
 			c.insertID('172.168.1.1','111100001')
 		else:
 			print('ID ::: ',res)
-'''
+	'''
+	t = time.time()
+	time.sleep(1)
+	c.insertResponse('aaaaaaaaaaaaaaaa','172.16.8.1|fc00::8:1',500,'fhissbfksbfksabfkjefnkjsnfkj','Geme',time.time()-t)
+	time.sleep(1)
+	c.insertResponse('aaaaaaaaaaaaaaaa','172.16.8.1|fc00::8:1',500,'fhissbfksbfksabfkjefnkjsnfkj','Fracca',time.time()-t)
+	time.sleep(1)
+	c.insertResponse('aaaaaaaaaaaaaaaa','172.16.8.1|fc00::8:1',500,'fhissbfksbfksabfkjefnkjsnfkj','Ceso',time.time()-t)
+	time.sleep(1)
+	c.insertResponse('aaaaaaaaaaaaaaaa','172.16.8.1|fc00::8:1',500,'fhissbfksbfksabfkjefnkjsnfkj','Lucia',time.time()-t)
+
+	res = c.retrieveResponse('aaaaaaaaaaaaaaaa',config.timeResearch)
+	print('\n\n---RISPOSTE---\n\n')
+	for re in res:
+		print(re)
+
+	c.insertSuperPeers('172.16.8.1',5000)
+	c.insertSuperPeers('172.16.8.2',5000)
+	c.insertSuperPeers('172.16.8.3',5000)
+	c.insertSuperPeers('172.16.8.4',5000)
+	c.insertSuperPeers('172.16.8.5',5000)
+	c.insertSuperPeers('172.16.8.6',5000)
+	c.insertSuperPeers('172.16.8.7',5000)
+	c.insertSuperPeers('172.16.8.8',5000)
+	r = c.retrieveSuperPeers(config.maxNear)
+
+	b = ['172.16.8.9',5000]
+
+	r.append(b)
+	print('\n\n\n\n')
+	for a in r:
+		print(a)
