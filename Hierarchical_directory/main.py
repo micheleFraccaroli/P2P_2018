@@ -5,14 +5,10 @@ import ipaddress as ipad
 import random as ra
 import threading as th
 from Config import Config
-from Vicini import Vicini
-from Ricerca import Ricerca
-from Retr import Retr
-from dataBase import dataBase
+from dataBase import *
 from tqdm import tqdm
 from Download import Download
-from Central_Thread import Central_Thread
-from Upload import Upload
+#from Central_Thread import Central_Thread
 
 class bcolors:
     HEADER = '\033[95m'
@@ -24,17 +20,127 @@ class bcolors:
     FAIL = '\033[91m'
     ENDC = '\033[0m'
 
-if len(sys.argv) > 2:
-	print('Syntax: python3 main.py [super]')
-	exit()
-elif len(sys.argv) == 2:
-	if sys.argv[1] != 'super':
-		print('Parameter \"' + sys.argv[1] + '\" undefined...')
+class optionsNormal:
+
+	def __init__(self):
+		
+		self.options = {1:['Login to supernode', self.login],2:['Exit', self.exit]}
+
+	def login(self):
+
+		print('LOGIN')
+		time.sleep(1)
+
+	def exit(self):
+
+		db = dataBase()
+		db.destroy()
+		
+		print('\nBye\n')
+		time.sleep(1)
+
 		exit()
+
+class optionsLogged:
+
+	def __init__(self):
+
+		self.options = {1:['Search a File', self.search],2:['Add a file to connected supernode', self.add],3:['Remove a file from connected supernode', self.remove],4:['Logout from supernode', self.logout],5:['Exit', self.exit]}
+
+	def search(self):
+
+		print('SEARCH')
+		time.sleep(1)
+
+	def add(self):
+
+		print('ADD')
+		time.sleep(1)
+
+	def remove(self):
+
+		print('REMOVE')
+		time.sleep(1)
+
+	def logout(self):
+
+		print('LOGOUT')
+		time.sleep(1)
+
+	def exit(self):
+
+		print("### Logout implicito da implementare ###")
+
+		db = dataBase()
+		db.destroy()
+		
+		print('\nBye\n')
+		time.sleep(1)
+
+		exit()
+
+class optionsSuper:
+
+	def __init__(self):
+
+		self.options = {1:['Update peers', self.update],2:['Search a File', self.search],3:['Add a file to connected supernode', self.add],4:['Remove a file from connected supernode', self.remove],5:['Exit', self.exit]}
+
+	def update(self):
+
+		print('UPDATE')
+		time.sleep(1)
+
+	def search(self):
+
+		print('SEARCH')
+		time.sleep(1)
+
+	def add(self):
+
+		print('ADD')
+		time.sleep(1)
+
+	def remove(self):
+
+		print('REMOVE')
+		time.sleep(1)
+
+	def exit(self):
+
+		db = dataBaseSuper()
+		
+		if db.existsLogged() > 0:
+
+			print(bcolors.FAIL + '\nUnable to exit. There are peers still connected to you.\n' + bcolors.ENDC)
+			time.sleep(4)
+
+		else:
+			db.destroy()
+		
+			print('\nBye\n')
+			time.sleep(1)
+
+			exit()
+
+if len(sys.argv) > 2:
+	
+	print(bcolors.WARNING + 'Syntax: python3 main.py [super]' + bcolors.ENDC)
+	exit()
+
+elif len(sys.argv) == 2:
+
+	if sys.argv[1] != 'super':
+
+		print(bcolors.FAIL + 'Argument \"' + sys.argv[1] + '\" undefined' + 'bcolors.ENDC')
+		exit()
+
 	else:
-		mode = 1
+		Util.mode = 'super'
+
 else:
-	mode = 0
+	Util.mode = 'normal'
+
+menuMode = {'normal': optionsNormal,'super': optionsSuper,'logged': optionsLogged}
 
 print(bcolors.MAGENTA + "____________________________      ________   ______   " + bcolors.ENDC)
 print(bcolors.MAGENTA + "\______   \_____  \______   \    /  _____/  /  __  \  " + bcolors.ENDC)
@@ -43,18 +149,22 @@ print(bcolors.OKBLUE + " |    |   /       \|    |       \    \_\  \/   --   \ " 
 print(bcolors.CYAN + " |____|   \_______ \____|        \______  /\______  / " + bcolors.ENDC)
 print(bcolors.CYAN + "                  \/                    \/        \/  " + bcolors.ENDC)
 
+time.sleep(2)
 
-
-
-#for i in tqdm(range(4), desc="Loading: "):
-#time.sleep(2)
-c=Config() #istanza delle configurazioni
 db = dataBase()
-db.destroy()
-db.create(c)
-#del db
+code,dbMode = db.create(Util.mode)
 
-if mode == 1:
+if code != 'OK':
+	print(bcolors.WARNING + '\nWarning: switching from mode \"'+ Util.mode + '\" to mode \"' + dbMode + '\" due previous session.\n' + bcolors.ENDC)
+else:
+	print(bcolors.OKGREEN + '\nMode accepted\n' + bcolors.ENDC)
+	time.sleep(2)
+
+Util.mode = dbMode
+
+c = db.retrieveConfig(('maxNear','ttl','timeResearch','timeIdPacket'))
+
+if Util.mode == 'normal':
 	c.maxNear = 1
 
 print("--- Configurations ---\n")
@@ -62,16 +172,39 @@ print('ttl: ',c.ttl)
 print('maxNear: ',c.maxNear)
 print('timeResearch: ',c.timeResearch)
 print('timeIdPacket: ',c.timeIdPacket)
+print('mode: ',Util.mode)
 print("\n----------------------\n")
-#near=Vicini(c)
 
 lock = th.Lock()
 
 # background thread for requests
-central_thread = Central_Thread(c, lock, mode)
-central_thread.start()
+#central_thread = Central_Thread(c, lock)
+#central_thread.start()
 
 while True:
+
+	op = menuMode[Util.mode]()
+
+	print('Select an option:\n\n')
+	i=1
+	for option in op.options:
+		print('['+str(i)+'] '+op.options[option][0]+'\n')
+		i+=1
+	try:
+		s = int(input(bcolors.OKBLUE + ">> " + bcolors.ENDC))
+	except ValueError:
+		print('\nInput error...\n')
+		time.sleep(2)
+	else:
+		if s > 0 and s <= len(op.options):
+			op.options[s][1]()
+		else:
+			print('\nInput error...\n')
+			time.sleep(2)
+
+	'''
+	name_search = input('Select an option:\n\n[1]Login\n[2]Search peers\n[3]Search a file\n[]')
+	
 	name_search = input(bcolors.OKBLUE + "Search >> " + bcolors.ENDC)
 	print("...peers searching...")
 	search = Ricerca(c.selfV4, c.selfV6, c.selfP, c.ttl, c.timeResearch, name_search, lock)
@@ -107,3 +240,4 @@ while True:
 		down = Download(str(addr[0]),str(ip6),peer[2],peer[3],peer[4].rstrip())
 		down.download()
 		print("\n--- FILE DOWNLOADED ---\n")
+	'''
