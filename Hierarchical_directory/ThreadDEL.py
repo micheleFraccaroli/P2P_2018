@@ -10,8 +10,8 @@ import threading as th
 
 #thread che si occupa della gestione dell'eliminazione di un file per conto di un peer
 
-class threadDEL(th.Thread):
-    def init(self, pkt_del, lock):
+class ThreadDEL(th.Thread):
+    def init(self, pkt_del):
         th.Thread.__init__(self)
         self.pkt_del = pkt_del
         self.lock = lock
