@@ -8,23 +8,27 @@ from Conn import Conn
 from Upload import Upload
 import threading as th
 
-#thread che si occupa della gestione dell'eliminazione di un file da parte di un peer
+#thread che si occupa della gestione dell'eliminazione di un file per conto di un peer
 
 class threadDEL(th.Thread):
-    def init(self, pkt_del):
+    def init(self, pkt_del, lock):
         th.Thread.__init__(self)
         self.pkt_del = pkt_del
+        self.lock = lock
 
     def run(self):
         self.sessionid = self.pkt_del[4:20]
         self.md5 = self.pkt_del[20:52]
 
         db = dataBase()
-        find = retrive_file(self.sessionid, self.md5)
+        self.lock.acquire()
+        find = db.retriveFILE(self.sessionid, self.md5)
 
-        if(find > 0):
-            Util.printLog("DEFF: non ho trovato nessun file")
+        if(find == 0):
+            self.lock.release()
+            Util.printLog("[DEFF] non ho trovato nessun file caricato da: "+self.sessionid+" con il seguente md5: "+self.md5)
         else:
-            db.delete_file(self.sessionid, self.md5)
-            Util.printLog("DEFF: ho eliminato il file")
+            db.deleteFILE(self.sessionid, self.md5)
+            self.lock.release()
+            Util.printLog("[DEFF] ho eliminato il file caricato da: "+self.sessionid+" con il seguente md5: "+self.md5)
         del db

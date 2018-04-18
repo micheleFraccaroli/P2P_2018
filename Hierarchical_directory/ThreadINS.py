@@ -11,9 +11,10 @@ import threading as th
 #thread che si occupa della gestione dell'aggiunta di un file da parte di un peer
 
 class threadINS(th.Thread):
-    def init(self, pkt_ins):
+    def init(self, pkt_ins, lock):
         th.Thread.__init__(self)
         self.pkt_ins = pkt_ins
+        self.lock = lock
 
     def run(self):
         self.sessionid = self.pkt_ins[4:20]
@@ -21,13 +22,16 @@ class threadINS(th.Thread):
         self.filename = self.pkt_ins[52:]
 
         db = dataBase()
-        find = retrive_file(self.sessionid, self.md5)
+        self.lock.acquire()
+        find = db.retriveFILE(self.sessionid, self.md5)
 
         if(find == 0):
-            db.insert_file(self.sessionid, self.md5, self.filename)
-            db.update_file(self.filename, self.md5)
-            Util.printLog("ADFF: l'utente con il seguente SessionID: "+self.sessionid+"ha aggiunto il file: "+self.filename)
+            db.insertFILE(self.sessionid, self.md5, self.filename)
+            db.updateFILE(self.filename, self.md5)
+            self.lock.release()
+            Util.printLog("[ADFF] l'utente con il seguente SessionID: "+self.sessionid+"ha aggiunto il file: "+self.filename)
         else:
-            db.update_file(self.filename, self.md5)
-            Util.printLog("ADFF: aggiornato nome file in : "+self.filename)
+            db.updateFILE(self.filename, self.md5)
+            self.lock.release()
+            Util.printLog("[ADFF] aggiornato nome file in : "+self.filename)
         del db

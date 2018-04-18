@@ -8,10 +8,10 @@ import subprocess as sub
 class dataBase:
 
 	def create(self, config):
-		
+
 		con = sqlite3.connect('P2P.db')
 		c = con.cursor()
-		c.execute('CREATE TABLE IF NOT EXISTS login (ip VARCHAR(55)NOT NULL, idSession NOT NULL,PRIMARY KEY(ip))')
+		c.execute('CREATE TABLE IF NOT EXISTS login (ip VARCHAR(55)NOT NULL, port VARCHAR(5)NOT NULL, idSession NOT NULL,PRIMARY KEY(ip))')
 		c.execute('CREATE TABLE IF NOT EXISTS file (Sessionid VARCHAR(16), md5 VARCHAR(32) NOT NULL, name VARCHAR(100) NOT NULL,PRIMARY KEY(Sessionid, md5))')
 		c.execute('CREATE TABLE IF NOT EXISTS requests (pid VARCHAR(16), ip VARCHAR(55), timeOperation FLOAT NOT NULL,PRIMARY KEY(pid,ip))')
 		c.execute('CREATE TABLE IF NOT EXISTS responses (id INTEGER,pid VARCHAR(16) NOT NULL, ip VARCHAR(55) NOT NULL, port VARCHAR(5) NOT NULL, md5 VARCHAR(32), name VARCHAR(100), timeResponse FLOAT NOT NULL, PRIMARY KEY(id))')
@@ -20,7 +20,7 @@ class dataBase:
 
 		root1 = Util.ip_formatting(config.root1V4,config.root1V6,config.root1P)
 		root2 = Util.ip_formatting(config.root2V4,config.root2V6,config.root2P)
-		
+
 		try:
 			c.execute('INSERT INTO peers VALUES (?,?)',(root1[:55],root1[55:]))
 			c.execute('INSERT INTO peers VALUES (?,?)',(root2[:55],root2[55:]))
@@ -28,7 +28,7 @@ class dataBase:
 		except:
 			pass
 		con.close()
-	
+
 	def destroy(self):
 
 		try:
@@ -57,13 +57,13 @@ class dataBase:
 
 		c.execute('SELECT * FROM peers')
 		res = c.fetchall()
-		
+
 		con.close()
 
 		return res
 
 	def updatePeers(self):
-		
+
 
 	def insertSuperPeers(self, ip, port):
 
@@ -99,9 +99,9 @@ class dataBase:
 
 		c.execute('SELECT * FROM peers')
 		res = c.fetchall()
-		
+
 		c.close()
-		
+
 		return res
 
 	def insertRequest(self, pktid, ip, timeOp):
@@ -120,9 +120,9 @@ class dataBase:
 		c = con.cursor()
 		c.execute('SELECT count(*) FROM requests WHERE pid = ? AND ip = ?',(pktid, ip))
 		res = c.fetchone()
-		
+
 		con.close()
-		
+
 		return res[0]
 
 	def retrieveRequestTimestamp(self, pktid, ip):
@@ -155,7 +155,7 @@ class dataBase:
 
 		con.commit()
 		con.close()
-	
+
 	def retrieveResponse(self, pid):
 
 			con = sqlite3.connect('P2P.db')
@@ -163,7 +163,7 @@ class dataBase:
 
 			res = c.execute('SELECT pid, ip, port, md5, name, timeResp FROM responses where pid = ?', (pid,))
 			res = c.fetchall()
-	
+
 			c.close()
 
 			return res
@@ -177,7 +177,7 @@ class dataBaseSuper(dataBase):
 
 		res = c.execute('SELECT idSession FROM login WHERE ip = ?', (ip,))
 		res = c.fetchone()
-		
+
 		con.close()
 
 		if res:
@@ -185,17 +185,30 @@ class dataBaseSuper(dataBase):
 		else:
 			return None
 
-	def insertID(self, ip, idSession):
+	def insertID(self, ip, idSession, port):
 
 		con = sqlite3.connect('P2P.db')
 		c = con.cursor()
 
-		res = c.execute('INSERT INTO login VALUES (?,?)', (ip, idSession))
-		
+		res = c.execute('INSERT INTO login VALUES (?,?,?)', (ip, port, idSession))
+
 		con.commit()
 		con.close()
 
-	def insert_file(self, Sessionid, md5, filename):
+	def retriveINFO(self, Sessionid):
+
+		con = sqlite3.connect('P2P.db')
+		c = con.cursor()
+
+		res = c.execute('SELECT ip, port FROM login WHERE idSession = ?', (Sessionid,))
+		res = c.fetchone()
+
+		con.commit()
+		con.close()
+
+		return res
+
+	def insertFILE(self, Sessionid, md5, filename):
 
 		con = sqlite3.connect('P2P.db')
 		c = con.cursor()
@@ -205,7 +218,7 @@ class dataBaseSuper(dataBase):
 		con.commit()
 		con.close()
 
-	def retrive_file(self, Sessionid, md5):
+	def retriveFILE(self, Sessionid, md5):
 
 		con = sqlite3.connect('P2P.db')
 		c = con.cursor()
@@ -216,7 +229,7 @@ class dataBaseSuper(dataBase):
 
 		return res[0]
 
-	def update_file(self, filename, md5):
+	def updateFILE(self, filename, md5):
 
 		con = sqlite3.connect('P2P.db')
 		c = con.cursor()
@@ -226,7 +239,7 @@ class dataBaseSuper(dataBase):
 		con.commit()
 		con.close()
 
-	def delete_file(self, Sessionid, md5):
+	def deleteFILE(self, Sessionid, md5):
 
 		con = sqlite3.connect('P2P.db')
 		c = con.cursor()
@@ -235,6 +248,19 @@ class dataBaseSuper(dataBase):
 
 		con.commit()
 		con.close()
+
+	def deleteFROMpeer(self, Sessionid):
+
+		con = sqlite3.connect('P2P.db')
+		c = con.cursor()
+
+		c.execute('SELECT count(*) FROM file WHERE Sessionid=?',(Sessionid,))
+		res = c.fetchone()
+		c.execute('DELETE FROM file WHERE Sessionid = ?', (Sessionid,))
+
+		con.commit()
+		con.close()
+		return res[0]
 
 if __name__ == '__main__':
 	print("faccio")
@@ -264,7 +290,7 @@ if __name__ == '__main__':
 	vicini=c.retrieveAll()
 	for vicino in vicini:
 		print('id ',vicino[0],' ip ',vicino[1],' porta ',vicino[2])
-	
+
 	for i in range(4):
 		res = c.retrieveID('172.168.1.1')
 		if not res:
