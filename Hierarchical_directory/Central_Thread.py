@@ -123,7 +123,7 @@ class Central_Thread(th.Thread):
             			addr = ip_formatting(self.ipv4, self.ipv6, self.port)
 
             			new_packet = "QUER" + pktid + addr + self.ttl + recv_packet[16:]
-            			th_FIND = ThreadFIND(new_packet, self.lock)
+            			th_FIND = ThreadFIND(new_packet,recv_packet[4:20] ,self.lock)
             			th_FIND.start()
 
     			# AQUE ---

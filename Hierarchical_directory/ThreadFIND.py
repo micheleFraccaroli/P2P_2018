@@ -7,12 +7,14 @@ from dataBase import dataBase
 
 
 class ThreadFIND(th.Thread):
-	def __init__(self, packets, lock):
+	def __init__(self, packets, sid, lock):
 		th.Thread.__init__(self)
 		self.packet = packet
 		self.lock = lock
+		self.sid = sid
 
 	def run(self):
+		db = dataBase()
 		superpeers = db.retrieveSuperPeers()
 
 		self.lock.acquire()
@@ -31,3 +33,37 @@ class ThreadFIND(th.Thread):
 		self.lock.acquire()
 		Util.statusRequest[self.packet[4:20]] = False
 		self.lock.release()
+
+		addrPeer = db.retrievePeer(self.sid)
+		resp = db.retrieveResponse(self.packet[4:20])
+		ipv4, ipv6, port = Util.ip_deformatting(addrPeer[0][:15], addrPeer[0][:17], addrPeer[1])
+		toPeer = "AFIN" + int(len(resp).zfill(3))
+		connP = Conn(ipv4, ipv6, port)
+		connP.connection()
+		connP.s.send(self.toPeer.encode())
+		connP.deconnection()
+
+		buffer_md5 = ''
+		for i in resp:
+			count = 0
+			ll = []
+			md5 = i[3]
+			if(md5 == buffer_md5):
+				continue
+			for j in resp:
+				if(md5 in j):
+					count = count + 1
+					add = j[1] + j[2]
+					ll.append(add)
+			if(count == 1):
+				toPeer = md5 + i[4] + str(count) + i[1] + i[2]
+				connP.connection()
+				connP.s.send(toPeer.encode())
+				connP.deconnection()
+			elif(count > 1):
+				toPeer = md5 + i[4] + str(count)
+				for l in ll:
+					toPeer = toPeer + l
+				connP.connection()
+				connP.s.send(toPeer.encode())
+				connP.deconnection()

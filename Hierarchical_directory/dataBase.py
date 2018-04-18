@@ -11,7 +11,7 @@ class dataBase:
 		
 		con = sqlite3.connect('P2P.db')
 		c = con.cursor()
-		c.execute('CREATE TABLE IF NOT EXISTS login (ip VARCHAR(55)NOT NULL, idSession NOT NULL,PRIMARY KEY(ip))')
+		c.execute('CREATE TABLE IF NOT EXISTS login (ip VARCHAR(55)NOT NULL, port VARCHAR(5) NOT NULL, idSession NOT NULL,PRIMARY KEY(ip))')
 		c.execute('CREATE TABLE IF NOT EXISTS file (Sessionid VARCHAR(16), md5 VARCHAR(32) NOT NULL, name VARCHAR(100) NOT NULL,PRIMARY KEY(Sessionid, md5))')
 		c.execute('CREATE TABLE IF NOT EXISTS requests (pid VARCHAR(16), ip VARCHAR(55), timeOperation FLOAT NOT NULL,PRIMARY KEY(pid,ip))')
 		c.execute('CREATE TABLE IF NOT EXISTS responses (id INTEGER,pid VARCHAR(16) NOT NULL, ip VARCHAR(55) NOT NULL, port VARCHAR(5) NOT NULL, md5 VARCHAR(32), name VARCHAR(100), timeResponse FLOAT NOT NULL, PRIMARY KEY(id))')
@@ -61,6 +61,17 @@ class dataBase:
 		con.close()
 
 		return res
+
+	def retrievePeer(self, sid):
+		con = sqlite3.connect('P2P.db')
+		c = con.cursor()
+
+		c.execute('SELECT ip, port FROM login WHERE idSession=?', (sid) )
+		res = c.fetchall()
+
+		c.close()
+
+		return res 
 
 	def updatePeers(self):
 		
@@ -161,7 +172,7 @@ class dataBase:
 			con = sqlite3.connect('P2P.db')
 			c = con.cursor()
 
-			res = c.execute('SELECT pid, ip, port, md5, name, timeResp FROM responses where pid = ?', (pid,))
+			res = c.execute('SELECT pid, ip, port, md5, name, timeResponse FROM responses where pid = ?', (pid,))
 			res = c.fetchall()
 	
 			c.close()
