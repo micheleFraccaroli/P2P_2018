@@ -26,7 +26,7 @@ for row in c.execute("SELECT * FROM login"):
     print(row)
 
 print(bcolors.HEADER + "VICINI |------------------------------------------------\n" + bcolors.ENDC)
-for row in c.execute("SELECT * FROM neighborhood"):
+for row in c.execute("SELECT * FROM peers"):
     print(row)
 
 print(bcolors.HEADER + "\nRICHIESTE |------------------------------------------------\n" + bcolors.ENDC)
@@ -39,6 +39,10 @@ for row in c.execute("SELECT * FROM responses"):
 
 print(bcolors.HEADER + "\nFILE |------------------------------------------------\n" + bcolors.ENDC)
 for row in c.execute("SELECT * FROM file"):
+    print(row)
+
+print(bcolors.HEADER + "\nCONFIG |------------------------------------------------\n" + bcolors.ENDC)
+for row in c.execute("SELECT * FROM config"):
     print(row)
 
 con.close()
