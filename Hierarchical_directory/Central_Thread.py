@@ -120,11 +120,14 @@ class Central_Thread(th.Thread):
 						while (self.bytes_read < 36):
 							recv_packet += other_peersocket.recv(36 - self.bytes_read)
 							self.bytes_read = len(recv_packet)
-            			pktid = ''.join(random.choice(string.ascii_uppercase+string.digits) for _ in range(16))
+            			pktid = Util.ip_packet16()
             			addr = ip_formatting(self.ipv4, self.ipv6, self.port)
 
-						Util.printLog("INVIO FIND")
+						Util.printLog("RICEVUTO FIND E TRASFORMO IN QUER")
             			new_packet = "QUER" + pktid + addr + self.ttl + recv_packet[16:]
+						Util.printLog("====> PACCHETTO DI QUER <====")
+						Util.printLog(str(new_packet))
+						Util.printLog("=============================")
             			th_FIND = ThreadFIND(new_packet,recv_packet[4:20] ,self.lock)
             			th_FIND.start()
 
@@ -142,7 +145,6 @@ class Central_Thread(th.Thread):
 						t_RESP = thread_Response(recv_packet, self.lock)
 						t_RESP.start()
 
-
 				# ADFF ---
 				elif(recv_type.decode() == "ADFF"):
 					if(Util.mode == "super"):
@@ -153,6 +155,7 @@ class Central_Thread(th.Thread):
 							self.bytes_read = len(recv_packet)
 						recv_packet = recv_type + recv_packet
 
+						Util.printLog("AGGIUNTO FILE AL SUPERPEER")
 						th_INS = ThreadINS(recv_packet, self.lock)
 						th_INS.start()
 
@@ -166,6 +169,7 @@ class Central_Thread(th.Thread):
 							self.bytes_read = len(recv_packet)
 						recv_packet = recv_type + recv_packet
 
+						Util.printLog("ELIMINATO FILE AL SUPERPEER")
 						th_DEL = ThreadDEL(recv_packet, self.lock)
 						th_DEL.start()
 
@@ -180,6 +184,7 @@ class Central_Thread(th.Thread):
 						'''
 						Chiama classe che gestisce il login
 						'''
+						Util.printLog("LOGGATO AL SUPERPEER")
 
 				# LOGO ---
 				elif(recv_type.decode() == "LOGO"):
@@ -191,6 +196,7 @@ class Central_Thread(th.Thread):
 							self.bytes_read = len(recv_packet)
 						recv_packet = recv_type + recv_packet
 
+						Util.printLog("LOGOUT DAL SUPERPEER")
 						th_LOGO = ThreadLOGO(recv_packet, self.lock)
 						th_LOGO.start() 
 

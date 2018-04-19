@@ -10,7 +10,6 @@ class Recv_Afin(th.Thread):
 		self.other_peersocket = other_peersocket
 
 	def stampaRicerca(self):
-
         print('Risultati ricerca:')
         for index in range(0, len(self.listPeers)):
             print('\n', index + 1, '- descrizione: ', self.listPeers[index][1])
