@@ -70,6 +70,7 @@ class Recv_Afin(th.Thread):
 
 	def run(self):
 		self.listPeers = []
+        Util.printLog("SONO DENTRO AL THREAD AFIN")
 		for i in range(self.nMd5):
 			data = self.other_peersocket.recv(135)  # Ricevo md5, descrizione e numero di copie
 			self.bytes_read = len(data)

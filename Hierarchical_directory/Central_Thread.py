@@ -107,7 +107,8 @@ class Central_Thread(th.Thread):
 						while (self.bytes_read < 3):
 							recv_packet += other_peersocket.recv(3 - self.bytes_read)
 							self.bytes_read = len(recv_packet)
-
+						
+						Util.printLog("RICEVUTO AFIN")
 						recv_afin = Recv_Afin(int(recv_packet), other_peersocket)
 						recv_afin.start()
 						
@@ -122,6 +123,7 @@ class Central_Thread(th.Thread):
             			pktid = ''.join(random.choice(string.ascii_uppercase+string.digits) for _ in range(16))
             			addr = ip_formatting(self.ipv4, self.ipv6, self.port)
 
+						Util.printLog("INVIO FIND")
             			new_packet = "QUER" + pktid + addr + self.ttl + recv_packet[16:]
             			th_FIND = ThreadFIND(new_packet,recv_packet[4:20] ,self.lock)
             			th_FIND.start()
@@ -135,6 +137,7 @@ class Central_Thread(th.Thread):
 							recv_packet += other_peersocket.recv(208 - self.bytes_read)
 							self.bytes_read = len(recv_packet)
 
+						Util.printLog("RICEVO GLI AQUE DALLA RETE")
 						recv_packet = recv_type + recv_packet
 						t_RESP = thread_Response(recv_packet, self.lock)
 						t_RESP.start()

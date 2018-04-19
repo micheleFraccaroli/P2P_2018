@@ -17,31 +17,38 @@ class ThreadFIND(th.Thread):
 		db = dataBase()
 		superpeers = db.retrieveSuperPeers()
 
-		self.lock.acquire()
+		Util.globalLock.acquire()
 		Util.statusRequest[self.packet[4:20]] = True
-		self.lock.release()
+		Util.printLog("DIZIONARIO GLOBALE SETTATO ---> " + str(Util.statusRequest[self.packet[4:20]]))
+		self.globalLock.release()
 
 		for sp in superpeers:
 			ipv4, ipv6, port = Util.ip_deformatting(sp[0][:15],sp[0][17:],sp[1])
 			conn = Conn(ipv4, ipv6, port)
-			conn.connection()
+			if(!conn.connection()):
+				Util.printLog("INVIO QUER FALLITO VERSO IL SUPER... PROBABILMENTE " + str(ipv4) + " E' OFFLINE")
+				continue
 			conn.s.send(self.packet.encode())
 			conn.deconnection()
+			Util.printLog("INVIO QUER VERSO " + str(ipv4) + " RIUSCITO")
 
 		th.wait(20)
 
-		self.lock.acquire()
+		self.globalLock.acquire()
 		Util.statusRequest[self.packet[4:20]] = False
-		self.lock.release()
+		Util.printLog("PASSATI 20 SECONDI.. DIZIONARIO ---> " + str(Util.statusRequest[self.packet[4:20]]))
+		self.globalLock.release()
 
 		addrPeer = db.retrievePeerSid(self.sid)
 		resp = db.retrieveResponse(self.packet[4:20])
 		ipv4, ipv6, port = Util.ip_deformatting(addrPeer[0][:15], addrPeer[0][:17], addrPeer[1])
 		toPeer = "AFIN" + str(len(resp)).zfill(3)
 		connP = Conn(ipv4, ipv6, port)
-		connP.connection()
+		if(!connP.connection()):
+			sys.exit(1)
 		connP.s.send(toPeer.encode())
 
+		#creazione pacchetto di AFIN
 		buffer_md5 = ''
 		for i in resp:
 			count = 0
