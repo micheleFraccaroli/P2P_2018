@@ -10,13 +10,8 @@ import threading as th
 
 #thread che si occupa della gestione dell'aggiunta di un file da parte di un peer
 
-<<<<<<< HEAD
-class threadINS(th.Thread):
-    def init(self, pkt_ins, lock):
-=======
 class ThreadINS(th.Thread):
     def init(self, pkt_ins):
->>>>>>> e332e09b763fe17cd420f26a67867b768c173c19
         th.Thread.__init__(self)
         self.pkt_ins = pkt_ins
         self.lock = lock
@@ -40,3 +35,13 @@ class ThreadINS(th.Thread):
             self.lock.release()
             Util.printLog("[ADFF] aggiornato nome file in : "+self.filename)
         del db
+
+if __name__ == '__main__':
+
+    sessionid = '1234'.ljust(16,'1')
+    md5 = 'abcd'.ljust(32,'2')
+    filename = 'ciao'.ljust(100, '3')
+    pkt_ins = 'ADFF'+sessionid+md5+filename
+
+    th_INS = ThreadINS(pkt_ins)
+    th_INS.start()

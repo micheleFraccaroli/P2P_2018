@@ -32,3 +32,12 @@ class ThreadDEL(th.Thread):
             self.lock.release()
             Util.printLog("[DEFF] ho eliminato il file caricato da: "+self.sessionid+" con il seguente md5: "+self.md5)
         del db
+
+if __name__ == '__main__':
+
+    sessionid = '1234'.ljust(16,'1')
+    md5 = 'abcd'.ljust(32,'2')
+    pkt_del = 'DEFF'+sessionid+md5
+
+    th_DEL = ThreadINS(pkt_del)
+    th_DEL.start()
