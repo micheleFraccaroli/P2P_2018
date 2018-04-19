@@ -34,14 +34,13 @@ class ThreadFIND(th.Thread):
 		Util.statusRequest[self.packet[4:20]] = False
 		self.lock.release()
 
-		addrPeer = db.retrievePeer(self.sid)
+		addrPeer = db.retrievePeerSid(self.sid)
 		resp = db.retrieveResponse(self.packet[4:20])
 		ipv4, ipv6, port = Util.ip_deformatting(addrPeer[0][:15], addrPeer[0][:17], addrPeer[1])
-		toPeer = "AFIN" + int(len(resp).zfill(3))
+		toPeer = "AFIN" + str(len(resp)).zfill(3)
 		connP = Conn(ipv4, ipv6, port)
 		connP.connection()
-		connP.s.send(self.toPeer.encode())
-		connP.deconnection()
+		connP.s.send(toPeer.encode())
 
 		buffer_md5 = ''
 		for i in resp:
@@ -56,14 +55,15 @@ class ThreadFIND(th.Thread):
 					add = j[1] + j[2]
 					ll.append(add)
 			if(count == 1):
-				toPeer = md5 + i[4] + str(count) + i[1] + i[2]
+				toPeer = md5 + i[4] + str(count).zfill(3) + i[1] + i[2]
 				connP.connection()
 				connP.s.send(toPeer.encode())
-				connP.deconnection()
 			elif(count > 1):
+				buffer_md5 = md5
 				toPeer = md5 + i[4] + str(count)
 				for l in ll:
 					toPeer = toPeer + l
 				connP.connection()
 				connP.s.send(toPeer.encode())
-				connP.deconnection()
+		
+		connP.deconnection()

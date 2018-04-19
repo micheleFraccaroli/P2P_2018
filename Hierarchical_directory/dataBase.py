@@ -154,7 +154,7 @@ class dataBase:
 
 		return res
 
-	def retrievePeer(self, sid):
+	def retrievePeerSid(self, sid):
 		con = sqlite3.connect('P2P.db')
 		c = con.cursor()
 
@@ -276,7 +276,7 @@ class dataBase:
 			con = sqlite3.connect('P2P.db')
 			c = con.cursor()
 
-			res = c.execute('SELECT pid, ip, port, md5, name, timeResponse FROM responses where pid = ? AND timeResp < ?', (pid, validTime))
+			res = c.execute('SELECT pid, ip, port, md5, name, timeResponse FROM responses where pid = ? AND timeResponse < ?', (pid, validTime))
 			res = c.fetchall()
 
 			c.close()
