@@ -17,7 +17,7 @@ class dataBase:
 			c = con.cursor()
 
 			c.execute('CREATE TABLE IF NOT EXISTS config (name VARCHAR(20) NOT NULL, value VARCHAR(50) NOT NULL, PRIMARY KEY(name))')
-			c.execute('CREATE TABLE IF NOT EXISTS login (ip VARCHAR(55) NOT NULL, idSession VARCHAR(16) NOT NULL,PRIMARY KEY(ip))')
+			c.execute('CREATE TABLE IF NOT EXISTS login (ip VARCHAR(55) NOT NULL, port VARCHAR(5) NOT NULL, idSession VARCHAR(16) NOT NULL,PRIMARY KEY(ip))')
 			c.execute('CREATE TABLE IF NOT EXISTS file (Sessionid VARCHAR(16), md5 VARCHAR(32) NOT NULL, name VARCHAR(100) NOT NULL,PRIMARY KEY(Sessionid, md5))')
 			c.execute('CREATE TABLE IF NOT EXISTS requests (pid VARCHAR(16), ip VARCHAR(55), timeOperation FLOAT NOT NULL,PRIMARY KEY(pid,ip))')
 			c.execute('CREATE TABLE IF NOT EXISTS responses (id INTEGER,pid VARCHAR(16) NOT NULL, ip VARCHAR(55) NOT NULL, port VARCHAR(5) NOT NULL, md5 VARCHAR(32), name VARCHAR(100), timeResp FLOAT NOT NULL, PRIMARY KEY(id))')
@@ -49,21 +49,21 @@ class dataBase:
 
 			sessionMode = self.retrieveConfig(('mode',))
 
-			if sessionMode.mode == 'logged':
+			if sessionMode == 'logged':
 
 				if mode == 'normal':
 
-					return ['LG', sessionMode.mode]
+					return ['LG', sessionMode]
 			
 				else:
-					return ['ER', sessionMode.mode]
+					return ['ER', sessionMode]
 			
-			elif sessionMode.mode == mode:
+			elif sessionMode == mode:
 
 				return ['OK', mode]
 
 			else:
-				return ['ER', sessionMode.mode]
+				return ['ER', sessionMode]
 
 	def destroy(self):
 
@@ -83,15 +83,6 @@ class dataBase:
 
 		con = sqlite3.connect('P2P.db')
 		c = con.cursor()
-		c.execute('CREATE TABLE IF NOT EXISTS login (ip VARCHAR(55)NOT NULL, port VARCHAR(5) NOT NULL, idSession NOT NULL,PRIMARY KEY(ip))')
-		c.execute('CREATE TABLE IF NOT EXISTS file (Sessionid VARCHAR(16), md5 VARCHAR(32) NOT NULL, name VARCHAR(100) NOT NULL,PRIMARY KEY(Sessionid, md5))')
-		c.execute('CREATE TABLE IF NOT EXISTS requests (pid VARCHAR(16), ip VARCHAR(55), timeOperation FLOAT NOT NULL,PRIMARY KEY(pid,ip))')
-		c.execute('CREATE TABLE IF NOT EXISTS responses (id INTEGER,pid VARCHAR(16) NOT NULL, ip VARCHAR(55) NOT NULL, port VARCHAR(5) NOT NULL, md5 VARCHAR(32), name VARCHAR(100), timeResponse FLOAT NOT NULL, PRIMARY KEY(id))')
-		c.execute('CREATE TABLE IF NOT EXISTS peers (ip VARCHAR(55) NOT NULL, port VARCHAR(5) NOT NULL, PRIMARY KEY(ip))')
-		c.execute('CREATE TABLE IF NOT EXISTS superPeers (ip VARCHAR(55) NOT NULL, port VARCHAR(5) NOT NULL, PRIMARY KEY(ip))')
-
-		root1 = Util.ip_formatting(config.root1V4,config.root1V6,config.root1P)
-		root2 = Util.ip_formatting(config.root2V4,config.root2V6,config.root2P)
 
 		c.execute('SELECT * FROM config')
 		res = c.fetchall()
@@ -118,15 +109,19 @@ class dataBase:
 		#c.execute('SELECT * FROM config WHERE name IN ("mode")')
 		c.execute('SELECT * FROM config WHERE name IN '+ lPars)
 		res = c.fetchall()
-		
+
 		class Container(object):
 			pass
 
-		container = Container()
-		for par in res:
-			setattr(container,par[0],par[1])
+		if len(res) > 1: # Ritorno un oggetto con gli attributi di config
 
-		return container
+			container = Container()
+			for par in res:
+				setattr(container,par[0],par[1])
+
+			return container
+		else: # Ritorno il singolo parametro richiesto
+			return res[0][1]
 
 	def insertPeers(self, ip, port):
 
@@ -142,7 +137,7 @@ class dataBase:
 
 		con.close()
 
-	def retrievePeers(self, config):
+	def retrievePeers(self):
 
 		con = sqlite3.connect('P2P.db')
 		c = con.cursor()
@@ -158,7 +153,7 @@ class dataBase:
 		con = sqlite3.connect('P2P.db')
 		c = con.cursor()
 
-		c.execute('SELECT ip, port FROM login WHERE idSession=?', (sid) )
+		c.execute('SELECT ip, port FROM login WHERE idSession = ?', (sid) )
 		res = c.fetchall()
 
 		c.close()
@@ -181,43 +176,44 @@ class dataBase:
 		con = sqlite3.connect('P2P.db')
 		c = con.cursor()
 
-		try:
-			c.execute('INSERT INTO superPeers VALUES(?,?)',(ip,port))
-			con.commit()
-		except:
-			pass
-		con.close()
+		c.execute('INSERT INTO superPeers VALUES(?,?)',(ip,port))
 
-	def retrieveSuperPeers(self, maxNear):
-		print(maxNear)
-		con = sqlite3.connect('P2P.db')
-		c = con.cursor()
+		con.commit()
 
-		c.execute('SELECT * FROM superPeers')# ORDER BY random() LIMIT ?',(maxNear,))
+		res = c.execute('SELECT value FROM config WHERE name = maxNear')
+		maxNear = res.fetchone()
+
+		c.execute('SELECT * FROM superPeers ORDER BY random() LIMIT ?',(maxNear,))
 		res = c.fetchall()
 
 		resIp = tuple(resp[0] for resp in res)
 		print('l ---->',len(res))
 		c.execute('DELETE FROM superPeers WHERE ip NOT IN ' + str(resIp))
-		c.execute('SELECT * FROM superPeers')
-		res = c.fetchall()
-		print('------> ',len(res))
+
 		con.commit()
+		
 		con.close()
 
-		return res
-
-	def retrieveAll(self):
+	def retrieveSuperPeers(self):
 
 		con = sqlite3.connect('P2P.db')
 		c = con.cursor()
 
-		c.execute('SELECT * FROM peers')
+		c.execute('SELECT * FROM superPeers')
 		res = c.fetchall()
 
-		c.close()
+		con.close()
 
 		return res
+
+	def deleteSuperPeers(self):
+
+		con = sqlite3.connect('P2P.db')
+		c = con.cursor()
+
+		c.execute('DELETE FROM superPeers')
+
+		c.close()
 
 	def insertRequest(self, pktid, ip, timeOp):
 
