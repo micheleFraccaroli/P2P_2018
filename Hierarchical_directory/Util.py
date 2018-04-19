@@ -3,17 +3,17 @@ import re
 import random
 import string
 from Conn import Conn
-from time import time
+import time
 from datetime import datetime
-from threading import Lock
+from threading import *
 from dataBase import *
 
 # Variabili globali
 mode = None # Modalità di utilizzo del programma: 'normal', 'super', 'update', 'logged'
-statusRequest = {} # Dizionario per lo stato delle richieste ::: true: valida false: invalida
+statusRequest = {} # Dizionario per lo stato delle richieste: true: valida false: invalida
 listPeers = [] # Lista dei peers utilizzata durante l'aggiornamento delle tabelle dei peers
 lock = Lock()
-globallock = Lock()
+globalLock = Lock()
 
 
 def ip_formatting(ipv4,ipv6,port):
@@ -81,10 +81,10 @@ def printError(desc):
 
 def updatePeers():
     
-    globallock.acquire()
+    globalLock.acquire()
     mode = Util.mode
     Util.mode = 'update'
-    globallock.release()
+    globalLock.release()
 
     lock.acquire()
     db = dataBase()
@@ -96,12 +96,21 @@ def updatePeers():
     db.deleteSuperPeers()
     
     config = db.retrieveConfig(('selfV4','selfV6','selfP','ttl'))
+    idPacket = ip_packet16()
+    ip = ip_formatting(config.selfV4, config.selfV6, config.selfP)
 
-    pack = 'SUPE' + ip_packet16() + ip_formatting(config.selfV4, config.selfV6, config.selfP) + config.ttl.zfill(2)
+    db.insertRequest(idPacket, ip[:55],time.time())
+
+    lock.release()
+
+    pack = 'SUPE' + idPacket + ip + config.ttl.zfill(2)
     print('\n'+pack+'\n')
 
     listPeers = listSuper + list(set(listNormal) - set(listSuper))
-    lock.release()
+
+    globalLock.acquire()
+    statusRequest[idPacket] = True
+    globalLock.release()
 
     count = 0
     for peer in listPeers:
@@ -118,7 +127,7 @@ def updatePeers():
         
         else:
             printLog("Richiesta SUPE fallita per ::: " + str(ipv4))
-
+    count = 1
     if count == 0:
 
         print("                              .-.                                                ")
@@ -162,9 +171,21 @@ def updatePeers():
         print('\nSorry, you\'re on your own\n')
         exit()
 
-    globallock.acquire()
+    print('attendo')
+    cond = Condition()
+    cond.acquire()
+    cond.wait(20)
+    cond.release()
+
+    globalLock.acquire()
+    statusRequest[idPacket] = False
+    globalLock.release()
+
+    globalLock.acquire()
     Util.mode = mode
-    globallock.release()
+    globalLock.release()
+    print('fatto')
+
     return listPeers
 
 ########################################################################################
