@@ -6,6 +6,10 @@ from time import time
 from datetime import datetime
 from threading import Lock
 
+# Variabili globali
+mode = None # Modalità di utilizzo del programma: 'normal', 'super', 'update', 'logged'
+statusRequest = {} # Dizionario per lo stato delle richieste ::: true: valida false: invalida
+
 def ip_formatting(ipv4,ipv6,port):
 
     # formattazione ipv6

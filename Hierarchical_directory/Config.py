@@ -26,8 +26,8 @@ class Config:
         try:
             data.read_file(open('config.ini'))
         except IOError:
-            self.create()
             print('Missing config file........ Autogenerating empty configuration file.')
+            self.create()
             exit() 
         except config.DuplicateOptionError:
             print('Duplicated parameter in same section. Aborted.')
@@ -103,6 +103,7 @@ class Config:
             print("\n\nConfiguration loading complete. Unnecessary parameters detected. Please check the file \'errors.log\' for more details.\n")
         else:
             print("\n\nConfiguration loading complete.\n")
+    
     def validateInt(self,num):
         
         return int(num)      
@@ -121,4 +122,10 @@ class Config:
 
 if __name__=='__main__':
     c=Config()
-    c.create()
+
+
+    print(c.__dict__)
+   
+    for el in c.__dict__:
+        print(el,c.__dict__[el])
+   # c.create()
