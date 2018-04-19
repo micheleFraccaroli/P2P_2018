@@ -28,7 +28,11 @@ class optionsNormal:
 
 	def login(self):
 
-		print('LOGIN')
+		peerList = Util.updatePeers()
+
+		for peer in peerList:
+			print(peer)
+
 		time.sleep(1)
 
 	def exit(self):
@@ -83,7 +87,7 @@ class optionsSuper:
 
 	def __init__(self):
 
-		self.options = {1:['Update peers', self.update],2:['Search a File', self.search],3:['Add a file to connected supernode', self.add],4:['Remove a file from connected supernode', self.remove],5:['Exit', self.exit]}
+		self.options = {1:['Update peers', Util.updatePeers],2:['Search a File', self.search],3:['Add a file to connected supernode', self.add],4:['Remove a file from connected supernode', self.remove],5:['Exit', self.exit]}
 
 	def update(self):
 
@@ -142,6 +146,8 @@ else:
 
 menuMode = {'normal': optionsNormal,'super': optionsSuper,'logged': optionsLogged}
 
+Util.initializeFiles() # Inizializzo i file di log ed errors
+
 print(bcolors.MAGENTA + "____________________________      ________   ______   " + bcolors.ENDC)
 print(bcolors.MAGENTA + "\______   \_____  \______   \    /  _____/  /  __  \  " + bcolors.ENDC)
 print(bcolors.OKBLUE + " |     ___//  ____/|     ___/   /   \  ___  >      <  " + bcolors.ENDC)
@@ -175,10 +181,8 @@ print('timeIdPacket: ',c.timeIdPacket)
 print('mode: ',Util.mode)
 print("\n----------------------\n")
 
-lock = th.Lock()
-
 # background thread for requests
-#central_thread = Central_Thread(c, lock)
+#central_thread = Central_Thread()
 #central_thread.start()
 
 while True:

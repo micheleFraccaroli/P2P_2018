@@ -36,8 +36,6 @@ class Config:
             print('Parameter found without section. Aborted.')
             exit()
 
-        Util.initializeFiles()
-
         # Barra di caricamento con la tempistica configurabile
 
         lenWhiteList = sum(len(par) for par in data.values())

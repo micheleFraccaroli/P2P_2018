@@ -15,23 +15,29 @@ class Conn:
             return b
 
     def connection(self):
-        try:
-            # this is for ipv4 and ipv6
+    
+        # this is for ipv4 and ipv6
             
-            ip = self.ip_choice(0,1) #se 0:ipv4 altrimenti 1:ipv6
+        ip = self.ip_choice(0,1) #se 0:ipv4 altrimenti 1:ipv6
 
-            if(ip == 1):
-                self.ipp2p = self.ipv6
-            else:
-                self.ipp2p = self.ipv4
-            
+        if(ip == 1):
+            self.ipp2p = self.ipv6
+        else:
+            self.ipp2p = self.ipv4
+
+        try:        
             self.infoS = socket.getaddrinfo(self.ipp2p, self.pp2p)
             self.s = socket.socket(*self.infoS[0][:3])
             self.s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+            self.s.setblocking(0)
             self.s.connect(self.infoS[0][4])
 
-        except IOError as expt:
-            print (expt)
+        except IOError:
+
+            return False
+        
+        else:
+            return True
 
     def deconnection(self):
         try:
