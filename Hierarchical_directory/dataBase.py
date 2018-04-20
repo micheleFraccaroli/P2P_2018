@@ -8,9 +8,9 @@ import subprocess as sub
 class dataBase:
 
 	def create(self,mode):
-		
+
 		if os.system('ls P2P.db 2>/dev/null 1>/dev/null') > 0: # Database mancante, lo creo
-			
+
 			config = Config()
 
 			con = sqlite3.connect('P2P.db')
@@ -26,16 +26,16 @@ class dataBase:
 
 			root1 = Util.ip_formatting(config.root1V4,config.root1V6,config.root1P)
 			root2 = Util.ip_formatting(config.root2V4,config.root2V6,config.root2P)
-			
+
 			try:
-				
+
 				# Vicini
 				c.execute('INSERT INTO peers VALUES (?,?)',(root1[:55],root1[55:]))
 				c.execute('INSERT INTO peers VALUES (?,?)',(root2[:55],root2[55:]))
 
 				# Configurazione
 				for el in config.__dict__:
-					c.execute('INSERT INTO config VALUES (?,?)',(el,str(config.__dict__[el])))			
+					c.execute('INSERT INTO config VALUES (?,?)',(el,str(config.__dict__[el])))
 
 				c.execute('INSERT INTO config VALUES ("mode",?)', (mode,))
 				con.commit()
@@ -54,10 +54,10 @@ class dataBase:
 				if mode == 'normal':
 
 					return ['LG', sessionMode]
-			
+
 				else:
 					return ['ER', sessionMode]
-			
+
 			elif sessionMode == mode:
 
 				return ['OK', mode]
@@ -86,7 +86,7 @@ class dataBase:
 
 		c.execute('SELECT * FROM config')
 		res = c.fetchall()
-		
+
 		class Container(object):
 			pass
 
@@ -158,11 +158,11 @@ class dataBase:
 
 		c.close()
 
-		return res 
+		return res
 
 	#def updatePeers(self):
 	def deletePeers(self):
-		
+
 		con = sqlite3.connect('P2P.db')
 		c = con.cursor()
 
@@ -191,7 +191,7 @@ class dataBase:
 		c.execute('DELETE FROM superPeers WHERE ip NOT IN ' + str(resIp))
 
 		con.commit()
-		
+
 		con.close()
 
 	def retrieveSuperPeers(self):
@@ -266,7 +266,7 @@ class dataBase:
 
 		con.commit()
 		con.close()
-	
+
 	def retrieveResponse(self, pid, validTime): # validTime è config.timeResearch
 
 			con = sqlite3.connect('P2P.db')
@@ -350,7 +350,7 @@ class dataBaseSuper(dataBase):
 		con.close()
 
 		return res[0]
-	
+
 	def findInLocalSP(self, search):
 
 		con = sqlite3.connect('P2P.db')
@@ -397,6 +397,19 @@ class dataBaseSuper(dataBase):
 		con.close()
 		return res[0]
 
+	def searchFILEquer(self, search):
+
+		con = sqlite3.connect('P2P.db')
+		c = con.cursor()
+
+		c.execute('SELECT * FROM file WHERE name LIKE "%?%"',(search,))
+		res = c.fetchall()
+
+		con.commit()
+		con.close()
+
+		return res
+
 if __name__ == '__main__':
 	print("faccio")
 	config=Config()
@@ -433,7 +446,7 @@ if __name__ == '__main__':
 			c.insertID('172.168.1.1','111100001')
 		else:
 			print('ID ::: ',res)
-	
+
 	t = time.time()
 	time.sleep(1)
 	c.insertResponse('aaaaaaaaaaaaaaaa','172.16.8.1|fc00::8:1',500,'fhissbfksbfksabfkjefnkjsnfkj','Geme',time.time()-t)
