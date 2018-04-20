@@ -10,6 +10,7 @@ from dataBase import *
 
 # Variabili globali
 mode = None # Modalità di utilizzo del programma: 'normal', 'super', 'update', 'logged'
+sessionId = None # Id sesion da loggati
 statusRequest = {} # Dizionario per lo stato delle richieste: true: valida false: invalida
 listPeers = [] # Lista dei peers utilizzata durante l'aggiornamento delle tabelle dei peers
 lock = Lock()
@@ -183,8 +184,6 @@ def updatePeers():
     globalLock.acquire()
     Util.mode = mode
     globalLock.release()
-
-    return listPeers
 
 ########################################################################################
 

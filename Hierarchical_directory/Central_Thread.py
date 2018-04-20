@@ -181,6 +181,19 @@ class Central_Thread(th.Thread):
 
 				# LOGO ---
 				elif(recv_type.decode() == "LOGO"):
+					recv_packet = other_peersocket.recv(16) # 20 - 4
+					self.bytes_read = len(recv_packet)
+					while (self.bytes_read < 16):
+						recv_packet += other_peersocket.recv(16 - self.bytes_read)
+						self.bytes_read = len(recv_packet)
+					recv_packet = recv_type + recv_packet
+
+					Util.printLog("LOGOUT DAL SUPERPEER")
+					th_LOGO = ThreadLOGO(recv_packet.decode())
+					th_LOGO.start()
+
+				# ALGO ---
+				elif(recv_type.decode() == "ALGO"):
 					recv_packet = other_peersocket.recv(3) # 7 - 4
 					self.bytes_read = len(recv_packet)
 					while (self.bytes_read < 3):
@@ -188,9 +201,8 @@ class Central_Thread(th.Thread):
 						self.bytes_read = len(recv_packet)
 					recv_packet = recv_type + recv_packet
 
-					Util.printLog("LOGOUT DAL SUPERPEER")
-					th_LOGO = ThreadLOGO(recv_packet.decode())
-					th_LOGO.start()
+					Util.printLog("LOGOUT da te stesso")
+					print('Logout done. Eliminated ' + recv_packet.decode() + 'from directory')
 
 				# UPLOAD ---
 				elif(recv_type.decode() == "RETR"):
