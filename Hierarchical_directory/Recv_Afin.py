@@ -4,12 +4,12 @@ import threading as th
 from Download import Download
 
 class Recv_Afin(th.Thread):
-	th.Thread.__init__(self)
-	def __init__(self, numMD5, other_peersocket):
-		self.nMd5 = numMD5
-		self.other_peersocket = other_peersocket
+    def __init__(self, numMD5, other_peersocket):
+        th.Thread.__init__(self)
+        self.nMd5 = numMD5
+        self.other_peersocket = other_peersocket
 
-	def stampaRicerca(self):
+    def stampaRicerca(self):
 
         print('Risultati ricerca:')
         for index in range(0, len(self.listPeers)):
@@ -62,17 +62,17 @@ class Recv_Afin(th.Thread):
                                         self.listPeers[self.index_md5-1][3][choicePeer-1][2],
                                         self.listPeers[self.index_md5-1][0], self.listPeers[self.index_md5-1][1],
                                         self.ipp2p_dir_4, self.ipp2p_dir_6)
-    					down = Download(self.sID, self.ipp2p, self.ipp2p_6,
+                        down = Download(self.sID, self.ipp2p, self.ipp2p_6,
                                         self.listPeers[self.index_md5-1][3][choicePeer-1][2],
                                         self.listPeers[self.index_md5-1][0], self.listPeers[self.index_md5-1][1],
                                         self.ipp2p_dir_4, self.ipp2p_dir_6)
                         down.download()
 
-	def run(self):
-		self.listPeers = []
-		for i in range(self.nMd5):
-			data = self.other_peersocket.recv(135)  # Ricevo md5, descrizione e numero di copie
-			self.bytes_read = len(data)
+    def run(self):
+        self.listPeers = []
+        for i in range(self.nMd5):
+            data = self.other_peersocket.recv(135)  # Ricevo md5, descrizione e numero di copie
+            self.bytes_read = len(data)
             while (self.bytes_read < 135):
                 data += self.other_peersocket.recv(135 - self.bytes_read)
                 self.bytes_read = len(data)

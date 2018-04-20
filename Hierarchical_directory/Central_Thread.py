@@ -3,8 +3,8 @@ import os
 from Util import Util
 import threading as th
 from ThreadSUPE import ThreadSUPE
-from ThreadQUER import ThreadQUER
-from Retr import retr
+#from ThreadQUER import ThreadQUER
+#from Retr import retr
 from Recv_Afin import Recv_Afin
 from dataBase import dataBase
 from ThreadINS import ThreadINS
@@ -15,14 +15,13 @@ from ThreadFIND import ThreadFIND
 
 
 class Central_Thread(th.Thread):
-	def __init__(self, config, lock):
+	def __init__(self, config, port):
 		th.Thread.__init__(self)
-		self.port = config.selfP
+		self.port = port
 		self.ipv4 = config.selfV4
 		self.ipv6 = config.selfV6
 		self.ttl = config.ttl
 		self.bytes_read = 0
-		self.lock = lock
 
 	def run(self):
 		db = dataBase()
@@ -56,7 +55,7 @@ class Central_Thread(th.Thread):
 				# SUPE ---
 				if(recv_type.decode() == "SUPE"):
 					if(Util.mode == "super"):
-						Util.printLog('Ricevo SUPE da: '+addrPack)
+						Util.printLog('Ricevo SUPE da: ' + addrPack)
 						recv_packet = other_peersocket.recv(78) # 82 - 4
 						self.bytes_read = len(recv_packet)
 						while (self.bytes_read < 78):
@@ -65,7 +64,7 @@ class Central_Thread(th.Thread):
 						Util.printLog("FINITO LETTURA SUPE, AVVIO THREAD SUPE")
 
 						pkt = recv_type+recv_packet
-						th_SUPE =  ThreadSUPE(pkt.decode(),self.ipv4,self.ipv6,self.port,addrPack,self.lock,self.config, Util.mode)
+						th_SUPE =  ThreadSUPE(pkt.decode(),self.ipv4,self.ipv6,self.port,addrPack, self.config, Util.mode)
 						th_SUPE.start()
 
 				# ASUP ---
@@ -78,10 +77,10 @@ class Central_Thread(th.Thread):
 							recv_packet += other_peersocket.recv(76 - self.bytes_read)
 							self.bytes_read = len(recv_packet)
 
-						self.lock.acquire()
+						Util.lock.acquire()
 						db.insertSuperPeers(recv_packet[16:71], recv_packet[71:])
 						db.insertResponse(recv_packet[:16],recv_packet[16:71], recv_packet[71:],"null","null")
-						self.lock.release()
+						Util.lock.release()
 
 				# QUER ---
 				elif(recv_type.decode() == "QUER"):
@@ -96,7 +95,7 @@ class Central_Thread(th.Thread):
 
 						pkt = recv_type+recv_packet
 						
-						th_QUER = ThreadQUER(self.port,pkt.decode(), addrPack, self.ipv4, self.ipv6, self.lock,self.config, self.port+10)
+						th_QUER = ThreadQUER(self.port,pkt.decode(), addrPack, self.ipv4, self.ipv6, self.config, self.port+10)
 						th_QUER.start()
 
 				# AFIN ---
@@ -112,21 +111,21 @@ class Central_Thread(th.Thread):
 						recv_afin.start()
 						
             	# FIND ---
-            	elif(recv_type.decode() == "FIND"):
-            		if(Util.mode == "super"):
-            			recv_packet = other_peersocket.recv(36) # 40 - 4
-            			self.bytes_read = len(recv_packet)
+				elif(recv_type.decode() == "FIND"):
+					if(Util.mode == "super"):
+						recv_packet = other_peersocket.recv(36) # 40 - 4
+						self.bytes_read = len(recv_packet)
 						while (self.bytes_read < 36):
 							recv_packet += other_peersocket.recv(36 - self.bytes_read)
 							self.bytes_read = len(recv_packet)
-            			pktid = ''.join(random.choice(string.ascii_uppercase+string.digits) for _ in range(16))
-            			addr = ip_formatting(self.ipv4, self.ipv6, self.port)
+						pktid = ''.join(random.choice(string.ascii_uppercase+string.digits) for _ in range(16))
+						addr = ip_formatting(self.ipv4, self.ipv6, self.port)
 
-            			new_packet = "QUER" + pktid + addr + self.ttl + recv_packet[16:]
-            			th_FIND = ThreadFIND(new_packet,recv_packet[4:20] ,self.lock)
-            			th_FIND.start()
+						new_packet = "QUER" + pktid + addr + self.ttl + recv_packet[16:]
+						th_FIND = ThreadFIND(new_packet,recv_packet[4:20])
+						th_FIND.start()
 
-    			# AQUE ---
+				# AQUE ---
 				elif(recv_type.decode() == "AQUE"):
 					if(Util.mode == "super"):
 						recv_packet = other_peersocket.recv(208) # 212 - 4
@@ -136,7 +135,7 @@ class Central_Thread(th.Thread):
 							self.bytes_read = len(recv_packet)
 
 						recv_packet = recv_type + recv_packet
-						t_RESP = thread_Response(recv_packet, self.lock)
+						t_RESP = thread_Response(recv_packet)
 						t_RESP.start()
 
 
@@ -150,7 +149,7 @@ class Central_Thread(th.Thread):
 							self.bytes_read = len(recv_packet)
 						recv_packet = recv_type + recv_packet
 
-						th_INS = ThreadINS(recv_packet, self.lock)
+						th_INS = ThreadINS(recv_packet)
 						th_INS.start()
 
 				# DEFF ---
@@ -163,7 +162,7 @@ class Central_Thread(th.Thread):
 							self.bytes_read = len(recv_packet)
 						recv_packet = recv_type + recv_packet
 
-						th_DEL = ThreadDEL(recv_packet, self.lock)
+						th_DEL = ThreadDEL(recv_packet)
 						th_DEL.start()
 
 				# LOGI ---
@@ -188,7 +187,7 @@ class Central_Thread(th.Thread):
 							self.bytes_read = len(recv_packet)
 						recv_packet = recv_type + recv_packet
 
-						th_LOGO = ThreadLOGO(recv_packet, self.lock)
+						th_LOGO = ThreadLOGO(recv_packet)
 						th_LOGO.start() 
 
 				other_peersocket.close()

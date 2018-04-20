@@ -122,12 +122,12 @@ def updatePeers():
 
             count += 1
             con.s.send(pack.encode())
-            printLog("Richiesta SUPE a vicino ::: " + str(ipv4))
+            printLog("Richiesta SUPE a vicino ::: " + ipv4)
             con.deconnection()
         
         else:
-            printLog("Richiesta SUPE fallita per ::: " + str(ipv4))
-    count = 1
+            printLog("Richiesta SUPE fallita per ::: " + ipv4)
+
     if count == 0:
 
         print("                              .-.                                                ")
@@ -168,10 +168,9 @@ def updatePeers():
         print("                   |_|/                                                          ")
         print("                                                                                 ")
 
-        print('\nSorry, you\'re on your own\n')
+        print('\nNobody found after update. Sorry, you\'re on your own\n')
         exit()
 
-    print('attendo')
     cond = Condition()
     cond.acquire()
     cond.wait(20)
@@ -184,7 +183,6 @@ def updatePeers():
     globalLock.acquire()
     Util.mode = mode
     globalLock.release()
-    print('fatto')
 
     return listPeers
 
