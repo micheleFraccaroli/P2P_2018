@@ -34,7 +34,7 @@ class Central_Thread(th.Thread):
 		peersocket.listen(20)
 
 		while True:
-			Util.printLog("IN ATTESA DI UNA RICHISTA")
+			Util.printLog("IN ATTESA DI UNA RICHIESTA ")
 
 			other_peersocket, addr = peersocket.accept()
 			if addr[0][:2] == "::":
@@ -67,7 +67,7 @@ class Central_Thread(th.Thread):
 					Util.printLog("FINITO LETTURA SUPE, AVVIO THREAD SUPE")
 
 					pkt = recv_type+recv_packet
-					th_SUPE =  ThreadSUPE(pkt.decode(),self.ipv4,self.ipv6,self.port,addrPack)
+					th_SUPE =  ThreadSUPE(pkt.decode(),self.ipv4,self.ipv6,addrPack)
 					th_SUPE.start()
 
 				# ASUP ---
@@ -175,9 +175,8 @@ class Central_Thread(th.Thread):
 					while (self.bytes_read < 60):
 						recv_packet += other_peersocket.recv(60 - self.bytes_read)
 						self.bytes_read = len(recv_packet)
-					'''
-					Chiama classe che gestisce il login
-					'''
+					fake_resp = "ALGI" + '1t2f34erd5t4refd'
+					other_peersocket.send(fake_resp.encode())
 					Util.printLog("LOGGATO AL SUPERPEER")
 
 				# LOGO ---
