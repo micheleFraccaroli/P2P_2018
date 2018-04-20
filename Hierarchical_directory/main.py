@@ -38,7 +38,18 @@ class optionsNormal:
 	def exit(self):
 
 		db = dataBase()
+		
+		Util.lock.acquire()
+		
+		config = db.retrieveConfig(('selfV4','selfV6','selfP'))
+
+		con = Conn(config.selfV4, config.selfV6, config.selfP)
+		con.connect()
+		con.s.send('EXIT')
+		con.deconnect()
+		
 		db.destroy()
+		Util.lock.release()
 		
 		print('\nBye\n')
 		time.sleep(1)
@@ -76,8 +87,19 @@ class optionsLogged:
 		print("### Logout implicito da implementare ###")
 
 		db = dataBase()
-		db.destroy()
 		
+		Util.lock.acquire()
+		
+		config = db.retrieveConfig(('selfV4','selfV6','selfP'))
+
+		con = Conn(config.selfV4, config.selfV6, config.selfP)
+		con.connect()
+		con.s.send('EXIT')
+		con.deconnect()
+		
+		db.destroy()
+		Util.lock.release()
+
 		print('\nBye\n')
 		time.sleep(1)
 
@@ -119,7 +141,22 @@ class optionsSuper:
 			time.sleep(4)
 
 		else:
+			Util.lock.acquire()
+		
+			config = db.retrieveConfig(('selfV4','selfV6','selfP'))
+			
+			con = Conn(config.selfV4, config.selfV6, config.selfP)
+			con.connect()
+			con.s.send('EXIT')
+			con.deconnect()
+
+			con = Conn(config.selfV4, config.selfV6, 3000)
+			con.connect()
+			con.s.send('EXIT')
+			con.deconnect()
+			
 			db.destroy()
+			Util.lock.release()
 		
 			print('\nBye\n')
 			time.sleep(1)
