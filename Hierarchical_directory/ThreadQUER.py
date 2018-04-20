@@ -84,7 +84,7 @@ class ThreadQUER(th.Thread):
 			#rispondo
 			self.answer(db, file_found, pktid, ip, peer_port)
 		if(ttl>1):
-			Util.printLog("QUER: eseguo l'inoltro ai vicini della richiesta\n")
+			Util.printLog("[QUER]: eseguo l'inoltro ai vicini della richiesta")
 			#vado a decrementare il ttl di uno e costruisco la nuova query da inviare ai vicini
 			self.ttl_new = self.new_ttl(ttl)
 			self.new_quer = "QUER"+pktid+ip+peer_port+self.ttl_new+last_part_pkt

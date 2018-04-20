@@ -21,7 +21,7 @@ class ThreadDEL(th.Thread):
         self.sessionid = self.pkt_del[4:20]
         self.md5 = self.pkt_del[20:52]
 
-        db = dataBase()
+        db = dataBaseSuper()
         self.lock.acquire()
         find = db.retriveFILE(self.sessionid, self.md5)
 

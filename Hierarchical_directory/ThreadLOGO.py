@@ -34,7 +34,7 @@ class ThreadLOGO(th.Thread):
                 #sys.exit(0)
 
         def run(self):
-            db = dataBase()
+            db = dataBaseSuper()
             self.lock.acquire()
             self.count = db.deleteFROMpeer(sessionid)
             self.info = db.retriveINFO(sessionid)
