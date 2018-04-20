@@ -32,8 +32,8 @@ class Conn:
 #            self.s.setblocking(0)
             self.s.connect(self.infoS[0][4])
 
-        except IOError:
-
+        except IOError as e:
+            print(e)
             return False
         
         else:

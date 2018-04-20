@@ -107,7 +107,7 @@ def updatePeers():
     print('\n'+pack+'\n')
 
     listPeers = listSuper + list(set(listNormal) - set(listSuper))
-
+    print(listPeers)
     globalLock.acquire()
     statusRequest[idPacket] = True
     globalLock.release()

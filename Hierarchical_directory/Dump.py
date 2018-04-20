@@ -25,8 +25,12 @@ print(bcolors.HEADER + "\nLOGIN |-----------------------------------------------
 for row in c.execute("SELECT * FROM login"):
     print(row)
 
-print(bcolors.HEADER + "VICINI |------------------------------------------------\n" + bcolors.ENDC)
+print(bcolors.HEADER + "\nPEERS |------------------------------------------------\n" + bcolors.ENDC)
 for row in c.execute("SELECT * FROM peers"):
+    print(row)
+
+print(bcolors.HEADER + "\nSUPER |------------------------------------------------\n" + bcolors.ENDC)
+for row in c.execute("SELECT * FROM superPeers"):
     print(row)
 
 print(bcolors.HEADER + "\nRICHIESTE |------------------------------------------------\n" + bcolors.ENDC)

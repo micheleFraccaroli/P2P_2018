@@ -80,14 +80,14 @@ class ThreadSUPE(th.Thread):
 				
 				con = Conn(self.ipv4,self.ipv6,self.port)
 			
-			if con.connection():
+				if con.connection():
 
-				con.s.send(self.pack.encode())
-				Util.printLog('Risposta ASUP a ::: ' + self.ipv4)
-				con.deconnection()
-			else:
+					con.s.send(self.pack.encode())
+					Util.printLog('Risposta ASUP a ::: ' + self.ipv4)
+					con.deconnection()
+				else:
 
-				Util.printLog('Risposta ASUP fallita per ::: ' + self.ipv4)
+					Util.printLog('Risposta ASUP fallita per ::: ' + self.ipv4)
 				
 		else:
 			Util.lock.release()

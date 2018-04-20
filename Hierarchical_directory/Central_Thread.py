@@ -67,7 +67,7 @@ class Central_Thread(th.Thread):
 					Util.printLog("FINITO LETTURA SUPE, AVVIO THREAD SUPE")
 
 					pkt = recv_type+recv_packet
-					th_SUPE =  ThreadSUPE(pkt.decode(),self.ipv4,self.ipv6,self.port,addrPack, self.config, Util.mode)
+					th_SUPE =  ThreadSUPE(pkt.decode(),self.ipv4,self.ipv6,self.port,addrPack)
 					th_SUPE.start()
 
 				# ASUP ---

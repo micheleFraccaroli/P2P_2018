@@ -20,7 +20,7 @@ class dataBase:
 			c.execute('CREATE TABLE IF NOT EXISTS login (ip VARCHAR(55) NOT NULL, port VARCHAR(5) NOT NULL, idSession VARCHAR(16) NOT NULL,PRIMARY KEY(ip))')
 			c.execute('CREATE TABLE IF NOT EXISTS file (Sessionid VARCHAR(16), md5 VARCHAR(32) NOT NULL, name VARCHAR(100) NOT NULL,PRIMARY KEY(Sessionid, md5))')
 			c.execute('CREATE TABLE IF NOT EXISTS requests (pid VARCHAR(16), ip VARCHAR(55), timeOperation FLOAT NOT NULL,PRIMARY KEY(pid,ip))')
-			c.execute('CREATE TABLE IF NOT EXISTS responses (id INTEGER,pid VARCHAR(16) NOT NULL, ip VARCHAR(55) NOT NULL, port VARCHAR(5) NOT NULL, md5 VARCHAR(32), name VARCHAR(100), timeResp FLOAT NOT NULL, PRIMARY KEY(id))')
+			c.execute('CREATE TABLE IF NOT EXISTS responses (id INTEGER,pid VARCHAR(16) NOT NULL, ip VARCHAR(55) NOT NULL, port VARCHAR(5) NOT NULL, md5 VARCHAR(32), name VARCHAR(100), PRIMARY KEY(id))')
 			c.execute('CREATE TABLE IF NOT EXISTS peers (ip VARCHAR(55) NOT NULL, port VARCHAR(5) NOT NULL, PRIMARY KEY(ip))')
 			c.execute('CREATE TABLE IF NOT EXISTS superPeers (ip VARCHAR(55) NOT NULL, port VARCHAR(5) NOT NULL, PRIMARY KEY(ip))')
 
@@ -180,15 +180,20 @@ class dataBase:
 
 		con.commit()
 
-		res = c.execute('SELECT value FROM config WHERE name = maxNear')
+		res = c.execute('SELECT value FROM config WHERE name = "maxNear"')
 		maxNear = res.fetchone()
 
-		c.execute('SELECT * FROM superPeers ORDER BY random() LIMIT ?',(maxNear,))
+		c.execute('SELECT * FROM superPeers ORDER BY random() LIMIT ?',(maxNear))
 		res = c.fetchall()
 
 		resIp = tuple(resp[0] for resp in res)
-		print('l ---->',len(res))
-		c.execute('DELETE FROM superPeers WHERE ip NOT IN ' + str(resIp))
+
+		if len(resIp) == 1:
+			resIp = str(resIp).replace(',','')
+		else:
+			resIp = str(resIp)
+
+		c.execute('DELETE FROM superPeers WHERE ip NOT IN ' + resIp)
 
 		con.commit()
 
@@ -199,9 +204,12 @@ class dataBase:
 		con = sqlite3.connect('P2P.db')
 		c = con.cursor()
 
-		c.execute('SELECT * FROM superPeers')
-		res = c.fetchall()
-
+		try:
+			c.execute('SELECT * FROM superPeers')
+			res = c.fetchall()
+		except:
+			pass
+			
 		con.close()
 
 		return res
@@ -257,12 +265,12 @@ class dataBase:
 		con.commit()
 		con.close()
 
-	def insertResponse(self, pktid, ip, port, md5, name, timeResp):
+	def insertResponse(self, pktid, ip, port, md5, name):
 
 		con = sqlite3.connect('P2P.db')
 		c = con.cursor()
 
-		c.execute('INSERT INTO responses VALUES (null,?,?,?,?,?,?)', (pktid, ip, port, md5, name, timeResp))
+		c.execute('INSERT INTO responses VALUES (null, ?, ?, ?, ?, ?)', (pktid, ip, port, md5, name))
 
 		con.commit()
 		con.close()
