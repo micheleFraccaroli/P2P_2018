@@ -7,7 +7,7 @@ from Conn import Conn
 
 class ThreadSUPE(th.Thread):
 
-	def __init__(self, pack, ipv4, ipv6, port, ipRequest, lock, config):
+	def __init__(self, pack, ipv4, ipv6, port, ipRequest):
 
 		th.Thread.__init__(self)
 		self.myIPP     = Util.ip_formatting(ipv4,ipv6,port)
@@ -19,14 +19,12 @@ class ThreadSUPE(th.Thread):
 		self.port      = info[2]
 		self.ttl       = info[3]
 		self.ipRequest = ipRequest
-		self.lock      = lock
-		self.config    = config
 
 	def run(self):
 		Util.printLog('\n\nApertura thread SUPE\n\n')
 		db = dataBase()
 
-		self.lock.acquire()
+		Util.lock.acquire()
 
 		res = db.retrieveCounterRequest(self.pid,self.pack[20:75])
 		if( res == 0): # Richiesta già conosciuta
@@ -34,47 +32,64 @@ class ThreadSUPE(th.Thread):
 			
 			db.insertRequest(self.pid,self.pack[20:75],time.time())
 			
+			Util.globalLock.acquire()
+			mode = Util.mode # Prelevo la modalità attuale
+			Util.globalLock.release()
+			
 			if self.ttl > 1: # Inoltro richiesta ai vicini
 
-				neighborhood = db.retrieveSuperPeers(self.config.maxNear) # Dati sulla tabella anche se c'è un aggiornamento in corso
-				
-				mode = Util.mode # Prelevo la modalità attuale
 
-				self.lock.release()
+				if mode == 'update':
+
+					Util.printLog('Update. Prendo vicini da lista')
+					neighborhood = Util.listPeers
+				else:
+
+					Util.printLog('Update. Prendo vicini da database')
+					neighborhood = db.retrieveSuperPeers()
+
+				Util.lock.release()
 
 				self.ttl = str(self.ttl-1).zfill(2)
 				self.pack=''.join((self.pack[:80],self.ttl))
 
 				for neighbor in neighborhood:
 
-					params = Util.ip_deformatting(neighbor[0],neighbor[1],None)
+					ipv4, ipv6, port, ttl = Util.ip_deformatting(neighbor[0],neighbor[1],None)
 					
-					if params[0] != self.ipRequest and params[1] != self.ipRequest and params[0] != self.ipv4:
-						self.con = Conn(params[0],params[1],params[2])
-						try:
-							self.con.connection()
-							self.con.s.send(self.pack.encode())
-							self.con.deconnection()
-							Util.printLog("vicino inoltro SUPE: "+params[0])
-						except IOError as e:
-							print("Inoltro vicino fallito")
+					if ipv4 != self.ipRequest and ipv6 != self.ipRequest and ipv4 != self.ipv4:
+						con = Conn(ipv4, ipv6, port)
+						
+						if con.connection():
+
+							con.s.send(self.pack.encode())
+							printLog("Inoltro SUPE a vicino ::: " + ipv4)
+							con.deconnection()
+						else:
+
+							printLog("Inoltro SUPE fallita per ::: " + ipv4)
 			else:
 
-				self.lock.release() # Non devo inoltrare, ma devo comunque rilasciare la lock
-							
-			self.pack = 'ASUP'+self.pid+self.myIPP
-			Util.printLog('ASUP ::: '+str(self.pack))
-			Util.printLog('ASUP CONN ::: '+self.ipv4+self.ipv6+str(self.port))
-			self.con = Conn(self.ipv4,self.ipv6,self.port)
-			#print('Con ASUP ', self.ipv4, self.ipv6, self.port)
-			try:
-				self.con.connection()
-				self.con.s.send(self.pack.encode())
-				self.con.deconnection()
-			except IOError as e:
-				print("Risposta diretta fallita")
+				Util.lock.release() # Non devo inoltrare, ma devo comunque rilasciare la lock
+
+			if mode in ['update','super']: # Sono superpeer e rispondo
+
+				self.pack = 'ASUP'+self.pid+self.myIPP
+				Util.printLog('ASUP pacchetto ::: '+str(self.pack))
+				Util.printLog('ASUP verso ::: '+self.ipv4+self.ipv6+str(self.port))
+				
+				con = Conn(self.ipv4,self.ipv6,self.port)
+			
+			if con.connection():
+
+				con.s.send(self.pack.encode())
+				Util.printLog('Risposta ASUP a ::: ' + self.ipv4)
+				con.deconnection()
+			else:
+
+				Util.printLog('Risposta ASUP fallita per ::: ' + self.ipv4)
 				
 		else:
-			self.lock.release()
+			Util.lock.release()
 			Util.printLog("SUPE per: "+self.ipRequest+". Già eseguita")
 		Util.printLog('\n\nChiusura thread SUPE\n\n')

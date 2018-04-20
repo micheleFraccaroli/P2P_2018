@@ -4,12 +4,13 @@ import threading as th
 from Download import Download
 
 class Recv_Afin(th.Thread):
-	th.Thread.__init__(self)
-	def __init__(self, numMD5, other_peersocket):
-		self.nMd5 = numMD5
-		self.other_peersocket = other_peersocket
+    def __init__(self, numMD5, other_peersocket):
+        th.Thread.__init__(self)
+        self.nMd5 = numMD5
+        self.other_peersocket = other_peersocket
 
-	def stampaRicerca(self):
+    def stampaRicerca(self):
+
         print('Risultati ricerca:')
         for index in range(0, len(self.listPeers)):
             print('\n', index + 1, '- descrizione: ', self.listPeers[index][1])
@@ -35,10 +36,10 @@ class Recv_Afin(th.Thread):
                 for copy in range(len(self.listPeers[choice - 1][3])):
                     print('\n', copy + 1, '- \n\tIPv4P2P: \t', self.listPeers[index][3][copy][0], '\n\tIPv6P2P: \t',
                           self.listPeers[index][3][copy][1], '\n\tPP2P: \t\t', self.listPeers[index][3][copy][2])
-                    
+
                 #Formattazione IPv4 eliminando gli zeri non necessari
                 self.split_ip = self.listPeers[index][3][copy][0].split(".")
-                self.ipp2p = self.split_ip[0].lstrip('0') + '.' + self.split_ip[1].lstrip('0') + '.' + self.split_ip[2].lstrip('0') + '.' + self.split_ip[3].lstrip('0') 
+                self.ipp2p = self.split_ip[0].lstrip('0') + '.' + self.split_ip[1].lstrip('0') + '.' + self.split_ip[2].lstrip('0') + '.' + self.split_ip[3].lstrip('0')
 
                 self.ipp2p_6 = str(ipaddr.ip_address(self.listPeers[index][3][copy][1]))
                 print(self.ipp2p_6)
@@ -61,18 +62,18 @@ class Recv_Afin(th.Thread):
                                         self.listPeers[self.index_md5-1][3][choicePeer-1][2],
                                         self.listPeers[self.index_md5-1][0], self.listPeers[self.index_md5-1][1],
                                         self.ipp2p_dir_4, self.ipp2p_dir_6)
-    					down = Download(self.sID, self.ipp2p, self.ipp2p_6,
+                        down = Download(self.sID, self.ipp2p, self.ipp2p_6,
                                         self.listPeers[self.index_md5-1][3][choicePeer-1][2],
                                         self.listPeers[self.index_md5-1][0], self.listPeers[self.index_md5-1][1],
                                         self.ipp2p_dir_4, self.ipp2p_dir_6)
                         down.download()
 
-	def run(self):
-		self.listPeers = []
-        Util.printLog("SONO DENTRO AL THREAD AFIN")
-		for i in range(self.nMd5):
-			data = self.other_peersocket.recv(135)  # Ricevo md5, descrizione e numero di copie
-			self.bytes_read = len(data)
+    def run(self):
+        self.listPeers = []
+        for i in range(self.nMd5):
+            data = self.other_peersocket.recv(135)  # Ricevo md5, descrizione e numero di copie
+            self.bytes_read = len(data)
+
             while (self.bytes_read < 135):
                 data += self.other_peersocket.recv(135 - self.bytes_read)
                 self.bytes_read = len(data)

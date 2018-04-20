@@ -8,7 +8,7 @@ from Config import Config
 from dataBase import *
 from tqdm import tqdm
 from Download import Download
-#from Central_Thread import Central_Thread
+from Central_Thread import Central_Thread
 
 class bcolors:
     HEADER = '\033[95m'
@@ -150,10 +150,10 @@ Util.initializeFiles() # Inizializzo i file di log ed errors
 
 print(bcolors.MAGENTA + "____________________________      ________   ______   " + bcolors.ENDC)
 print(bcolors.MAGENTA + "\______   \_____  \______   \    /  _____/  /  __  \  " + bcolors.ENDC)
-print(bcolors.OKBLUE + " |     ___//  ____/|     ___/   /   \  ___  >      <  " + bcolors.ENDC)
-print(bcolors.OKBLUE + " |    |   /       \|    |       \    \_\  \/   --   \ " + bcolors.ENDC)
-print(bcolors.CYAN + " |____|   \_______ \____|        \______  /\______  / " + bcolors.ENDC)
-print(bcolors.CYAN + "                  \/                    \/        \/  " + bcolors.ENDC)
+print(bcolors.OKBLUE  + " |     ___//  ____/|     ___/   /   \  ___  >      <  " + bcolors.ENDC)
+print(bcolors.OKBLUE  + " |    |   /       \|    |       \    \_\  \/   --   \ " + bcolors.ENDC)
+print(bcolors.CYAN    + " |____|   \_______ \____|        \______  /\______  / " + bcolors.ENDC)
+print(bcolors.CYAN    + "                  \/                    \/        \/  " + bcolors.ENDC)
 
 time.sleep(2)
 
@@ -168,13 +168,11 @@ else:
 
 Util.mode = dbMode
 
-c = db.retrieveConfig(('maxNear','ttl','timeResearch','timeIdPacket'))
-
-if Util.mode == 'normal':
-	c.maxNear = 1
+c = db.retrieveConfig(('maxNear', 'timeResearch', 'timeIdPacket'))
+config = db.retrieveConfig(('selfV4', 'selfV6', 'ttl', 'selfP'))
 
 print("--- Configurations ---\n")
-print('ttl: ',c.ttl)
+print('ttl: ',config.ttl)
 print('maxNear: ',c.maxNear)
 print('timeResearch: ',c.timeResearch)
 print('timeIdPacket: ',c.timeIdPacket)
@@ -182,8 +180,13 @@ print('mode: ',Util.mode)
 print("\n----------------------\n")
 
 # background thread for requests
-#central_thread = Central_Thread()
-#central_thread.start()
+if Util.mode == 'super':
+	
+	central_threadS = Central_Thread(config,3000)
+	central_threadS.start()
+
+central_threadN = Central_Thread(config,config.selfP)
+central_threadN.start()
 
 while True:
 
