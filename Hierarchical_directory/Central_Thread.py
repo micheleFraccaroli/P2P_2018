@@ -54,29 +54,20 @@ class Central_Thread(th.Thread):
 
 				# SUPE ---
 				if(recv_type.decode() == "SUPE"):
-<<<<<<< HEAD
-					if(Util.mode == "super"):
-						Util.printLog('Ricevo SUPE da: ' + addrPack)
-						recv_packet = other_peersocket.recv(78) # 82 - 4
-=======
+
 					Util.printLog('Ricevo SUPE da: '+addrPack)
 					recv_packet = other_peersocket.recv(78) # 82 - 4
 					self.bytes_read = len(recv_packet)
+
 					while (self.bytes_read < 78):
+
 						recv_packet += other_peersocket.recv(78 - self.bytes_read)
->>>>>>> 0d81011ae14cc60bb0f28311e8cf89e3105d43c1
 						self.bytes_read = len(recv_packet)
 					Util.printLog("FINITO LETTURA SUPE, AVVIO THREAD SUPE")
 
-<<<<<<< HEAD
-						pkt = recv_type+recv_packet
-						th_SUPE =  ThreadSUPE(pkt.decode(),self.ipv4,self.ipv6,self.port,addrPack, self.config, Util.mode)
-						th_SUPE.start()
-=======
 					pkt = recv_type+recv_packet
-					th_SUPE =  ThreadSUPE(pkt.decode(),self.ipv4,self.ipv6,self.port,addrPack,self.lock,self.config, Util.mode)
+					th_SUPE =  ThreadSUPE(pkt.decode(),self.ipv4,self.ipv6,self.port,addrPack, self.config, Util.mode)
 					th_SUPE.start()
->>>>>>> 0d81011ae14cc60bb0f28311e8cf89e3105d43c1
 
 				# ASUP ---
 				elif(recv_type.decode() == "ASUP"):
@@ -87,17 +78,10 @@ class Central_Thread(th.Thread):
 						recv_packet += other_peersocket.recv(76 - self.bytes_read)
 						self.bytes_read = len(recv_packet)
 
-<<<<<<< HEAD
-						Util.lock.acquire()
-						db.insertSuperPeers(recv_packet[16:71], recv_packet[71:])
-						db.insertResponse(recv_packet[:16],recv_packet[16:71], recv_packet[71:],"null","null")
-						Util.lock.release()
-=======
-					self.lock.acquire()
+					Util.lock.acquire()
 					db.insertSuperPeers(recv_packet[16:71].decode(), recv_packet[71:].decode())
 					db.insertResponse(recv_packet[:16].decode(),recv_packet[16:71].decode(), recv_packet[71:].decode(),"null","null")
-					self.lock.release()
->>>>>>> 0d81011ae14cc60bb0f28311e8cf89e3105d43c1
+					Util.lock.release()
 
 				# QUER ---
 				elif(recv_type.decode() == "QUER"):
@@ -109,17 +93,10 @@ class Central_Thread(th.Thread):
 						recv_packet += other_peersocket.recv(98 - self.bytes_read)
 						self.bytes_read = len(recv_packet)
 
-<<<<<<< HEAD
-						pkt = recv_type+recv_packet
-						
-						th_QUER = ThreadQUER(self.port,pkt.decode(), addrPack, self.ipv4, self.ipv6, self.config, self.port+10)
-						th_QUER.start()
-=======
 					pkt = recv_type+recv_packet
-
-					th_QUER = ThreadQUER(self.port,pkt.decode(), addrPack, self.ipv4, self.ipv6, self.lock,self.config, self.port+10)
+					
+					th_QUER = ThreadQUER(self.port,pkt.decode(), addrPack, self.ipv4, self.ipv6, self.config, self.port+10)
 					th_QUER.start()
->>>>>>> 0d81011ae14cc60bb0f28311e8cf89e3105d43c1
 
 				# AFIN ---
 				elif(recv_type.decode() == "AFIN"):
@@ -130,25 +107,10 @@ class Central_Thread(th.Thread):
 						self.bytes_read = len(recv_packet)
 
 					Util.printLog("RICEVUTO AFIN")
-					recv_afin = Recv_Afin(int(recv_packet..decode()), other_peersocket)
+					recv_afin = Recv_Afin(int(recv_packet.decode()), other_peersocket)
 					recv_afin.start()
 
             	# FIND ---
-<<<<<<< HEAD
-				elif(recv_type.decode() == "FIND"):
-					if(Util.mode == "super"):
-						recv_packet = other_peersocket.recv(36) # 40 - 4
-						self.bytes_read = len(recv_packet)
-						while (self.bytes_read < 36):
-							recv_packet += other_peersocket.recv(36 - self.bytes_read)
-							self.bytes_read = len(recv_packet)
-						pktid = ''.join(random.choice(string.ascii_uppercase+string.digits) for _ in range(16))
-						addr = ip_formatting(self.ipv4, self.ipv6, self.port)
-
-						new_packet = "QUER" + pktid + addr + self.ttl + recv_packet[16:]
-						th_FIND = ThreadFIND(new_packet,recv_packet[4:20])
-						th_FIND.start()
-=======
             	elif(recv_type.decode() == "FIND"):
         			recv_packet = other_peersocket.recv(36) # 40 - 4
         			self.bytes_read = len(recv_packet)
@@ -163,9 +125,8 @@ class Central_Thread(th.Thread):
 					Util.printLog("====> PACCHETTO DI QUER <====")
 					Util.printLog(str(new_packet))
 					Util.printLog("=============================")
-        			th_FIND = ThreadFIND(new_packet,recv_packet[4:20].decode(),self.lock)
+        			th_FIND = ThreadFIND(new_packet,recv_packet[4:20].decode())
         			th_FIND.start()
->>>>>>> 0d81011ae14cc60bb0f28311e8cf89e3105d43c1
 
 				# AQUE ---
 				elif(recv_type.decode() == "AQUE"):
@@ -174,20 +135,10 @@ class Central_Thread(th.Thread):
 					while (self.bytes_read < 208):
 						recv_packet += other_peersocket.recv(208 - self.bytes_read)
 						self.bytes_read = len(recv_packet)
-<<<<<<< HEAD
-						while (self.bytes_read < 208):
-							recv_packet += other_peersocket.recv(208 - self.bytes_read)
-							self.bytes_read = len(recv_packet)
-
-						recv_packet = recv_type + recv_packet
-						t_RESP = thread_Response(recv_packet)
-						t_RESP.start()
-=======
->>>>>>> 0d81011ae14cc60bb0f28311e8cf89e3105d43c1
 
 					Util.printLog("RICEVO GLI AQUE DALLA RETE")
 					recv_packet = recv_type + recv_packet
-					t_RESP = thread_Response(recv_packet.decode(), self.lock)
+					t_RESP = thread_Response(recv_packet.decode())
 					t_RESP.start()
 
 				# ADFF ---
@@ -199,14 +150,9 @@ class Central_Thread(th.Thread):
 						self.bytes_read = len(recv_packet)
 					recv_packet = recv_type + recv_packet
 
-<<<<<<< HEAD
-						th_INS = ThreadINS(recv_packet)
-						th_INS.start()
-=======
 					Util.printLog("AGGIUNTO FILE AL SUPERPEER")
-					th_INS = ThreadINS(recv_packet.decode(), self.lock)
+					th_INS = ThreadINS(recv_packet.decode())
 					th_INS.start()
->>>>>>> 0d81011ae14cc60bb0f28311e8cf89e3105d43c1
 
 				# DEFF ---
 				elif(recv_type.decode() == "DEFF"):
@@ -217,14 +163,9 @@ class Central_Thread(th.Thread):
 						self.bytes_read = len(recv_packet)
 					recv_packet = recv_type + recv_packet
 
-<<<<<<< HEAD
-						th_DEL = ThreadDEL(recv_packet)
-						th_DEL.start()
-=======
 					Util.printLog("ELIMINATO FILE AL SUPERPEER")
-					th_DEL = ThreadDEL(recv_packet.decode(), self.lock)
+					th_DEL = ThreadDEL(recv_packet.decode())
 					th_DEL.start()
->>>>>>> 0d81011ae14cc60bb0f28311e8cf89e3105d43c1
 
 				# LOGI ---
 				elif(recv_type.decode() == "LOGI"):
@@ -248,7 +189,7 @@ class Central_Thread(th.Thread):
 					recv_packet = recv_type + recv_packet
 
 					Util.printLog("LOGOUT DAL SUPERPEER")
-					th_LOGO = ThreadLOGO(recv_packet.decode(), self.lock)
+					th_LOGO = ThreadLOGO(recv_packet.decode())
 					th_LOGO.start()
 
 				# UPLOAD ---
@@ -260,13 +201,8 @@ class Central_Thread(th.Thread):
 						recv_packet += other_peersocket.recv(32 - self.bytes_read)
 						self.bytes_read = len(recv_packet)
 
-<<<<<<< HEAD
-						th_LOGO = ThreadLOGO(recv_packet)
-						th_LOGO.start() 
-=======
 					th_UPLOAD = Upload(self.port, recv_packet.decode(), other_peersocket)
 					th_UPLOAD.start()
 					th_UPLOAD.join()
->>>>>>> 0d81011ae14cc60bb0f28311e8cf89e3105d43c1
 
 				other_peersocket.close()
