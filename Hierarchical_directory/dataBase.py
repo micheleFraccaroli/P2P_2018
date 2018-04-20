@@ -350,6 +350,19 @@ class dataBaseSuper(dataBase):
 		con.close()
 
 		return res[0]
+	
+	def findInLocalSP(self, search):
+
+		con = sqlite3.connect('P2P.db')
+		c = con.cursor()
+
+		c.execute("SELECT md5, name FROM file WHERE name LIKE '%?%'", (search))
+		res = c.fetchall()
+
+		con.commit()
+		con.close()
+
+		return res
 
 	def updateFILE(self, filename, md5):
 

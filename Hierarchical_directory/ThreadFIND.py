@@ -15,32 +15,56 @@ class ThreadFIND(th.Thread):
 
 	def run(self):
 		db = dataBase()
+
+		#controllo tra i peer loggati a me prima di inoltrare la quer nella rete
+		dbS = dataBaseSuper()
+		Util.printLog("CERCATO ----> " + str(self.packet[82:]))
+		localFile = dbS.findInLocalSP(self.packet[82:])
+		
+		if(localFile): # se la lista non è vuota entro nel ciclo
+			research = localFile[1] + (' '*(100 - len(self.search)))
+			internalResponse = "AQUE" + self.packet[4:20] + self.packet[20:80] + localFile[0] + research
+			ipv4, ipv6, port, ttl = Util.ip_deformatting(self.packet[20:35],self.packet[36:75], self.packet[75:80], None)
+			connL = Conn(ipv4, ipv6, port)
+			if(connL.connection()):	
+				connL.s.send(internalResponse.encode())
+				connL.deconnection()
+			Util.printLog("RISPONDO CON UN FILE PRESENTE NEL MIO DATABASE")
+
+		#ricavo i superpeer a cui sono collegato e inoltro la richiesta nella rete
 		superpeers = db.retrieveSuperPeers()
 
-		self.lock.acquire()
+		Util.globalLock.acquire()
 		Util.statusRequest[self.packet[4:20]] = True
-		self.lock.release()
+		Util.printLog("DIZIONARIO GLOBALE SETTATO ---> " + str(Util.statusRequest[self.packet[4:20]]))
+		self.globalLock.release()
 
 		for sp in superpeers:
 			ipv4, ipv6, port = Util.ip_deformatting(sp[0][:15],sp[0][17:],sp[1])
 			conn = Conn(ipv4, ipv6, port)
-			conn.connection()
-			conn.s.send(self.packet.encode())
-			conn.deconnection()
+			if(conn.connection()):	
+				conn.s.send(self.packet.encode())
+				conn.deconnection()
+				Util.printLog("INVIO QUER VERSO " + str(ipv4) + " RIUSCITO")
+			else:
+				Util.printLog("INVIO QUER FALLITO VERSO IL SUPER... PROBABILMENTE " + str(ipv4) + " E' OFFLINE")
+				continue
 
 		th.wait(20)
 
-		self.lock.acquire()
+		self.globalLock.acquire()
 		Util.statusRequest[self.packet[4:20]] = False
-		self.lock.release()
+		Util.printLog("PASSATI 20 SECONDI.. DIZIONARIO ---> " + str(Util.statusRequest[self.packet[4:20]]))
+		self.globalLock.release()
 
+		#creazione pacchetto di AFIN passati i 20 secondi
 		addrPeer = db.retrievePeerSid(self.sid)
 		resp = db.retrieveResponse(self.packet[4:20])
 		ipv4, ipv6, port = Util.ip_deformatting(addrPeer[0][:15], addrPeer[0][:17], addrPeer[1])
 		toPeer = "AFIN" + str(len(resp)).zfill(3)
 		connP = Conn(ipv4, ipv6, port)
-		connP.connection()
-		connP.s.send(toPeer.encode())
+		if(connP.connection()):
+			connP.s.send(toPeer.encode())
 
 		buffer_md5 = ''
 		for i in resp:

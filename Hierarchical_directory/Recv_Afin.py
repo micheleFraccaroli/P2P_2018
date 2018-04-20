@@ -36,10 +36,10 @@ class Recv_Afin(th.Thread):
                 for copy in range(len(self.listPeers[choice - 1][3])):
                     print('\n', copy + 1, '- \n\tIPv4P2P: \t', self.listPeers[index][3][copy][0], '\n\tIPv6P2P: \t',
                           self.listPeers[index][3][copy][1], '\n\tPP2P: \t\t', self.listPeers[index][3][copy][2])
-                    
+
                 #Formattazione IPv4 eliminando gli zeri non necessari
                 self.split_ip = self.listPeers[index][3][copy][0].split(".")
-                self.ipp2p = self.split_ip[0].lstrip('0') + '.' + self.split_ip[1].lstrip('0') + '.' + self.split_ip[2].lstrip('0') + '.' + self.split_ip[3].lstrip('0') 
+                self.ipp2p = self.split_ip[0].lstrip('0') + '.' + self.split_ip[1].lstrip('0') + '.' + self.split_ip[2].lstrip('0') + '.' + self.split_ip[3].lstrip('0')
 
                 self.ipp2p_6 = str(ipaddr.ip_address(self.listPeers[index][3][copy][1]))
                 print(self.ipp2p_6)
@@ -73,6 +73,7 @@ class Recv_Afin(th.Thread):
         for i in range(self.nMd5):
             data = self.other_peersocket.recv(135)  # Ricevo md5, descrizione e numero di copie
             self.bytes_read = len(data)
+
             while (self.bytes_read < 135):
                 data += self.other_peersocket.recv(135 - self.bytes_read)
                 self.bytes_read = len(data)
