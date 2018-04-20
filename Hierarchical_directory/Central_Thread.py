@@ -118,8 +118,8 @@ class Central_Thread(th.Thread):
 					while (self.bytes_read < 36):
 						recv_packet += other_peersocket.recv(36 - self.bytes_read)
 						self.bytes_read = len(recv_packet)
-						pktid = Util.ip_packet16()
-						addr = ip_formatting(self.ipv4, self.ipv6, self.port)
+					pktid = Util.ip_packet16()
+					addr = ip_formatting(self.ipv4, self.ipv6, self.port)
 
 					Util.printLog("RICEVUTO FIND E TRASFORMO IN QUER")
 					new_packet = "QUER" + pktid + addr + self.ttl + recv_packet[16:].decode()
