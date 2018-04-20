@@ -111,7 +111,7 @@ class ThreadQUER(th.Thread):
 			self.lock.release()
 			self.do(self, db, self.pktid, self.ip, self.timestamp, self.lock, self.string, self.peer_port, self.ttl, self.from_peer[82:], self.ip_request)
 		else:
-			before = db.retrieveCounterRequest(self.pktid, self.ip)
+			before = db.retrieveRequestTimestamp(self.pktid, self.ip)
 			self.lock.release()
 			now = time.time()
 			if((now - before) < 20):
