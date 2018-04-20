@@ -7,10 +7,10 @@ from Conn import Conn
 
 class ThreadSUPE(th.Thread):
 
-	def __init__(self, pack, ipv4, ipv6, port, ipRequest):
+	def __init__(self, pack, ipv4, ipv6, ipRequest):
 
 		th.Thread.__init__(self)
-		self.myIPP     = Util.ip_formatting(ipv4,ipv6,port)
+		self.myIPP     = Util.ip_formatting(ipv4,ipv6,3000) # Porta 3000 visto che devo rispondere da super peer
 		info           = Util.ip_deformatting(pack[20:75],pack[75:80],pack[80:])
 		self.pack      = pack
 		self.pid       = pack[4:20]
@@ -63,11 +63,11 @@ class ThreadSUPE(th.Thread):
 						if con.connection():
 
 							con.s.send(self.pack.encode())
-							printLog("Inoltro SUPE a vicino ::: " + ipv4)
+							Util.printLog("Inoltro SUPE a vicino ::: " + ipv4)
 							con.deconnection()
 						else:
 
-							printLog("Inoltro SUPE fallita per ::: " + ipv4)
+							Util.printLog("Inoltro SUPE fallita per ::: " + ipv4)
 			else:
 
 				Util.lock.release() # Non devo inoltrare, ma devo comunque rilasciare la lock

@@ -37,6 +37,10 @@ class dataBase:
 				for el in config.__dict__:
 					c.execute('INSERT INTO config VALUES (?,?)',(el,str(config.__dict__[el])))
 
+				if mode == 'normal':
+
+					c.execute('UPDATE config SET value = "1" WHERE name = "maxNear"')
+
 				c.execute('INSERT INTO config VALUES ("mode",?)', (mode,))
 				con.commit()
 			except:
@@ -209,7 +213,7 @@ class dataBase:
 			res = c.fetchall()
 		except:
 			pass
-			
+
 		con.close()
 
 		return res

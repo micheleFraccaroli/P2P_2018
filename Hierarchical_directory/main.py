@@ -29,12 +29,36 @@ class optionsNormal:
 
 	def login(self):
 
-		peerList = Util.updatePeers()
+		Util.updatePeers()
 
-		for peer in peerList:
-			print(peer)
+		db = dataBase()
 
+		Util.lock.acquire()
+
+		config = db.retrieveConfig(('selfV4','selfV6','selfP'))
+		ip = Util.ip_formatting(config.selfV4, config.selfV6, config.selfP)
+
+		listPeers = db.retrieveSuperPeers()
+
+		Util.lock.release()
+
+		ipv4, ipv6, port, ttl = Util.ip_deformatting(listPeers[0][0],listPeers[0][1],None)
+		con = Conn(ipv4, ipv6, port)
+
+		if con.connection():
+		
+			packet = 'LOGI' + ip
+			Util.printLog('Richiesta LOGI a vicino ::: ' + ipv4)
+			con.s.send(packet.encode())
+			con.deconnection()
+
+		else:
+
+			Util.printLog('Richiesta LOGI fallita per ::: ' + ipv4)
+	
 		time.sleep(1)
+
+		Util.sessionId = input('Inserisci sessione ::: ')
 
 	def exit(self):
 
@@ -81,7 +105,29 @@ class optionsLogged:
 
 	def logout(self):
 
-		print('LOGOUT')
+		db = dataBase()
+
+		Util.lock.acquire()
+
+		dirV4, dirV6, dirP = db.retrieveSuperPeers()
+
+		Util.lock.release()
+
+		packet = 'LOGO' + Util.sessionId
+
+		con = Conn(durV4, dirV6, dirP)
+
+		if con.connection():
+		
+			packet = 'LOGO' + ip
+			Util.printLog('Richiesta LOGO a vicino ::: ' + ipv4)
+			con.s.send(packet.encode())
+			con.deconnection()
+
+		else:
+
+			Util.printLog('Richiesta LOGO fallita per ::: ' + ipv4)
+
 		time.sleep(1)
 
 	def exit(self):
@@ -149,7 +195,7 @@ class optionsSuper:
 			
 			db.destroy()
 			Util.lock.release()
-			
+
 			con = Conn(config.selfV4, config.selfV6, config.selfP)
 			con.connection()
 			con.s.send('EXIT'.encode())
