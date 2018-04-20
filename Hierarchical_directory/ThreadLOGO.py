@@ -4,12 +4,13 @@ import sys
 import os
 import ipaddress as ipad
 from dataBase import dataBase
+from dataBase import dataBaseSuper
 from Conn import Conn
 from Upload import Upload
 import threading as th
 
 class ThreadLOGO(th.Thread):
-    def init(self, pkt_logo, lock):
+    def __init__(self, pkt_logo, lock):
         th.Thread.__init__(self)
         self.pkt_logo = pkt_logo
         self.lock = lock

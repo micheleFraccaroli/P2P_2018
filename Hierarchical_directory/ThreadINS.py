@@ -4,14 +4,14 @@ import sys
 import os
 import ipaddress as ipad
 from dataBase import dataBase
+from dataBase import dataBaseSuper
 from Conn import Conn
-from Upload import Upload
 import threading as th
 
 #thread che si occupa della gestione dell'aggiunta di un file da parte di un peer
 
 class ThreadINS(th.Thread):
-    def init(self, pkt_ins):
+    def __init__(self, pkt_ins, lock):
         th.Thread.__init__(self)
         self.pkt_ins = pkt_ins
         self.lock = lock
@@ -21,7 +21,7 @@ class ThreadINS(th.Thread):
         self.md5 = self.pkt_ins[20:52]
         self.filename = self.pkt_ins[52:]
 
-        db = dataBase()
+        db = dataBaseSuper()
         self.lock.acquire()
         find = db.retriveFILE(self.sessionid, self.md5)
 
@@ -42,6 +42,7 @@ if __name__ == '__main__':
     md5 = 'abcd'.ljust(32,'2')
     filename = 'ciao'.ljust(100, '3')
     pkt_ins = 'ADFF'+sessionid+md5+filename
+    lock = th.Lock()
 
-    th_INS = ThreadINS(pkt_ins)
+    th_INS = ThreadINS(pkt_ins, lock)
     th_INS.start()
