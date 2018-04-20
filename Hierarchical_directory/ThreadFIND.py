@@ -7,10 +7,9 @@ from dataBase import dataBase
 
 
 class ThreadFIND(th.Thread):
-	def __init__(self, packets, sid, lock):
+	def __init__(self, packets, sid):
 		th.Thread.__init__(self)
 		self.packet = packet
-		self.lock = lock
 		self.sid = sid
 
 	def run(self):
@@ -20,13 +19,13 @@ class ThreadFIND(th.Thread):
 		dbS = dataBaseSuper()
 		Util.printLog("CERCATO ----> " + str(self.packet[82:]))
 		localFile = dbS.findInLocalSP(self.packet[82:])
-		
+
 		if(localFile): # se la lista non è vuota entro nel ciclo
 			research = localFile[1] + (' '*(100 - len(self.search)))
 			internalResponse = "AQUE" + self.packet[4:20] + self.packet[20:80] + localFile[0] + research
 			ipv4, ipv6, port, ttl = Util.ip_deformatting(self.packet[20:35],self.packet[36:75], self.packet[75:80], None)
 			connL = Conn(ipv4, ipv6, port)
-			if(connL.connection()):	
+			if(connL.connection()):
 				connL.s.send(internalResponse.encode())
 				connL.deconnection()
 			Util.printLog("RISPONDO CON UN FILE PRESENTE NEL MIO DATABASE")
@@ -42,7 +41,7 @@ class ThreadFIND(th.Thread):
 		for sp in superpeers:
 			ipv4, ipv6, port = Util.ip_deformatting(sp[0][:15],sp[0][17:],sp[1])
 			conn = Conn(ipv4, ipv6, port)
-			if(conn.connection()):	
+			if(conn.connection()):
 				conn.s.send(self.packet.encode())
 				conn.deconnection()
 				Util.printLog("INVIO QUER VERSO " + str(ipv4) + " RIUSCITO")
@@ -89,5 +88,5 @@ class ThreadFIND(th.Thread):
 					toPeer = toPeer + l
 				connP.connection()
 				connP.s.send(toPeer.encode())
-		
+
 		connP.deconnection()

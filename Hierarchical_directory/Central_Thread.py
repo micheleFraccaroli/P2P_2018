@@ -1,3 +1,4 @@
+import sys
 import socket
 import os
 import threading as th
@@ -7,17 +8,17 @@ from ThreadSUPE import ThreadSUPE
 #from Retr import retr
 from Recv_Afin import Recv_Afin
 from dataBase import dataBase
-from ThreadINS import ThreadINS
-from ThreadDEL import ThreadDEL
-from ThreadLOGO import ThreadLOGO
+#from ThreadINS import ThreadINS
+#from ThreadDEL import ThreadDEL
+#from ThreadLOGO import ThreadLOGO
 from Response import thread_Response
 from ThreadFIND import ThreadFIND
-from Upload import Upload
+#from Upload import Upload
 
 class Central_Thread(th.Thread):
 	def __init__(self, config, port):
 		th.Thread.__init__(self)
-		self.port = port
+		self.port = int(port)
 		self.ipv4 = config.selfV4
 		self.ipv6 = config.selfV6
 		self.ttl = config.ttl
@@ -94,8 +95,8 @@ class Central_Thread(th.Thread):
 						self.bytes_read = len(recv_packet)
 
 					pkt = recv_type+recv_packet
-					
-					th_QUER = ThreadQUER(self.port,pkt.decode(), addrPack, self.ipv4, self.ipv6, self.config, self.port+10)
+
+					th_QUER = ThreadQUER(pkt.decode(),addrPack)
 					th_QUER.start()
 
 				# AFIN ---
@@ -110,23 +111,23 @@ class Central_Thread(th.Thread):
 					recv_afin = Recv_Afin(int(recv_packet.decode()), other_peersocket)
 					recv_afin.start()
 
-            	# FIND ---
-            	elif(recv_type.decode() == "FIND"):
-        			recv_packet = other_peersocket.recv(36) # 40 - 4
-        			self.bytes_read = len(recv_packet)
+				# FIND ---
+				elif(recv_type.decode() == "FIND"):
+					recv_packet = other_peersocket.recv(36) # 40 - 4
+					self.bytes_read = len(recv_packet)
 					while (self.bytes_read < 36):
 						recv_packet += other_peersocket.recv(36 - self.bytes_read)
 						self.bytes_read = len(recv_packet)
-        			pktid = Util.ip_packet16()
-        			addr = ip_formatting(self.ipv4, self.ipv6, self.port)
+						pktid = Util.ip_packet16()
+						addr = ip_formatting(self.ipv4, self.ipv6, self.port)
 
 					Util.printLog("RICEVUTO FIND E TRASFORMO IN QUER")
-        			new_packet = "QUER" + pktid + addr + self.ttl + recv_packet[16:].decode()
+					new_packet = "QUER" + pktid + addr + self.ttl + recv_packet[16:].decode()
 					Util.printLog("====> PACCHETTO DI QUER <====")
 					Util.printLog(str(new_packet))
 					Util.printLog("=============================")
-        			th_FIND = ThreadFIND(new_packet,recv_packet[4:20].decode())
-        			th_FIND.start()
+					th_FIND = ThreadFIND(new_packet,recv_packet[4:20].decode())
+					th_FIND.start()
 
 				# AQUE ---
 				elif(recv_type.decode() == "AQUE"):
@@ -204,5 +205,9 @@ class Central_Thread(th.Thread):
 					th_UPLOAD = Upload(self.port, recv_packet.decode(), other_peersocket)
 					th_UPLOAD.start()
 					th_UPLOAD.join()
+
+				# EXIT ---
+				elif(recv_type.decode() == "EXIT"):
+					sys.exit()
 
 				other_peersocket.close()
