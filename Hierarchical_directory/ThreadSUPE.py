@@ -10,6 +10,7 @@ class ThreadSUPE(th.Thread):
 	def __init__(self, pack, ipv4, ipv6, ipRequest):
 
 		th.Thread.__init__(self)
+		
 		self.myIPP     = Util.ip_formatting(ipv4,ipv6,3000) # Porta 3000 visto che devo rispondere da super peer
 		info           = Util.ip_deformatting(pack[20:75],pack[75:80],pack[80:])
 		self.pack      = pack
@@ -29,13 +30,13 @@ class ThreadSUPE(th.Thread):
 		res = db.retrieveCounterRequest(self.pid,self.pack[20:75])
 		if( res == 0): # Richiesta già conosciuta
 			Util.printLog("Eseguo SUPE per: "+self.ipRequest)
-			
+
 			db.insertRequest(self.pid,self.pack[20:75],time.time())
-			
+
 			Util.globalLock.acquire()
 			mode = Util.mode # Prelevo la modalità attuale
 			Util.globalLock.release()
-			
+
 			if self.ttl > 1: # Inoltro richiesta ai vicini
 
 
@@ -56,10 +57,10 @@ class ThreadSUPE(th.Thread):
 				for neighbor in neighborhood:
 
 					ipv4, ipv6, port, ttl = Util.ip_deformatting(neighbor[0],neighbor[1],None)
-					
+
 					if ipv4 != self.ipRequest and ipv6 != self.ipRequest and ipv4 != self.ipv4:
 						con = Conn(ipv4, ipv6, port)
-						
+
 						if con.connection():
 
 							con.s.send(self.pack.encode())
@@ -77,18 +78,18 @@ class ThreadSUPE(th.Thread):
 				self.pack = 'ASUP'+self.pid+self.myIPP
 				Util.printLog('ASUP pacchetto ::: '+str(self.pack))
 				Util.printLog('ASUP verso ::: '+self.ipv4+self.ipv6+str(self.port))
-				
+
 				con = Conn(self.ipv4,self.ipv6,self.port)
-			
-				if con.connection():
 
-					con.s.send(self.pack.encode())
-					Util.printLog('Risposta ASUP a ::: ' + self.ipv4)
-					con.deconnection()
-				else:
+			if con.connection():
 
-					Util.printLog('Risposta ASUP fallita per ::: ' + self.ipv4)
-				
+				con.s.send(self.pack.encode())
+				Util.printLog('Risposta ASUP a ::: ' + self.ipv4)
+				con.deconnection()
+			else:
+
+				Util.printLog('Risposta ASUP fallita per ::: ' + self.ipv4)
+
 		else:
 			Util.lock.release()
 			Util.printLog("SUPE per: "+self.ipRequest+". Già eseguita")
