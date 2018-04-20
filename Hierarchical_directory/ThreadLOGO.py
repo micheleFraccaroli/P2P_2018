@@ -10,10 +10,9 @@ from Upload import Upload
 import threading as th
 
 class ThreadLOGO(th.Thread):
-    def __init__(self, pkt_logo, lock):
+    def __init__(self, pkt_logo):
         th.Thread.__init__(self)
         self.pkt_logo = pkt_logo
-        self.lock = lock
         self.sessionid = self.pkt_logo[4:]
 
         def answer(self, db, count, info):
@@ -35,10 +34,10 @@ class ThreadLOGO(th.Thread):
 
         def run(self):
             db = dataBaseSuper()
-            self.lock.acquire()
+            Util.lock.acquire()
             self.count = db.deleteFROMpeer(sessionid)
             self.info = db.retriveINFO(sessionid)
-            self.lock.release()
+            Util.lock.release()
             Util.printLog("[ALGO] disconnessione dell'utente: "+self.sessionid+", file eliminati: "+str(self.count))
             self.answer(db, self.count, self.info)
 

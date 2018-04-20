@@ -23,11 +23,10 @@ from File_system import File_system
 #inizializzo il thread
 
 class ThreadQUER(th.Thread):
-	def __init__(self, quer_pkt, ip_request, lock):
+	def __init__(self, quer_pkt, ip_request):
 		th.Thread.__init__(self)
 		self.from_peer = quer_pkt
 		self.ip_request = ip_request
-		self.lock = lock
 
 	#risponde al superpeer che ha effettuato una ricerca
 
@@ -77,9 +76,9 @@ class ThreadQUER(th.Thread):
 
 	def do(self, db, pktid, ip, timestamp, lock, string, peer_port, ttl, last_part_pkt, ip_request):
 
-		self.lock.acquire()
+		lock.acquire()
 		file_found = db.searchFILEquer(string)
-		self.lock.release()
+		lock.release()
 		if(file_found):
 			#rispondo
 			self.answer(db, file_found, pktid, ip, peer_port)
@@ -88,9 +87,9 @@ class ThreadQUER(th.Thread):
 			#vado a decrementare il ttl di uno e costruisco la nuova query da inviare ai vicini
 			self.ttl_new = self.new_ttl(ttl)
 			self.new_quer = "QUER"+pktid+ip+peer_port+self.ttl_new+last_part_pkt
-			self.lock.acquire()
+			lock.acquire()
 			self.search_neighbors(db, ip_request, new_quer)
-			self.lock.release()
+			lock.release()
 		del db
 
 	def run(self):
@@ -102,27 +101,27 @@ class ThreadQUER(th.Thread):
 		self.string = self.from_peer[82:].rstrip()
 
 		db = dataBaseSuper()
-		self.lock.acquire()
+		Util.lock.acquire()
 		res = db.retrieveCounterRequest(self.pktid, self.ip)
 
 		if(res == 0):
 			self.timestamp = time.time()
 			db.insertRequest(self.pktid, self.ip, self.timestamp)
-			self.lock.release()
-			self.do(self, db, self.pktid, self.ip, self.timestamp, self.lock, self.string, self.peer_port, self.ttl, self.from_peer[82:], self.ip_request)
+			Util.lock.release()
+			self.do(self, db, self.pktid, self.ip, self.timestamp, Util.lock, self.string, self.peer_port, self.ttl, self.from_peer[82:], self.ip_request)
 		else:
 			before = db.retrieveRequestTimestamp(self.pktid, self.ip)
-			self.lock.release()
+			Util.lock.release()
 			now = time.time()
 			if((now - before) < 20):
 				Util.printLog('QUER: non faccio nulla perchè ho già elaborato la richiesta\n')
 				del db
 			else:
 				self.timestamp = time.time()
-				self.lock.acquire()
+				Util.lock.acquire()
 				db.updateTimestamp(self.pktid, self.ip)
-				self.lock.release()
-				self.do(self, db, self.pktid, self.ip, self.timestamp, self.lock, self.string, self.peer_port, self.ttl, self.from_peer[82:], self.ip_request)
+				Util.lock.release()
+				self.do(self, db, self.pktid, self.ip, self.timestamp, Util.lock, self.string, self.peer_port, self.ttl, self.from_peer[82:], self.ip_request)
 '''
 if __name__ == '__main__':
 
