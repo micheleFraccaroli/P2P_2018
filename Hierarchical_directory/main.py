@@ -9,6 +9,7 @@ from dataBase import *
 from tqdm import tqdm
 from Download import Download
 from Central_Thread import Central_Thread
+from Conn import Conn
 
 class bcolors:
     HEADER = '\033[95m'
@@ -43,13 +44,14 @@ class optionsNormal:
 		
 		config = db.retrieveConfig(('selfV4','selfV6','selfP'))
 
-		con = Conn(config.selfV4, config.selfV6, config.selfP)
-		con.connect()
-		con.s.send('EXIT')
-		con.deconnect()
-		
 		db.destroy()
 		Util.lock.release()
+
+		con = Conn(config.selfV4, config.selfV6, config.selfP)
+		con.connection()
+		con.s.send('EXIT'.encode())
+		con.deconnection()
+		
 		
 		print('\nBye\n')
 		time.sleep(1)
@@ -93,9 +95,9 @@ class optionsLogged:
 		config = db.retrieveConfig(('selfV4','selfV6','selfP'))
 
 		con = Conn(config.selfV4, config.selfV6, config.selfP)
-		con.connect()
-		con.s.send('EXIT')
-		con.deconnect()
+		con.connection()
+		con.s.send('EXIT'.encode())
+		con.deconnection()
 		
 		db.destroy()
 		Util.lock.release()
@@ -145,18 +147,19 @@ class optionsSuper:
 		
 			config = db.retrieveConfig(('selfV4','selfV6','selfP'))
 			
-			con = Conn(config.selfV4, config.selfV6, config.selfP)
-			con.connect()
-			con.s.send('EXIT')
-			con.deconnect()
-
-			con = Conn(config.selfV4, config.selfV6, 3000)
-			con.connect()
-			con.s.send('EXIT')
-			con.deconnect()
-			
 			db.destroy()
 			Util.lock.release()
+			
+			con = Conn(config.selfV4, config.selfV6, config.selfP)
+			con.connection()
+			con.s.send('EXIT'.encode())
+			con.deconnection()
+
+			con = Conn(config.selfV4, config.selfV6, 3000)
+			con.connection()
+			con.s.send('EXIT'.encode())
+			con.deconnection()
+			
 		
 			print('\nBye\n')
 			time.sleep(1)
