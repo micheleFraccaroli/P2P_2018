@@ -29,32 +29,7 @@ class Login:
 
         data_login = "LOGI" + self.ipp2p
 
-        self.con.s.send(data_login.encode('ascii'))
-
-        self.ack_login = self.con.s.recv(20)  # 4B di ALGI + 16B di SID
-
-        bytes_read = len(self.ack_login)
-
-        while(bytes_read < 20):
-            self.ack_login += self.s.recv(20 - self.bytes_read)
-            self.bytes_read += len(self.ack_login)
-
-        print("Ip peer ---> " + str(self.ipp2p))
-        print("Port peer ---> " + str(self.pp2p))
-
-        if (self.ack_login[:4].decode() == "ALGI"):
-            self.sid = self.ack_login[4:20]
-
-            if (self.sid == '0000000000000000'):
-                print("Errore durante il login\n")
-                exit()
-            else:
-                print("Session ID ---> " + str(self.sid.decode()) + "\n")
-        else:
-            print("Errore del pacchetto, string 'ALGI' non trovata")
-            self.con.deconnection()
-            exit()
-
+        self.con.s.send(data_login.encode())
         self.con.deconnection()
 
         return self.sid
@@ -65,18 +40,5 @@ class Login:
         self.con.connection()
 
         data_logout = "LOGO" + sid.decode()
-
-        self.con.s.send(data_logout.encode('ascii'))
-
-        self.ack_logout = self.con.s.recv(7)
-
-        self.bytes_read = len(self.ack_logout)
-
-        while(self.bytes_read < 7):
-            self.ack_logout += self.con.s.recv(7 - self.bytes_read)
-            self.bytes_read = len(self.ack_logout)
-
-        if (self.ack_logout[:4].decode() == "ALGO"):
-            print("Numero di file eliminati ---> " + str(self.ack_logout[4:7].decode()))
-
+        self.con.s.send(data_logout.encode())
         self.con.deconnection()

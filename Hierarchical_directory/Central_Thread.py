@@ -14,6 +14,7 @@ from dataBase import dataBase
 from Response import thread_Response
 from ThreadFIND import ThreadFIND
 #from Upload import Upload
+from ThreadALGI import ThreadALGI
 
 class Central_Thread(th.Thread):
 	def __init__(self, config, port):
@@ -175,9 +176,29 @@ class Central_Thread(th.Thread):
 					while (self.bytes_read < 60):
 						recv_packet += other_peersocket.recv(60 - self.bytes_read)
 						self.bytes_read = len(recv_packet)
-					fake_resp = "ALGI" + '1t2f34erd5t4refd'
-					other_peersocket.send(fake_resp.encode())
-					Util.printLog("LOGGATO AL SUPERPEER")
+					
+					th_ALGI = ThreadALGI(recv_packet[:15].decode(),recv_packet[16:].decode())
+					th_ALGI.start()
+
+					#sid = th_ALGI.sid
+
+					Util.printLog("FINE LOGIN NEL CENTRAL THREAD")
+
+				# ALGI ---
+				elif(recv_type.decode() == "ALGI"):
+					recv_packet = other_peersocket.recv(16)
+					self.bytes_read = len(recv_packet)
+					while (self.bytes_read < 16):
+						recv_packet += other_peersocket.recv(16 - self.bytes_read)
+						self.bytes_read = len(recv_packet)
+
+					'''
+					Qua sono un peer normale e inserisco nella tabella del
+					DB chiama 'login' l'ip e la porta del superpeer alla quale mi
+					sono loggato e il sessionId che mi ha restituito
+					'''
+					spDir = db.retrieveSuperPeers()
+					
 
 				# LOGO ---
 				elif(recv_type.decode() == "LOGO"):

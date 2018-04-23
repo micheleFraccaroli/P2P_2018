@@ -281,15 +281,15 @@ class dataBase:
 
 	def retrieveResponse(self, pid, validTime): # validTime è config.timeResearch
 
-			con = sqlite3.connect('P2P.db')
-			c = con.cursor()
+		con = sqlite3.connect('P2P.db')
+		c = con.cursor()
 
-			res = c.execute('SELECT pid, ip, port, md5, name, timeResponse FROM responses where pid = ? AND timeResponse < ?', (pid, validTime))
-			res = c.fetchall()
+		res = c.execute('SELECT pid, ip, port, md5, name, timeResponse FROM responses where pid = ? AND timeResponse < ?', (pid, validTime))
+		res = c.fetchall()
 
-			c.close()
+		c.close()
 
-			return res
+		return res
 
 class dataBaseSuper(dataBase):
 
@@ -329,12 +329,25 @@ class dataBaseSuper(dataBase):
 		con.commit()
 		con.close()
 
-	def retriveINFO(self, Sessionid):
+	def retriveLOGIN(self, Sessionid):
 
 		con = sqlite3.connect('P2P.db')
 		c = con.cursor()
 
 		res = c.execute('SELECT ip, port FROM login WHERE idSession = ?', (Sessionid,))
+		res = c.fetchone()
+
+		con.commit()
+		con.close()
+
+		return res
+
+	def retriveLOGINwithIP(self, ip, port):
+
+		con = sqlite3.connect('P2P.db')
+		c = con.cursor()
+
+		res = c.execute('SELECT ip, port FROM login WHERE ip = ? and port = ?', (ip,port,))
 		res = c.fetchone()
 
 		con.commit()

@@ -39,7 +39,7 @@ class ThreadFIND(th.Thread):
 		self.globalLock.release()
 
 		for sp in superpeers:
-			ipv4, ipv6, port = Util.ip_deformatting(sp[0][:15],sp[0][17:],sp[1])
+			ipv4, ipv6, port = Util.ip_deformatting(sp[0][:15],sp[0][16:],sp[1])
 			conn = Conn(ipv4, ipv6, port)
 			if(conn.connection()):
 				conn.s.send(self.packet.encode())
@@ -59,7 +59,7 @@ class ThreadFIND(th.Thread):
 		#creazione pacchetto di AFIN passati i 20 secondi
 		addrPeer = db.retrievePeerSid(self.sid)
 		resp = db.retrieveResponse(self.packet[4:20])
-		ipv4, ipv6, port = Util.ip_deformatting(addrPeer[0][:15], addrPeer[0][:17], addrPeer[1])
+		ipv4, ipv6, port = Util.ip_deformatting(addrPeer[0][:15], addrPeer[0][16:], addrPeer[1])
 		toPeer = "AFIN" + str(len(resp)).zfill(3)
 		connP = Conn(ipv4, ipv6, port)
 		if(connP.connection()):
