@@ -36,7 +36,7 @@ class ThreadLOGO(th.Thread):
             db = dataBaseSuper()
             Util.lock.acquire()
             self.count = db.deleteFROMpeer(sessionid)
-            self.info = db.retriveINFO(sessionid)
+            self.info = db.retrieveLOGIN(sessionid)
             Util.lock.release()
             Util.printLog("[ALGO] disconnessione dell'utente: "+self.sessionid+", file eliminati: "+str(self.count))
             self.answer(db, self.count, self.info)
@@ -46,5 +46,5 @@ if __name__ == '__main__':
     sessionid = '1234'.ljust(16,'1')
     pkt_logo = 'LOGO'+sessionid
 
-    th_LOGO = ThreadINS(pkt_logo)
+    th_LOGO = ThreaLOGO(pkt_logo)
     th_LOGO.start()
