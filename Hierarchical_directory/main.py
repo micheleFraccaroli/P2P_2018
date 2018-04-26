@@ -39,7 +39,7 @@ class optionsNormal:
 		ip = Util.ip_formatting(config.selfV4, config.selfV6, config.selfP)
 
 		listPeers = db.retrieveSuperPeers()
-
+		Util.printLog('Nella lock')
 		Util.lock.release()
 
 		ipv4, ipv6, port, ttl = Util.ip_deformatting(listPeers[0][0],listPeers[0][1],None)
@@ -107,26 +107,30 @@ class optionsLogged:
 
 		Util.lock.acquire()
 
-		dirV4, dirV6, dirP = db.retrieveSuperPeers()
+		listPeers = db.retrieveSuperPeers()
+		Util.printLog(listPeers[0][0])
+		Util.printLog(listPeers[0][1])
+		dirV4, dirV6, dirP , ttl = Util.ip_deformatting(listPeers[0][0],listPeers[0][1],None)
 
 		Util.lock.release()
 
 		packet = 'LOGO' + Util.sessionId
 
-		con = Conn(durV4, dirV6, dirP)
+		con = Conn(dirV4, dirV6, dirP)
 
 		if con.connection():
 		
-			packet = 'LOGO' + ip
-			Util.printLog('Richiesta LOGO a vicino ::: ' + ipv4)
+			Util.printLog('Richiesta LOGO a vicino ::: ' + dirV4)
 			con.s.send(packet.encode())
 			con.deconnection()
 
+			Util.loggedOut.acquire()
+			Util.loggedOut.wait()
+			Util.loggedOut.release()
+
 		else:
 
-			Util.printLog('Richiesta LOGO fallita per ::: ' + ipv4)
-
-		time.sleep(1)
+			Util.printLog('Richiesta LOGO fallita per ::: ' + dirV4)
 
 	def exit(self):
 

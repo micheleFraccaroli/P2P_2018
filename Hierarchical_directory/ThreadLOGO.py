@@ -39,6 +39,7 @@ class ThreadLOGO(th.Thread):
             self.info = db.retrieveLOGIN(sessionid)
             Util.lock.release()
             Util.printLog("[ALGO] disconnessione dell'utente: "+self.sessionid+", file eliminati: "+str(self.count))
+            del db
             self.answer(db, self.count, self.info)
 
 if __name__ == '__main__':

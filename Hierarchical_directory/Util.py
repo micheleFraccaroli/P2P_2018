@@ -15,6 +15,7 @@ statusRequest = {} # Dizionario per lo stato delle richieste: true: valida false
 listPeers = [] # Lista dei peers utilizzata durante l'aggiornamento delle tabelle dei peers
 lock = Lock()
 globalLock = Lock()
+loggedOut = Condition()
 
 
 def ip_formatting(ipv4,ipv6,port):

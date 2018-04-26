@@ -83,7 +83,7 @@ class dataBase:
 		c = con.cursor()
 
 		c.execute("UPDATE config SET value = ? WHERE name = ?", (value, attr))
-		print(attr,value)
+
 		con.commit()
 		con.close()
 
