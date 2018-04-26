@@ -333,7 +333,7 @@ class dataBaseSuper(dataBase):
 		con.commit()
 		con.close()
 
-	def retriveLOGIN(self, Sessionid):
+	def retrieveLOGIN(self, Sessionid):
 
 		con = sqlite3.connect('P2P.db')
 		c = con.cursor()
@@ -346,7 +346,7 @@ class dataBaseSuper(dataBase):
 
 		return res
 
-	def retriveLOGINwithIP(self, ip, port):
+	def retrieveLOGINwithIP(self, ip, port):
 
 		con = sqlite3.connect('P2P.db')
 		c = con.cursor()
@@ -369,7 +369,7 @@ class dataBaseSuper(dataBase):
 		con.commit()
 		con.close()
 
-	def retriveFILE(self, Sessionid, md5):
+	def retrieveFILE(self, Sessionid, md5):
 
 		con = sqlite3.connect('P2P.db')
 		c = con.cursor()

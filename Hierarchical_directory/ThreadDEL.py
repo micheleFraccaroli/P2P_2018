@@ -22,7 +22,7 @@ class ThreadDEL(th.Thread):
 
         db = dataBaseSuper()
         Util.lock.acquire()
-        find = db.retriveFILE(self.sessionid, self.md5)
+        find = db.retrieveFILE(self.sessionid, self.md5)
 
         if(find == 0):
             Util.lock.release()

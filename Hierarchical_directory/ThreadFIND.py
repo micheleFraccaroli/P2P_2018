@@ -79,14 +79,12 @@ class ThreadFIND(th.Thread):
 					ll.append(add)
 			if(count == 1):
 				toPeer = md5 + i[4] + str(count).zfill(3) + i[1] + i[2]
-				connP.connection()
 				connP.s.send(toPeer.encode())
 			elif(count > 1):
 				buffer_md5 = md5
 				toPeer = md5 + i[4] + str(count)
 				for l in ll:
 					toPeer = toPeer + l
-				connP.connection()
 				connP.s.send(toPeer.encode())
 
 		connP.deconnection()

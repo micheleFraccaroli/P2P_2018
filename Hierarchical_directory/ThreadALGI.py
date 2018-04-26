@@ -16,7 +16,7 @@ class ThreadALGI(th.Thread):
 
 		found = db.retriveLOGINwithIP(self.ip,self.port)
 		if(found):
-			Util.printLog("UTENTE GIA' TROVATO NEL DB... LOGIN FALLITO")
+			Util.printLog("UTENTE GIA' TROVATO NEL DB... REINVIO IL SESSION ID")
 			print("User already logged! Login failed!")
 			
 			packet = "ALGI" + found[2]
