@@ -11,6 +11,7 @@ from Download import Download
 from Central_Thread import Central_Thread
 from Conn import Conn
 from Add_Remove import *
+from incipit_research import *
 
 class bcolors:
     HEADER = '\033[95m'
@@ -89,7 +90,11 @@ class optionsLogged:
 
 	def search(self):
 
-		print('SEARCH')
+		research = input('>> ')
+
+		search = incipit_reasearch(research)
+		search.research()
+
 		time.sleep(1)
 
 	def add(self):

@@ -198,6 +198,7 @@ class Central_Thread(th.Thread):
 					Util.sessionId = recv_packet.decode()
 					Util.mode = 'logged'
 					Util.globalLock.release()
+					Util.printLog('ALGI post lock')
 
 					Util.lock.acquire()
 					db.updateConfig('mode','logged')
