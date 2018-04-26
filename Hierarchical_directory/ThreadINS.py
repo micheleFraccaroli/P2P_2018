@@ -18,7 +18,7 @@ class ThreadINS(th.Thread):
     def run(self):
         self.sessionid = self.pkt_ins[4:20]
         self.md5 = self.pkt_ins[20:52]
-        self.filename = self.pkt_ins[52:]
+        self.filename = self.pkt_ins[52:].rstrip()
 
         db = dataBaseSuper()
         Util.lock.acquire()

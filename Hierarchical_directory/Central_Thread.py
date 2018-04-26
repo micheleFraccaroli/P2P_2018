@@ -5,7 +5,6 @@ import threading as th
 from Util import Util
 from ThreadSUPE import ThreadSUPE
 from ThreadQUER import ThreadQUER
-from Retr import retr
 from Recv_Afin import Recv_Afin
 from dataBase import dataBase
 from ThreadINS import ThreadINS
@@ -147,7 +146,9 @@ class Central_Thread(th.Thread):
 				elif(recv_type.decode() == "ADFF"):
 					recv_packet = other_peersocket.recv(148) # 152 - 4
 					self.bytes_read = len(recv_packet)
+					Util.printLog("LUNGHEZZA LETTURA AGG FILE " + str(self.bytes_read))
 					while (self.bytes_read < 148):
+						Util.printLog("I'M HERE")
 						recv_packet += other_peersocket.recv(148 - self.bytes_read)
 						self.bytes_read = len(recv_packet)
 					recv_packet = recv_type + recv_packet

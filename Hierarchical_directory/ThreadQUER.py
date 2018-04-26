@@ -13,7 +13,6 @@ from dataBase import dataBase
 from dataBase import dataBaseSuper
 from Conn import Conn
 from Vicini import Vicini
-from Vicini_res import Vicini_res
 from Config import Config
 from Upload import Upload
 import threading as th
