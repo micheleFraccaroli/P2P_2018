@@ -192,13 +192,16 @@ class Central_Thread(th.Thread):
 						recv_packet += other_peersocket.recv(16 - self.bytes_read)
 						self.bytes_read = len(recv_packet)
 
-					'''
-					Qua sono un peer normale e inserisco nella tabella del
-					DB chiama 'login' l'ip e la porta del superpeer alla quale mi
-					sono loggato e il sessionId che mi ha restituito
-					'''
-					spDir = db.retrieveSuperPeers()
-					
+
+					Util.globalLock.acquire()
+					Util.sessionId = recv_packet.decode()
+					Util.mode = 'logged'
+					Util.globalLock.release()
+
+					Util.lock.acquire()
+					db.updateConfig(('mode','logged'))
+					db.updateConfig(('sessionId',Util.sessionId))
+					Util.lock.release()			
 
 				# LOGO ---
 				elif(recv_type.decode() == "LOGO"):
@@ -224,6 +227,10 @@ class Central_Thread(th.Thread):
 
 					Util.printLog("LOGOUT da te stesso")
 					print('Logout done. Eliminated ' + recv_packet.decode() + 'from directory')
+
+					Util.lock.acquire()
+					db.updateConfig('mode','normal')
+					Util.lock.release()
 
 				# UPLOAD ---
 				elif(recv_type.decode() == "RETR"):

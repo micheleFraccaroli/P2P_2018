@@ -42,6 +42,8 @@ class dataBase:
 					c.execute('UPDATE config SET value = "1" WHERE name = "maxNear"')
 
 				c.execute('INSERT INTO config VALUES ("mode",?)', (mode,))
+				c.execute('INSERT INTO config VALUES ("sessionId","default")')
+
 				con.commit()
 			except:
 				pass
@@ -50,6 +52,8 @@ class dataBase:
 			return ['OK', mode]
 
 		else: # Database già esistente, riutilizzo le impostazioni
+
+			Util.sessionId = self.retrieveConfig(('sessionId',))
 
 			sessionMode = self.retrieveConfig(('mode',))
 
@@ -73,13 +77,13 @@ class dataBase:
 
 		os.system('rm -f P2P.db')
 
-	def updateMode(self,mode):
+	def updateConfig(self, attr, value):
 
 		con = sqlite3.connect('P2P.db')
 		c = con.cursor()
 
-		c.execute('UPDATE config SET value = ? WHERE name = "mode"', (mode,))
-
+		c.execute("UPDATE config SET value = ? WHERE name = ?", (value, attr))
+		print(attr,value)
 		con.commit()
 		con.close()
 
@@ -437,10 +441,9 @@ class dataBaseSuper(dataBase):
 
 if __name__ == '__main__':
 	print("faccio")
-	config=Config()
 	c=dataBaseSuper()
 	#c.destroy()
-	c.create(config)
+	c.create('normal')
 	'''
 	c.insertPeers('192.168.1.3',5600)
 	c.insertPeers('192.168.1.4',5601)
@@ -507,8 +510,16 @@ if __name__ == '__main__':
 	print('------------------------')
 	config = c.retrieveConfig(('ttl','selfP','selfV4'))
 	mod = c.retrieveConfig(('mode',))
-	print('\n\n'+mod.mode+'\n\n')
-	c.updateMode('normal')
+	print('\n\n'+mod+'\n\n')
+	c.updateConfig('mode','normall')
 	mod = c.retrieveConfig(('mode',))
-	print('\n\n'+mod.mode+'\n\n')
+	print('\nNew:\n'+mod+'\n\n')
+
+
+	mod = c.retrieveConfig(('sessionId',))
+	print('\n\n'+mod+'\n\n')
+	c.updateConfig('sessionId','test')
+	mod = c.retrieveConfig(('sessionId',))
+	print('\nNew:\n'+mod+'\n\n')
+
 	print(config.ttl,config.selfP,config.selfV4)

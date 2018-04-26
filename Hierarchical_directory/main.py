@@ -58,8 +58,6 @@ class optionsNormal:
 	
 		time.sleep(1)
 
-		Util.sessionId = input('Inserisci sessione ::: ')
-
 	def exit(self):
 
 		db = dataBase()
