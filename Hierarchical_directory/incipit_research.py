@@ -7,26 +7,27 @@ import ipaddress as ipad
 from dataBase import dataBase
 
 class incipit_research:
-	def __init__(self, sid, search):
-		self.sid = sid
+	def __init__(self, search):
+		self.sid = Util.sessionId
 		self.search = search
 
-	def research(self, config):
+	def research(self):
+		db = dataBase()
 		#generating packet
 		search_extended = self.search + (' '*(20 - len(self.search)))
 		pack = "FIND" + self.sid + search_extended
 
 		#retreive address of superpeer
-		db = dataBase()
-		super_ip, super_port = db.retrieveNeighborhood(config)
-		addr = ip_deformatting(super_ip, super_port, None)
+		if(Util.mode in ["normal","logged"]):
+			super_ip = db.retrieveSuperPeers()
+			sIpv4, sIpv6, sPort, ttl = ip_deformatting(super_ip[0][0], super_ip[0][1], None)
+			#connection to superpeer
+			con = Conn(sIpv4, sIpv6, sPort)
 
-		sIpv4 = addr[0]
-		sIpv6 = str(ipad.ip_address(super_ip[16:]))
-		sPort = addr[2]
-
-		#connection to superpeer
-		con = Conn(sIpv4, sIpv6, sPort)
+		else:
+			config = db.retreiveConfig(("selfV4", "selfV6"))
+			#connection to superpeer
+			con = Conn(config.selfV4, config.selfV6, 3000)
 
 		try:
 			con.connection()
