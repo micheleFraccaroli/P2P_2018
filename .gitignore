@@ -1,6 +1,7 @@
 **/*.ini
 **/*.db
 **/__pycache__
+**/share
 **/*.log
 **/*.txt
 **/img
