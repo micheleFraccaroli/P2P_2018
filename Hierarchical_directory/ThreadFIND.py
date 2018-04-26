@@ -46,10 +46,6 @@ class ThreadFIND(th.Thread):
 		Util.printLog("CERCATO ----> " + str(self.packet[82:]))
 		localFile = dbS.findInLocalSP(self.packet[82:])
 
-		if(localFile): # se la lista non è vuota entro nel ciclo
-			research = localFile[1] + (' '*(100 - len(self.search)))
-			config = db.retrieveConfig(("selfV4", "selfV6"))
-
 		#creazione pacchetto di AFIN passati i 20 secondi
 		addrPeer = db.retrievePeerSid(self.sid)
 		resp = db.retrieveResponse(self.packet[4:20])
@@ -81,7 +77,13 @@ class ThreadFIND(th.Thread):
 					toPeer = toPeer + l
 				connP.s.send(toPeer.encode())
 
-		toPeer = localFile[0] + localFile[1] + str(1).zfill(3) + config.selfV4+"|"+config.selfV6 + '03000'
-		connP.s.send(toPeer.encode())
+		if(localFile): # se la lista non è vuota entro nel ciclo
+			k = 0
+			for lf in localFile:
+				research = lf[k][1] + (' '*(100 - len(self.search)))
+				config = db.retrieveConfig(("selfV4", "selfV6"))
+				toPeer = lf[k][0] + lf[k][1] + str(1).zfill(3) + config.selfV4+"|"+config.selfV6 + '03000'
+				k = k + 1
+				connP.s.send(toPeer.encode())
 
 		connP.deconnection()
