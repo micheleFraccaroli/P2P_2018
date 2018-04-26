@@ -1,7 +1,7 @@
 import socket
 import sys
 import threading as th
-from dataBase import dataBase
+from dataBase import *
 from Util import Util
 from Conn import Conn
 
@@ -14,14 +14,16 @@ class ThreadALGI(th.Thread):
 	def run(self):
 		db = dataBaseSuper()
 
-		found = db.retriveLOGINwithIP(self.ip,self.port)
+		found = db.retrieveLOGINwithIP(self.ip,self.port)
 		if(found):
 			Util.printLog("UTENTE GIA' TROVATO NEL DB... REINVIO IL SESSION ID")
 			print("User already logged! Login failed!")
 			
 			packet = "ALGI" + found[2]
+
+            ipv4,ipv6,port,ttl = Util.ip_deformatting(self.ip, self.port, None)
 			
-			conn = Conn(self.ip[:15], self.ip[16:], self.port)
+			conn = Conn(ipv4,ipv6,port)
 			conn.connection()
 			conn.s.send(packet.encode())
 			conn.deconnection()
@@ -30,18 +32,22 @@ class ThreadALGI(th.Thread):
 			try:
 				self.sid = Util.ip_packet16() #generation SessionID
 				#signup on db new user
-				db.insertID(self.ip, self.port, sid)
+				db.insertID(self.ip, self.port, self.sid)
 
 				#generation ALGI packet
 				packet = "ALGI" + str(sid)
 
-				conn = Conn(self.ip[:15], self.ip[16:], self.port)
+                ipv4,ipv6,port,ttl = Util.ip_deformatting(self.ip, self.port, None)
+            
+                conn = Conn(ipv4,ipv6,port)
 				conn.connection()
 				conn.s.send(packet.encode())
 				conn.deconnection()
 			except:
 				packet = "ALGI" + '0000000000000000'
-				conn = Conn(self.ip[:15], self.ip[16:], self.port)
+				ipv4,ipv6,port,ttl = Util.ip_deformatting(self.ip, self.port, None)
+            
+                conn = Conn(ipv4,ipv6,port)
 				conn.connection()
 				conn.s.send(packet.encode())
 				conn.deconnection()
