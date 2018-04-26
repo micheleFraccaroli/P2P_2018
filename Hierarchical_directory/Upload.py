@@ -55,7 +55,7 @@ class Upload(th.Thread):
 
             try:
                 file_to_send = str(dictSystem[self.packet])
-                f = open('img/'+file_to_send, "rb")
+                f = open('share/'+file_to_send, "rb")
                 self.data_to_send, self.nchunk = self.chunking(f, file_to_send, self.chunk_size)
                 nchunk = int(self.nchunk)
                 first_response = "ARET" + str(nchunk).zfill(6)

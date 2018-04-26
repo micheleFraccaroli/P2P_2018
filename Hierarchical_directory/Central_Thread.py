@@ -4,16 +4,16 @@ import os
 import threading as th
 from Util import Util
 from ThreadSUPE import ThreadSUPE
-#from ThreadQUER import ThreadQUER
-#from Retr import retr
+from ThreadQUER import ThreadQUER
+from Retr import retr
 from Recv_Afin import Recv_Afin
 from dataBase import dataBase
-#from ThreadINS import ThreadINS
-#from ThreadDEL import ThreadDEL
+from ThreadINS import ThreadINS
+from ThreadDEL import ThreadDEL
 from ThreadLOGO import ThreadLOGO
 from Response import thread_Response
 from ThreadFIND import ThreadFIND
-#from Upload import Upload
+from Upload import Upload
 from ThreadALGI import ThreadALGI
 
 class Central_Thread(th.Thread):
@@ -46,11 +46,11 @@ class Central_Thread(th.Thread):
 				Util.printLog("Richiesta in arrivo da: "+addrPack)
 
 			recv_type = other_peersocket.recv(4)
-			#Util.printLog(str(recv_type))
+
 			if(len(recv_type) != 0):
 				self.bytes_read = len(recv_type)
 				while (self.bytes_read < 4):
-					Util.printLog(str(self.bytes_read))
+
 					recv_type += other_peersocket.recv(4 - self.bytes_read)
 					self.bytes_read = len(recv_type)
 
@@ -192,16 +192,16 @@ class Central_Thread(th.Thread):
 						recv_packet += other_peersocket.recv(16 - self.bytes_read)
 						self.bytes_read = len(recv_packet)
 
-
+					Util.printLog('ALGI pre lock')
 					Util.globalLock.acquire()
 					Util.sessionId = recv_packet.decode()
 					Util.mode = 'logged'
 					Util.globalLock.release()
 
 					Util.lock.acquire()
-					db.updateConfig(('mode','logged'))
-					db.updateConfig(('sessionId',Util.sessionId))
-					Util.lock.release()			
+					db.updateConfig('mode','logged')
+					db.updateConfig('sessionId',Util.sessionId)
+					Util.lock.release()
 
 				# LOGO ---
 				elif(recv_type.decode() == "LOGO"):
@@ -232,6 +232,10 @@ class Central_Thread(th.Thread):
 					db.updateConfig('mode','normal')
 					Util.lock.release()
 
+					Util.loggedOut.acquire()
+					Util.loggedOut.notify()
+					Util.loggedOut.release()
+					
 				# UPLOAD ---
 				elif(recv_type.decode() == "RETR"):
 					recv_packet = other_peersocket.recv(32) # 36 - 4
