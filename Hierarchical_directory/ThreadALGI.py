@@ -19,7 +19,7 @@ class ThreadALGI(th.Thread):
 			Util.printLog("UTENTE GIA' TROVATO NEL DB... LOGIN FALLITO")
 			print("User already logged! Login failed!")
 			
-			packet = "ALGI" + '0000000000000000'
+			packet = "ALGI" + found[2]
 			
 			conn = Conn(self.ip[:15], self.ip[16:], self.port)
 			conn.connection()

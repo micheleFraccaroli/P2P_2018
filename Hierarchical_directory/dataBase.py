@@ -347,7 +347,7 @@ class dataBaseSuper(dataBase):
 		con = sqlite3.connect('P2P.db')
 		c = con.cursor()
 
-		res = c.execute('SELECT ip, port FROM login WHERE ip = ? and port = ?', (ip,port,))
+		res = c.execute('SELECT ip, port, idSession FROM login WHERE ip = ? and port = ?', (ip,port,))
 		res = c.fetchone()
 
 		con.commit()
