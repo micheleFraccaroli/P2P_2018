@@ -17,7 +17,6 @@ class ThreadALGI(th.Thread):
 		found = db.retrieveLOGINwithIP(self.ip,self.port)
 		if(found):
 			Util.printLog("UTENTE GIA' TROVATO NEL DB... REINVIO IL SESSION ID")
-			print("User already logged! Login failed!")
 			
 			packet = "ALGI" + found[2]
 
@@ -35,7 +34,7 @@ class ThreadALGI(th.Thread):
 				db.insertID(self.ip, self.port, self.sid)
 
 				#generation ALGI packet
-				packet = "ALGI" + str(sid)
+				packet = "ALGI" + str(self.sid)
 
 				ipv4,ipv6,port,ttl = Util.ip_deformatting(self.ip, self.port, None)
 

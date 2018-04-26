@@ -10,7 +10,7 @@ from Recv_Afin import Recv_Afin
 from dataBase import dataBase
 #from ThreadINS import ThreadINS
 #from ThreadDEL import ThreadDEL
-#from ThreadLOGO import ThreadLOGO
+from ThreadLOGO import ThreadLOGO
 from Response import thread_Response
 from ThreadFIND import ThreadFIND
 #from Upload import Upload
@@ -46,7 +46,7 @@ class Central_Thread(th.Thread):
 				Util.printLog("Richiesta in arrivo da: "+addrPack)
 
 			recv_type = other_peersocket.recv(4)
-			Util.printLog(str(recv_type))
+			#Util.printLog(str(recv_type))
 			if(len(recv_type) != 0):
 				self.bytes_read = len(recv_type)
 				while (self.bytes_read < 4):
@@ -177,7 +177,7 @@ class Central_Thread(th.Thread):
 						recv_packet += other_peersocket.recv(60 - self.bytes_read)
 						self.bytes_read = len(recv_packet)
 					
-					th_ALGI = ThreadALGI(recv_packet[:15].decode(),recv_packet[16:].decode())
+					th_ALGI = ThreadALGI(recv_packet[:55].decode(),recv_packet[55:].decode())
 					th_ALGI.start()
 
 					#sid = th_ALGI.sid
