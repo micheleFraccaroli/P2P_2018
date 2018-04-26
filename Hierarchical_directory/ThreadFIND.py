@@ -15,21 +15,6 @@ class ThreadFIND(th.Thread):
 	def run(self):
 		db = dataBase()
 
-		#controllo tra i peer loggati a me prima di inoltrare la quer nella rete
-		dbS = dataBaseSuper()
-		Util.printLog("CERCATO ----> " + str(self.packet[82:]))
-		localFile = dbS.findInLocalSP(self.packet[82:])
-
-		if(localFile): # se la lista non è vuota entro nel ciclo
-			research = localFile[1] + (' '*(100 - len(self.search)))
-			internalResponse = "AQUE" + self.packet[4:20] + self.packet[20:80] + localFile[0] + research
-			ipv4, ipv6, port, ttl = Util.ip_deformatting(self.packet[20:35],self.packet[36:75], self.packet[75:80], None)
-			connL = Conn(ipv4, ipv6, port)
-			if(connL.connection()):
-				connL.s.send(internalResponse.encode())
-				connL.deconnection()
-			Util.printLog("RISPONDO CON UN FILE PRESENTE NEL MIO DATABASE")
-
 		#ricavo i superpeer a cui sono collegato e inoltro la richiesta nella rete
 		superpeers = db.retrieveSuperPeers()
 
@@ -56,11 +41,20 @@ class ThreadFIND(th.Thread):
 		Util.printLog("PASSATI 20 SECONDI.. DIZIONARIO ---> " + str(Util.statusRequest[self.packet[4:20]]))
 		self.globalLock.release()
 
+		#controllo tra i peer loggati a me prima di inoltrare la quer nella rete
+		dbS = dataBaseSuper()
+		Util.printLog("CERCATO ----> " + str(self.packet[82:]))
+		localFile = dbS.findInLocalSP(self.packet[82:])
+
+		if(localFile): # se la lista non è vuota entro nel ciclo
+			research = localFile[1] + (' '*(100 - len(self.search)))
+			config = db.retrieveConfig(("selfV4", "selfV6"))
+
 		#creazione pacchetto di AFIN passati i 20 secondi
 		addrPeer = db.retrievePeerSid(self.sid)
 		resp = db.retrieveResponse(self.packet[4:20])
 		ipv4, ipv6, port = Util.ip_deformatting(addrPeer[0][:15], addrPeer[0][16:], addrPeer[1])
-		toPeer = "AFIN" + str(len(resp)).zfill(3)
+		toPeer = "AFIN" + str(len(resp)+len(localFile)).zfill(3)
 		connP = Conn(ipv4, ipv6, port)
 		if(connP.connection()):
 			connP.s.send(toPeer.encode())
@@ -86,5 +80,8 @@ class ThreadFIND(th.Thread):
 				for l in ll:
 					toPeer = toPeer + l
 				connP.s.send(toPeer.encode())
+
+		toPeer = localFile[0] + localFile[1] + str(1).zfill(3) + config.selfV4+"|"+config.selfV6 + '03000'
+		connP.s.send(toPeer.encode())
 
 		connP.deconnection()
