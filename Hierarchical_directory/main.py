@@ -10,6 +10,7 @@ from tqdm import tqdm
 from Download import Download
 from Central_Thread import Central_Thread
 from Conn import Conn
+from Add_Remove import *
 
 class bcolors:
     HEADER = '\033[95m'
@@ -93,12 +94,38 @@ class optionsLogged:
 
 	def add(self):
 
-		print('ADD')
+		db = dataBase()
+
+		listPeers = db.retrieveSuperPeers()
+
+		ipv4, ipv6, port, ttl = Util.ip_deformatting(listPeers[0][0],listPeers[0][1],None)
+
+		nameFile = input('Insert name file for add operation: ')
+
+		addf = AddRm(ipv4, ipv6, port, Util.sessionId)
+
+		addf.aggiunta('./share/' + nameFile)
+
+		print('Added file ' + nameFile + 'to directory')
+
 		time.sleep(1)
 
 	def remove(self):
 
-		print('REMOVE')
+		db = dataBase()
+
+		listPeers = db.retrieveSuperPeers()
+
+		ipv4, ipv6, port, ttl = Util.ip_deformatting(listPeers[0][0],listPeers[0][1],None)
+
+		nameFile = input('Insert name file for remove operation: ')
+
+		addf = AddRm(ipv4, ipv6, port, Util.sessionId)
+
+		addf.rimuovi('./share/' + nameFile)
+
+		print('Removed file ' + nameFile + 'from directory')
+
 		time.sleep(1)
 
 	def logout(self):

@@ -41,15 +41,13 @@ class AddRm:
         else:
             Util.printlog("[ADFF] Controllare l'esistenza del file o il percorso indicato in fase di input")
 
-    def rimuovi(self):
+    def rimuovi(self, rm_file):
 
-        self.rm_file = input("Inserisci il nome del file che desideri eliminare dalla directory:\n")
-
-        self.check_file = Path(self.rm_file)
+        self.check_file = Path(rm_file)
 
         if (self.check_file.is_file()):
 
-            self.f = open(self.rm_file, 'rb')
+            self.f = open(rm_file, 'rb')
             self.contenuto = self.f.read()
 
             self.FileHash = hashlib.md5()

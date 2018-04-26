@@ -4,16 +4,16 @@ import os
 import threading as th
 from Util import Util
 from ThreadSUPE import ThreadSUPE
-#from ThreadQUER import ThreadQUER
-#from Retr import retr
+from ThreadQUER import ThreadQUER
+from Retr import retr
 from Recv_Afin import Recv_Afin
 from dataBase import dataBase
-#from ThreadINS import ThreadINS
-#from ThreadDEL import ThreadDEL
-#from ThreadLOGO import ThreadLOGO
+from ThreadINS import ThreadINS
+from ThreadDEL import ThreadDEL
+from ThreadLOGO import ThreadLOGO
 from Response import thread_Response
 from ThreadFIND import ThreadFIND
-#from Upload import Upload
+from Upload import Upload
 from ThreadALGI import ThreadALGI
 
 class Central_Thread(th.Thread):

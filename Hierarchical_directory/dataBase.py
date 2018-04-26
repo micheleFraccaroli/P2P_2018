@@ -323,7 +323,7 @@ class dataBaseSuper(dataBase):
 		else:
 			return None
 
-	def insertID(self, ip, idSession, port):
+	def insertID(self, ip, port, idSession):
 
 		con = sqlite3.connect('P2P.db')
 		c = con.cursor()
@@ -417,10 +417,13 @@ class dataBaseSuper(dataBase):
 
 		con = sqlite3.connect('P2P.db')
 		c = con.cursor()
+		c2 = con.cursor()
+		c3 = con.cursor()
 
 		c.execute('SELECT count(*) FROM file WHERE Sessionid=?',(Sessionid,))
 		res = c.fetchone()
-		c.execute('DELETE FROM file WHERE Sessionid = ?', (Sessionid,))
+		c2.execute('DELETE FROM file WHERE Sessionid = ?', (Sessionid,))
+		c3.execute('DELETE FROM login WHERE idSession = ?', (Sessionid,))
 
 		con.commit()
 		con.close()
