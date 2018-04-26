@@ -5,7 +5,6 @@ import threading as th
 from Util import Util
 from ThreadSUPE import ThreadSUPE
 from ThreadQUER import ThreadQUER
-from Retr import retr
 from Recv_Afin import Recv_Afin
 from dataBase import dataBase
 from ThreadINS import ThreadINS

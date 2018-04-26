@@ -24,7 +24,7 @@ class Upload(th.Thread):
 
     def chunking(self, file_obj, file_name, chunk_size):
         list_of_chunk = []
-        info = os.stat('img/'+file_name)
+        info = os.stat('share/'+file_name)
         dim_file = info.st_size
 
         nchunk = math.modf(dim_file / chunk_size)[1] + 1  # numero di chunk

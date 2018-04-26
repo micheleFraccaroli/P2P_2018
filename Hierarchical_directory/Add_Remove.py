@@ -4,6 +4,7 @@ import hashlib
 from pathlib import Path
 from Conn import Conn
 from File_system import File_system
+import Util
 
 class AddRm:
     def __init__(self, ipp2p_4, ipp2p_6, pp2p, sid):
@@ -15,13 +16,13 @@ class AddRm:
 
     def aggiunta(self, file):
 
-        self.check_file = Path(file)
+        self.check_file = Path('./share/' + file)
 
         if (self.check_file.is_file()):
 
-            self.f = open(file, 'rb')
+            self.f = open('./share/' + file, 'rb')
             self.contenuto = self.f.read()
-            self.filename = self.f.name
+            self.filename = file
 
             self.FileHash = hashlib.md5()
             self.FileHash.update(self.contenuto)
@@ -31,15 +32,15 @@ class AddRm:
                 f_name = self.filename.ljust(100, ' ')
 
             self.con.connection()
-            data_add_file = "ADDF" + str(self.sid.decode()) + self.FileHash.hexdigest() + f_name
-            Util.printlog(data_add_file)
+            data_add_file = "ADFF" + self.sid + self.FileHash.hexdigest() + f_name
+            Util.printLog(data_add_file)
             self.con.s.send(data_add_file.encode())
             self.con.deconnection()
             file_write = File_system(self.FileHash.hexdigest(), self.filename)
             file_write.write()
 
         else:
-            Util.printlog("[ADFF] Controllare l'esistenza del file o il percorso indicato in fase di input")
+            Util.printLog("[ADFF] Controllare l'esistenza del file o il percorso indicato in fase di input")
 
     def rimuovi(self, rm_file):
 
@@ -55,10 +56,10 @@ class AddRm:
             self.FileHash.hexdigest()
 
             self.con.connection()
-            data_remove_file = "DEFF" + str(self.sid.decode()) + self.FileHash.hexdigest()
-            Util.printlog(data_remove_file)
+            data_remove_file = "DEFF" + self.sid + self.FileHash.hexdigest()
+            Util.printLog(data_remove_file)
             self.con.s.send(data_remove_file.encode())
             self.con.deconnection()
 
         else:
-            Util.printlog("[DEFF] Controllare l'esistenza del file o che il percorso indicato in fase di input sia corretto")
+            Util.printLog("[DEFF] Controllare l'esistenza del file o che il percorso indicato in fase di input sia corretto")

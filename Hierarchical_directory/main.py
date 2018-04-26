@@ -104,7 +104,7 @@ class optionsLogged:
 
 		addf = AddRm(ipv4, ipv6, port, Util.sessionId)
 
-		addf.aggiunta('./share/' + nameFile)
+		addf.aggiunta(nameFile)
 
 		print('Added file ' + nameFile + 'to directory')
 
