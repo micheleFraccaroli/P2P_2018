@@ -1,4 +1,5 @@
 import socket
+import os
 import sys
 import threading as th
 from Download import Download
@@ -85,4 +86,4 @@ class Recv_Afin(th.Thread):
                 IPv4, IPv6 = data[:55].split('|')
                 self.listPeers[i][3].append([IPv4, IPv6, int(data[55:])])
 
-        stampaRicerca()
+        self.stampaRicerca()

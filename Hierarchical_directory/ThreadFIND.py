@@ -48,15 +48,15 @@ class ThreadFIND(th.Thread):
 
 		#controllo tra i peer loggati a me prima di inoltrare la quer nella rete
 		dbS = dataBaseSuper()
-		Util.printLog("CERCATO ----> " + str(self.packet[82:]))
 		localFile = dbS.findInLocalSP(self.packet[82:])
-
+		Util.printLog("LOCALFILE " + str(localFile))
 		#creazione pacchetto di AFIN passati i 20 secondi
 		addrPeer = db.retrievePeerSid(self.sid)
-		Util.printLog(str(addrPeer))
+		Util.printLog("ADDRPEER " + str(addrPeer))
 		resp = db.retrieveResponse(self.packet[4:20])
-		ipv4, ipv6, port, ttl = Util.ip_deformatting(addrPeer[0], addrPeer[1], None)
+		ipv4, ipv6, port, ttl = Util.ip_deformatting(addrPeer[0][0], addrPeer[0][1], None)
 		toPeer = "AFIN" + str(len(resp)+len(localFile)).zfill(3)
+		
 		connP = Conn(ipv4, ipv6, port)
 		if(connP.connection()):
 			connP.s.send(toPeer.encode())
@@ -86,9 +86,10 @@ class ThreadFIND(th.Thread):
 		if(localFile): # se la lista non è vuota entro nel ciclo
 			k = 0
 			for lf in localFile:
-				research = lf[k][1] + (' '*(100 - len(self.search)))
-				config = db.retrieveConfig(("selfV4", "selfV6"))
-				toPeer = lf[k][0] + lf[k][1] + str(1).zfill(3) + config.selfV4+"|"+config.selfV6 + '03000'
+				Util.printLog("localfile in for " + str(lf))
+				addrLocalPeer = db.retrievePeerSid(lf[0])
+				Util.printLog("addrLocalPeer " + str(addrLocalPeer))
+				toPeer = lf[1] + lf[2] + str(1).zfill(3) + addrLocalPeer[0][0] + addrLocalPeer[0][1]
 				k = k + 1
 				connP.s.send(toPeer.encode())
 

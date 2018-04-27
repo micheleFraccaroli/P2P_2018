@@ -162,7 +162,7 @@ class dataBase:
 		c = con.cursor()
 
 		c.execute('SELECT ip, port FROM login WHERE idSession = ?', (sid,))
-		res = c.fetchone()
+		res = c.fetchall()
 
 		c.close()
 
@@ -385,10 +385,9 @@ class dataBaseSuper(dataBase):
 		con = sqlite3.connect('P2P.db')
 		c = con.cursor()
 
-		c.execute("SELECT md5, name FROM file WHERE name LIKE ?", ('%'+search+'%',))
+		c.execute("SELECT * FROM file WHERE name LIKE ?", ('%'+search.rstrip()+'%',))
 		res = c.fetchall()
 
-		con.commit()
 		con.close()
 
 		return res
