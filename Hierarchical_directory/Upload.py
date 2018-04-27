@@ -50,23 +50,19 @@ class Upload(th.Thread):
 
     def run(self):
         dictSystem = {}
-        while True:
-            dictSystem = self.readFileDict()
+        dictSystem = self.readFileDict()
 
-            try:
-                file_to_send = str(dictSystem[self.packet])
-                f = open('share/'+file_to_send, "rb")
-                self.data_to_send, self.nchunk = self.chunking(f, file_to_send, self.chunk_size)
-                nchunk = int(self.nchunk)
-                first_response = "ARET" + str(nchunk).zfill(6)
-                self.other_peersocket.send(first_response.encode())
-                for i in self.data_to_send:
-                    length = str(len(i)).zfill(5)
-                    self.other_peersocket.send(length.encode())
-                    self.other_peersocket.send(i)
+        try:
+            file_to_send = str(dictSystem[self.packet])
+            f = open('share/'+file_to_send, "rb")
+            self.data_to_send, self.nchunk = self.chunking(f, file_to_send, self.chunk_size)
+            nchunk = int(self.nchunk)
+            first_response = "ARET" + str(nchunk).zfill(6)
+            self.other_peersocket.send(first_response.encode())
+            for i in self.data_to_send:
+                length = str(len(i)).zfill(5)
+                self.other_peersocket.send(length.encode())
+                self.other_peersocket.send(i)
 
-            except IOError:
-                print("Errore, file non trovato! errore")
-
-            #signal.signal(signal.SIGINT,handler)
-            #signal.signal(signal.SIGTSTP,handler)
+        except IOError:
+            print("Errore, file non trovato! errore")

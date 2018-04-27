@@ -12,8 +12,8 @@ import hashlib
 from dataBase import dataBase
 from dataBase import dataBaseSuper
 from Conn import Conn
+from Vicini import Vicini
 from Config import Config
-from Upload import Upload
 import threading as th
 import random as ra
 from File_system import File_system
@@ -112,7 +112,7 @@ class ThreadQUER(th.Thread):
 			Util.lock.release()
 			now = time.time()
 			if((now - before) < 20):
-				Util.printLog('QUER: non faccio nulla perchè ho già elaborato la richiesta\n')
+				Util.printLog('[QUER]: non faccio nulla perchè ho già elaborato la richiesta\n')
 				del db
 			else:
 				self.timestamp = time.time()
