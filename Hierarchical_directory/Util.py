@@ -94,7 +94,7 @@ def updatePeers():
     listNormal = db.retrievePeers() 
     listSuper = db.retrieveSuperPeers()
 
-    db.deletePeers()
+    #db.deletePeers()
     db.deleteSuperPeers()
     
     config = db.retrieveConfig(('selfV4','selfV6','selfP','ttl'))

@@ -35,7 +35,7 @@ class ThreadQUER(th.Thread):
 
 		if(self.con.connection()):
 			for file in file_list:
-				peer_info = db.retriveINFO(file[0])
+				peer_info = db.retrieveLOGIN(file[0])
 				answer = "AQUE"+pktid+peer_info[0]+peer_info[1]+file[1]+file[2]
 				self.con.s.send(answer.encode())
 				Util.printLog(answer)
@@ -86,7 +86,7 @@ class ThreadQUER(th.Thread):
 			self.ttl_new = self.new_ttl(ttl)
 			self.new_quer = "QUER"+pktid+ip+peer_port+self.ttl_new+last_part_pkt
 			lock.acquire()
-			self.search_neighbors(db, ip_request, new_quer)
+			self.search_neighbors(db, ip_request, self.new_quer)
 			lock.release()
 		del db
 
@@ -106,7 +106,7 @@ class ThreadQUER(th.Thread):
 			self.timestamp = time.time()
 			db.insertRequest(self.pktid, self.ip, self.timestamp)
 			Util.lock.release()
-			self.do(self, db, self.pktid, self.ip, self.timestamp, Util.lock, self.string, self.peer_port, self.ttl, self.from_peer[82:], self.ip_request)
+			self.do(db, self.pktid, self.ip, self.timestamp, Util.lock, self.string, self.peer_port, self.ttl, self.from_peer[82:], self.ip_request)
 		else:
 			before = db.retrieveRequestTimestamp(self.pktid, self.ip)
 			Util.lock.release()
@@ -119,7 +119,7 @@ class ThreadQUER(th.Thread):
 				Util.lock.acquire()
 				db.updateTimestamp(self.pktid, self.ip)
 				Util.lock.release()
-				self.do(self, db, self.pktid, self.ip, self.timestamp, Util.lock, self.string, self.peer_port, self.ttl, self.from_peer[82:], self.ip_request)
+				self.do(db, self.pktid, self.ip, self.timestamp, Util.lock, self.string, self.peer_port, self.ttl, self.from_peer[82:], self.ip_request)
 '''
 if __name__ == '__main__':
 

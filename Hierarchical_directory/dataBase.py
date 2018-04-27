@@ -433,10 +433,9 @@ class dataBaseSuper(dataBase):
 		con = sqlite3.connect('P2P.db')
 		c = con.cursor()
 
-		c.execute('SELECT * FROM file WHERE name LIKE "%?%"',(search,))
+		c.execute('SELECT * FROM file WHERE name LIKE ?',('%'+search+'%',))
 		res = c.fetchall()
 
-		con.commit()
 		con.close()
 
 		return res
