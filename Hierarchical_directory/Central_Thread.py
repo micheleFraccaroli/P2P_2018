@@ -255,4 +255,5 @@ class Central_Thread(th.Thread):
 				elif(recv_type.decode() == "EXIT"):
 					sys.exit()
 
-				#other_peersocket.close()
+			if(recv_type.decode() != "AFIN"):
+				other_peersocket.close()

@@ -85,4 +85,5 @@ class Recv_Afin(th.Thread):
                 IPv4, IPv6 = data[:55].split('|')
                 self.listPeers[i][3].append([IPv4, IPv6, int(data[55:])])
 
+        self.other_peersocket.close()
         self.stampaRicerca()
