@@ -92,7 +92,7 @@ class optionsLogged:
 
 		research = input('>> ')
 
-		search = incipit_reasearch(research)
+		search = incipit_research(research)
 		search.research()
 
 		time.sleep(1)

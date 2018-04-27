@@ -2,7 +2,7 @@ import socket
 import os
 import sys
 import Util
-import Conn
+from Conn import Conn
 import ipaddress as ipad
 from dataBase import dataBase
 
@@ -20,7 +20,7 @@ class incipit_research:
 		#retreive address of superpeer
 		if(Util.mode in ["normal","logged"]):
 			super_ip = db.retrieveSuperPeers()
-			sIpv4, sIpv6, sPort, ttl = ip_deformatting(super_ip[0][0], super_ip[0][1], None)
+			sIpv4, sIpv6, sPort, ttl = Util.ip_deformatting(super_ip[0][0], super_ip[0][1], None)
 			#connection to superpeer
 			con = Conn(sIpv4, sIpv6, sPort)
 
@@ -31,7 +31,7 @@ class incipit_research:
 
 		try:
 			con.connection()
-			con.send(pack.encode())
+			con.s.send(pack.encode())
 			con.deconnection()
 		except IOError as e:
 			print(e)
