@@ -4,10 +4,11 @@ import threading as th
 import Util
 from Conn import Conn
 from dataBase import dataBase
+from dataBase import dataBaseSuper
 
 
 class ThreadFIND(th.Thread):
-	def __init__(self, packets, sid):
+	def __init__(self, packet, sid):
 		th.Thread.__init__(self)
 		self.packet = packet
 		self.sid = sid
@@ -21,25 +22,29 @@ class ThreadFIND(th.Thread):
 		Util.globalLock.acquire()
 		Util.statusRequest[self.packet[4:20]] = True
 		Util.printLog("DIZIONARIO GLOBALE SETTATO ---> " + str(Util.statusRequest[self.packet[4:20]]))
-		self.globalLock.release()
+		Util.globalLock.release()
 
-		for sp in superpeers:
-			ipv4, ipv6, port = Util.ip_deformatting(sp[0][:15],sp[0][16:],sp[1])
-			conn = Conn(ipv4, ipv6, port)
-			if(conn.connection()):
-				conn.s.send(self.packet.encode())
-				conn.deconnection()
-				Util.printLog("INVIO QUER VERSO " + str(ipv4) + " RIUSCITO")
-			else:
-				Util.printLog("INVIO QUER FALLITO VERSO IL SUPER... PROBABILMENTE " + str(ipv4) + " E' OFFLINE")
-				continue
+		if(superpeers):
+			for sp in superpeers:
+				ipv4, ipv6, port = Util.ip_deformatting(sp[0][:15],sp[0][16:],sp[1])
+				conn = Conn(ipv4, ipv6, port)
+				if(conn.connection()):
+					conn.s.send(self.packet.encode())
+					conn.deconnection()
+					Util.printLog("INVIO QUER VERSO " + str(ipv4) + " RIUSCITO")
+				else:
+					Util.printLog("INVIO QUER FALLITO VERSO IL SUPER... PROBABILMENTE " + str(ipv4) + " E' OFFLINE")
+					continue
 
-		th.wait(20)
+		cond = th.Condition()
+		cond.acquire()
+		cond.wait(20)
+		cond.release()
 
-		self.globalLock.acquire()
+		Util.globalLock.acquire()
 		Util.statusRequest[self.packet[4:20]] = False
 		Util.printLog("PASSATI 20 SECONDI.. DIZIONARIO ---> " + str(Util.statusRequest[self.packet[4:20]]))
-		self.globalLock.release()
+		Util.globalLock.release()
 
 		#controllo tra i peer loggati a me prima di inoltrare la quer nella rete
 		dbS = dataBaseSuper()
@@ -48,8 +53,9 @@ class ThreadFIND(th.Thread):
 
 		#creazione pacchetto di AFIN passati i 20 secondi
 		addrPeer = db.retrievePeerSid(self.sid)
+		Util.printLog(str(addrPeer))
 		resp = db.retrieveResponse(self.packet[4:20])
-		ipv4, ipv6, port = Util.ip_deformatting(addrPeer[0][:15], addrPeer[0][16:], addrPeer[1])
+		ipv4, ipv6, port, ttl = Util.ip_deformatting(addrPeer[0], addrPeer[1], None)
 		toPeer = "AFIN" + str(len(resp)+len(localFile)).zfill(3)
 		connP = Conn(ipv4, ipv6, port)
 		if(connP.connection()):

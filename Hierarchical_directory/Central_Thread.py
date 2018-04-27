@@ -119,14 +119,14 @@ class Central_Thread(th.Thread):
 						recv_packet += other_peersocket.recv(36 - self.bytes_read)
 						self.bytes_read = len(recv_packet)
 					pktid = Util.ip_packet16()
-					addr = ip_formatting(self.ipv4, self.ipv6, self.port)
+					addr = Util.ip_formatting(self.ipv4, self.ipv6, self.port)
 
 					Util.printLog("RICEVUTO FIND E TRASFORMO IN QUER")
-					new_packet = "QUER" + pktid + addr + self.ttl + recv_packet[16:].decode()
+					new_packet = "QUER" + pktid + addr + str(self.ttl).zfill(2) + recv_packet[16:].decode()
 					Util.printLog("====> PACCHETTO DI QUER <====")
 					Util.printLog(str(new_packet))
 					Util.printLog("=============================")
-					th_FIND = ThreadFIND(new_packet,recv_packet[4:20].decode())
+					th_FIND = ThreadFIND(new_packet,recv_packet[:16].decode())
 					th_FIND.start()
 
 				# AQUE ---
