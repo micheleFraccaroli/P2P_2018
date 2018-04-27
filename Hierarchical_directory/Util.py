@@ -16,7 +16,7 @@ listPeers = [] # Lista dei peers utilizzata durante l'aggiornamento delle tabell
 lock = Lock()
 globalLock = Lock()
 loggedOut = Condition()
-
+waitMenu = Condition()
 
 def ip_formatting(ipv4,ipv6,port):
 

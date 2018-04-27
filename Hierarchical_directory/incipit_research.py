@@ -25,14 +25,15 @@ class incipit_research:
 			con = Conn(sIpv4, sIpv6, sPort)
 
 		else:
-			config = db.retreiveConfig(("selfV4", "selfV6"))
+			config = db.retrieveConfig(("selfV4", "selfV6"))
 			#connection to superpeer
 			con = Conn(config.selfV4, config.selfV6, 3000)
+		
+		if con.connection():
 
-		try:
-			con.connection()
+			Util.printLog('Incipit corretto')
 			con.s.send(pack.encode())
 			con.deconnection()
-		except IOError as e:
-			print(e)
-			sys.exit(0)
+		
+		else:
+			Util.printLog('Incipit fallita')
