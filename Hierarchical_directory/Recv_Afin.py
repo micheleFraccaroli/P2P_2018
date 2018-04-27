@@ -28,7 +28,6 @@ class Recv_Afin(th.Thread):
             print('\nIndicare quale si desidera scaricare (0 per annullare):')
             choice = int(input())
             if choice == 0:
-                os.system('clear')
                 flag=False
             elif not choice in range(1, len(self.listPeers) + 1):
                 print('La risorsa non esiste, ritenta')
