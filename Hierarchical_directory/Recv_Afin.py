@@ -2,6 +2,7 @@ import socket
 import os
 import sys
 import threading as th
+import ipaddress as ipaddr
 from Download import Download
 
 class Recv_Afin(th.Thread):
@@ -43,7 +44,6 @@ class Recv_Afin(th.Thread):
                 self.ipp2p = self.split_ip[0].lstrip('0') + '.' + self.split_ip[1].lstrip('0') + '.' + self.split_ip[2].lstrip('0') + '.' + self.split_ip[3].lstrip('0')
 
                 self.ipp2p_6 = str(ipaddr.ip_address(self.listPeers[index][3][copy][1]))
-                print(self.ipp2p_6)
 
                 flag = True
                 while flag:
@@ -59,14 +59,14 @@ class Recv_Afin(th.Thread):
                         print('Il peer non esiste, ritenta')
                         flag = True
                     else:
-                        print(self.sID, self.ipp2p, self.ipp2p_6,
+                        print(self.ipp2p, self.ipp2p_6,
                                         self.listPeers[self.index_md5-1][3][choicePeer-1][2],
                                         self.listPeers[self.index_md5-1][0], self.listPeers[self.index_md5-1][1],
-                                        self.ipp2p_dir_4, self.ipp2p_dir_6)
-                        down = Download(self.sID, self.ipp2p, self.ipp2p_6,
-                                        self.listPeers[self.index_md5-1][3][choicePeer-1][2],
-                                        self.listPeers[self.index_md5-1][0], self.listPeers[self.index_md5-1][1],
-                                        self.ipp2p_dir_4, self.ipp2p_dir_6)
+                                        )
+                        down = Download(self.ipp2p, self.ipp2p_6,
+                                        str(self.listPeers[self.index_md5-1][3][choicePeer-1][2]),
+                                        str(self.listPeers[self.index_md5-1][0]), str(self.listPeers[self.index_md5-1][1]),
+                                        )
                         down.download()
 
     def run(self):
@@ -79,7 +79,7 @@ class Recv_Afin(th.Thread):
                 data += self.other_peersocket.recv(135 - self.bytes_read)
                 self.bytes_read = len(data)
 
-            self.listPeers.insert(i, [data[:32], data[32:132].strip(), int(data[132:]), []])
+            self.listPeers.insert(i, [data[:32].decode(), data[32:132].decode().strip(), int(data[132:].decode()), []])
             for j in range(0, self.listPeers[i][2]):  # Per ogni copia dello specifico file
                 data = self.other_peersocket.recv(60)  # Ricevo IP e porta del prossimo peer
                 data = data.decode()

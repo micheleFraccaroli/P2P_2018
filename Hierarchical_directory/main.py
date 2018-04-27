@@ -95,9 +95,9 @@ class optionsLogged:
 		search = incipit_research(research)
 		search.research()
 
-		waitMenu.acquire()
-		waitMenu.wait()
-		waitMenu.release()
+		Util.waitMenu.acquire()
+		Util.waitMenu.wait()
+		Util.waitMenu.release()
 
 	def add(self):
 
