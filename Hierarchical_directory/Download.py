@@ -5,6 +5,7 @@ import math
 from pathlib import Path
 from Conn import Conn
 import multiprocessing as mp
+import Util
 
 class Download:
     def __init__(self, ipp2p_B_4, ipp2p_B_6, pp2p_B, md5, filename):
@@ -84,6 +85,10 @@ class Download:
                 file_recv.write(i)
             file_recv.close()
 
+        Util.waitMenu.acquire()
+        Util.waitMenu.notify()
+        Util.waitMenu.release()
+        
 '''
 if __name__ == "__main__":
     l = []
