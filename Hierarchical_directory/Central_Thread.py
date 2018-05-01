@@ -177,7 +177,7 @@ class Central_Thread(th.Thread):
 					while (self.bytes_read < 60):
 						recv_packet += other_peersocket.recv(60 - self.bytes_read)
 						self.bytes_read = len(recv_packet)
-					
+
 					th_ALGI = ThreadALGI(recv_packet[:55].decode(),recv_packet[55:].decode())
 					th_ALGI.start()
 
@@ -237,7 +237,7 @@ class Central_Thread(th.Thread):
 					Util.loggedOut.acquire()
 					Util.loggedOut.notify()
 					Util.loggedOut.release()
-					
+
 				# UPLOAD ---
 				elif(recv_type.decode() == "RETR"):
 					recv_packet = other_peersocket.recv(32) # 36 - 4
