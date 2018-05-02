@@ -99,6 +99,9 @@ def menu(stdscr, listMenu, titleMenu, flag = None):
     init_pair(1, COLOR_WHITE, COLOR_BLACK)
     init_pair(2, COLOR_BLACK, COLOR_WHITE)
     init_pair(3, COLOR_RED, COLOR_BLACK)
+
+    use_default_colors() # Prendi i colori del terminale
+    
     attr['normal'] = color_pair(1)
     attr['highlighted'] = color_pair(2)
     attr['system'] = color_pair(3)
@@ -209,7 +212,7 @@ def menu(stdscr, listMenu, titleMenu, flag = None):
                 c = 0 # Resetto input e l'opzione scelta
                 option = 0
 
-def updatePeers():
+def updatePeers(flag = None):
     
     globalLock.acquire()
     mode = Util.mode
@@ -243,20 +246,35 @@ def updatePeers():
     globalLock.release()
 
     count = 0
-    for peer in listPeers:
 
-        ipv4, ipv6, port = Util.ip_deformatting(peer[0],peer[1])
-        con = Conn(ipv4, ipv6, port)
-        
-        if con.connection():
+    if flag != None:
+
+        con = Conn(config.selfV4, config.selfV6, 3000)
+
+        if con.connection()
 
             count += 1
-            con.s.send(pack.encode())
-            printLog("Richiesta SUPE a vicino ::: " + ipv4)
-            con.deconnection()
-        
-        else:
-            printLog("Richiesta SUPE fallita per ::: " + ipv4)
+                con.s.send(pack.encode())
+                printLog("Richiesta SUPE a me ::: " + config.selfV4)
+                con.deconnection()
+            
+            else:
+                printLog("Richiesta SUPE fallita a me ::: " + config.selfV4)
+    else:
+        for peer in listPeers:
+
+            ipv4, ipv6, port = Util.ip_deformatting(peer[0],peer[1])
+            con = Conn(ipv4, ipv6, port)
+            
+            if con.connection():
+
+                count += 1
+                con.s.send(pack.encode())
+                printLog("Richiesta SUPE a vicino ::: " + ipv4)
+                con.deconnection()
+            
+            else:
+                printLog("Richiesta SUPE fallita per ::: " + ipv4)
 
     if count == 0:
 

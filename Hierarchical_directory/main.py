@@ -98,11 +98,12 @@ class optionsLogged:
 							'Add a file to connected supernode', self.add,
 							'Remove a file from connected supernode', self.remove,
 							'Logout from supernode', self.logout,
+							'Show network status', print('ciao'),
 							'Exit', self.exit
 					   ]
 	def search(self):
 
-		research = input('>> ')
+		research = input('Insert file name >> ')
 
 		search = incipit_research(research)
 		search.research()
@@ -141,7 +142,7 @@ class optionsLogged:
 
 		addf = AddRm(ipv4, ipv6, port, Util.sessionId)
 
-		addf.rimuovi('./share/' + nameFile)
+		addf.rimuovi('share/' + nameFile)
 
 		print('Removed file ' + nameFile + 'from directory')
 
@@ -170,9 +171,15 @@ class optionsLogged:
 			con.s.send(packet.encode())
 			con.deconnection()
 
+			# Attendo una risposta al logout
 			Util.loggedOut.acquire()
 			Util.loggedOut.wait()
 			Util.loggedOut.release()
+
+			# Ripristino la modalità a 'normal'
+			Util.globalLock.acquire()
+			Util.mode = 'normal'
+			Util.globalLock.release()
 
 		else:
 
@@ -180,7 +187,7 @@ class optionsLogged:
 
 	def exit(self):
 
-		print("### Logout implicito da implementare ###")
+		self.logout()
 
 		db = dataBase()
 
@@ -211,26 +218,54 @@ class optionsSuper:
 							'Search a File', self.search,
 							'Add a file to connected supernode', self.add,
 							'Remove a file from connected supernode', self.remove,
+							'Show network status', print('ciao'),
 							'Exit', self.exit
 					   ]
-	def update(self):
-
-		print('UPDATE')
-		time.sleep(1)
-
 	def search(self):
 
-		print('SEARCH')
-		time.sleep(1)
+		research = input('Insert file name >> ')
+
+		search = incipit_research(research)
+		search.research()
+
+		Util.waitMenu.acquire()
+		Util.waitMenu.wait()
+		Util.waitMenu.release()
 
 	def add(self):
 
-		print('ADD')
+		db = dataBase()
+
+		listPeers = db.retrieveSuperPeers()
+
+		ipv4, ipv6, port = Util.ip_deformatting(listPeers[0][0],listPeers[0][1])
+
+		nameFile = input('Insert name file for add operation: ')
+
+		addf = AddRm(ipv4, ipv6, port, Util.sessionId)
+
+		addf.aggiunta(nameFile)
+
+		print('Added file ' + nameFile + 'to directory')
+
 		time.sleep(1)
 
 	def remove(self):
 
-		print('REMOVE')
+		db = dataBase()
+
+		listPeers = db.retrieveSuperPeers()
+
+		ipv4, ipv6, port = Util.ip_deformatting(listPeers[0][0],listPeers[0][1])
+
+		nameFile = input('Insert name file for remove operation: ')
+
+		addf = AddRm(ipv4, ipv6, port, Util.sessionId)
+
+		addf.rimuovi('share/' + nameFile)
+
+		print('Removed file ' + nameFile + 'from directory')
+
 		time.sleep(1)
 
 	def exit(self):
@@ -326,6 +361,9 @@ if Util.mode == 'super':
 
 	central_threadS = Central_Thread(config,3000)
 	central_threadS.start()
+
+	op = optionsNormal()
+	op.login(True) # Valore non importante, basta sia diverso da None
 
 central_threadN = Central_Thread(config,config.selfP)
 central_threadN.start()
