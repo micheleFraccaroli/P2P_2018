@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 
 def toPlot(nodes, edges, sol_edges):
 	dict = {}
-	G = nx.DiGraph()
+	G = nx.Graph()
 	G.add_nodes_from(nodes)
 	pos=nx.spring_layout(G)
 
@@ -17,7 +17,7 @@ def toPlot(nodes, edges, sol_edges):
 		if(not trovato):
 			v1, v2 = i
 			G.add_edge(v1,v2, color='black', weight=2)
-	
+
 	edges = G.edges()
 	colors = [G[u][v]['color'] for u,v in edges]
 	weights = [G[u][v]['weight'] for u,v in edges]
