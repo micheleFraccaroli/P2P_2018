@@ -12,6 +12,7 @@ from Central_Thread import Central_Thread
 from Conn import Conn
 from Add_Remove import *
 from incipit_research import *
+from curses import *
 
 class bcolors:
     HEADER = '\033[95m'
@@ -27,10 +28,14 @@ class optionsNormal:
 
 	def __init__(self):
 		
-		self.options = {1:['Login to supernode', self.login],2:['Exit', self.exit]}
+		#self.options = {0:['Login to supernode', self.login],1:['Exit', self.exit]}
+		self.options = [
+							'Login to supernode', self.login,
+							'Exit', self.exit
+					   ]
 
 	def login(self):
-
+		
 		Util.updatePeers()
 
 		db = dataBase()
@@ -44,7 +49,7 @@ class optionsNormal:
 		Util.printLog('Nella lock')
 		Util.lock.release()
 
-		ipv4, ipv6, port, ttl = Util.ip_deformatting(listPeers[0][0],listPeers[0][1],None)
+		ipv4, ipv6, port, = Util.ip_deformatting(listPeers[0][0],listPeers[0][1])
 		con = Conn(ipv4, ipv6, port)
 
 		if con.connection():
@@ -57,7 +62,8 @@ class optionsNormal:
 		else:
 
 			Util.printLog('Richiesta LOGI fallita per ::: ' + ipv4)
-	
+		
+		Util.mode = 'logged'
 		time.sleep(1)
 
 	def exit(self):
@@ -86,8 +92,14 @@ class optionsLogged:
 
 	def __init__(self):
 
-		self.options = {1:['Search a File', self.search],2:['Add a file to connected supernode', self.add],3:['Remove a file from connected supernode', self.remove],4:['Logout from supernode', self.logout],5:['Exit', self.exit]}
-
+		#self.options = {0:['Search a File', self.search],1:['Add a file to connected supernode', self.add],2:['Remove a file from connected supernode', self.remove],3:['Logout from supernode', self.logout],4:['Exit', self.exit]}
+		self.options = [
+							'Search a File', self.search,
+							'Add a file to connected supernode', self.add,
+							'Remove a file from connected supernode', self.remove,
+							'Logout from supernode', self.logout,
+							'Exit', self.exit
+					   ]
 	def search(self):
 
 		research = input('>> ')
@@ -105,7 +117,7 @@ class optionsLogged:
 
 		listPeers = db.retrieveSuperPeers()
 
-		ipv4, ipv6, port, ttl = Util.ip_deformatting(listPeers[0][0],listPeers[0][1],None)
+		ipv4, ipv6, port = Util.ip_deformatting(listPeers[0][0],listPeers[0][1])
 
 		nameFile = input('Insert name file for add operation: ')
 
@@ -123,7 +135,7 @@ class optionsLogged:
 
 		listPeers = db.retrieveSuperPeers()
 
-		ipv4, ipv6, port, ttl = Util.ip_deformatting(listPeers[0][0],listPeers[0][1],None)
+		ipv4, ipv6, port = Util.ip_deformatting(listPeers[0][0],listPeers[0][1])
 
 		nameFile = input('Insert name file for remove operation: ')
 
@@ -144,7 +156,7 @@ class optionsLogged:
 		listPeers = db.retrieveSuperPeers()
 		Util.printLog(listPeers[0][0])
 		Util.printLog(listPeers[0][1])
-		dirV4, dirV6, dirP , ttl = Util.ip_deformatting(listPeers[0][0],listPeers[0][1],None)
+		dirV4, dirV6, dirP = Util.ip_deformatting(listPeers[0][0],listPeers[0][1])
 
 		Util.lock.release()
 
@@ -193,8 +205,14 @@ class optionsSuper:
 
 	def __init__(self):
 
-		self.options = {1:['Update peers', Util.updatePeers],2:['Search a File', self.search],3:['Add a file to connected supernode', self.add],4:['Remove a file from connected supernode', self.remove],5:['Exit', self.exit]}
-
+		self.options = {0:['Update peers', Util.updatePeers],1:['Search a File', self.search],2:['Add a file to connected supernode', self.add],3:['Remove a file from connected supernode', self.remove],4:['Exit', self.exit]}
+		self.options = [
+							'Update peers', Util.updatePeers,
+							'Search a File', self.search,
+							'Add a file to connected supernode', self.add,
+							'Remove a file from connected supernode', self.remove,
+							'Exit', self.exit
+					   ]
 	def update(self):
 
 		print('UPDATE')
@@ -266,7 +284,7 @@ elif len(sys.argv) == 2:
 else:
 	Util.mode = 'normal'
 
-menuMode = {'normal': optionsNormal,'super': optionsSuper,'logged': optionsLogged}
+menuMode = {'normal': optionsNormal,'super': optionsSuper,'logged': optionsLogged} # Associazione tra modalità di utilizzo e classe associata per il menu
 
 Util.initializeFiles() # Inizializzo i file di log ed errors
 
@@ -279,10 +297,12 @@ print(bcolors.CYAN    + "                  \/                    \/        \/  "
 
 time.sleep(2)
 
+# Cerco di creare il database
+
 db = dataBase()
 code,dbMode = db.create(Util.mode)
 
-if code != 'OK':
+if code != 'OK': # C'è ancora una sessione salvata
 	print(bcolors.WARNING + '\nWarning: switching from mode \"'+ Util.mode + '\" to mode \"' + dbMode + '\" due previous session.\n' + bcolors.ENDC)
 else:
 	print(bcolors.OKGREEN + '\nMode accepted\n' + bcolors.ENDC)
@@ -310,63 +330,10 @@ if Util.mode == 'super':
 central_threadN = Central_Thread(config,config.selfP)
 central_threadN.start()
 
-while True:
+while True: # Menu principale
 
 	op = menuMode[Util.mode]()
 
-	print('Select an option:\n\n')
-	i=1
-	for option in op.options:
-		print('['+str(i)+'] '+op.options[option][0]+'\n')
-		i+=1
-	try:
-		s = int(input(bcolors.OKBLUE + ">> " + bcolors.ENDC))
-	except ValueError:
-		print('\nInput error...\n')
-		time.sleep(2)
-	else:
-		if s > 0 and s <= len(op.options):
-			op.options[s][1]()
-		else:
-			print('\nInput error...\n')
-			time.sleep(2)
+	fun = wrapper(Util.menu,op.options,['Select an option:'])
 
-	'''
-	name_search = input('Select an option:\n\n[1]Login\n[2]Search peers\n[3]Search a file\n[]')
-	
-	name_search = input(bcolors.OKBLUE + "Search >> " + bcolors.ENDC)
-	print("...peers searching...")
-	search = Ricerca(c.selfV4, c.selfV6, c.selfP, c.ttl, c.timeResearch, name_search, lock)
-	pktid = search.query(c)
-	print("\n------| New research launched |------\n")
-
-	for i in tqdm(range(c.timeResearch), desc="\033[94mLoading\033[0m"):
-		time.sleep(1)
-
-	print("Research terminateded\nResult for " + pktid)
-	print("[select the file to download using numbers]")
-	
-	res = db.retrieveResponses(pktid)
-	
-	if(len(res) == 0):
-		print("File not found")
-		
-	else:
-		choice_list = []
-		i = 1
-		for row in res:
-			print(str(i) + ") " + "ip: " + row[1] + "  port: " + row[2] + "  md5: " + row[3] + "  file: " + row[4])
-			choice_list.append(row)
-			i = i + 1
-
-		choice = input(bcolors.OKBLUE + ">> " + bcolors.ENDC)
-		
-		peer = choice_list[int(choice)-1]
-		
-		addr = Util.ip_deformatting(peer[1], peer[2], None)
-		ip6 = ipad.ip_address(peer[1][16:])
-
-		down = Download(str(addr[0]),str(ip6),peer[2],peer[3],peer[4].rstrip())
-		down.download()
-		print("\n--- FILE DOWNLOADED ---\n")
-	'''
+	fun()

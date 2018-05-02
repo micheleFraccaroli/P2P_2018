@@ -7,6 +7,7 @@ import time
 from datetime import datetime
 from threading import *
 from dataBase import *
+from curses import *
 
 # Variabili globali
 mode = None # Modalità di utilizzo del programma: 'normal', 'super', 'update', 'logged'
@@ -33,7 +34,7 @@ def ip_formatting(ipv4,ipv6,port):
     pp2p=str(port).zfill(5)
     return p2p+pp2p
 
-def ip_deformatting(ip,port,ttl):
+def ip_deformatting(ip,port,ttl = None):
 	
     ipv4, ipv6 = ip.split('|')
     
@@ -45,10 +46,10 @@ def ip_deformatting(ip,port,ttl):
     
     if(ttl != None):
         f_ttl = int(ttl)
+        return f_ipv4, f_ipv6, f_port, f_ttl
     else:
         f_ttl = None
-
-    return f_ipv4, f_ipv6, f_port, f_ttl
+        return f_ipv4, f_ipv6, f_port
 
 def ip_packet16():
 
@@ -81,6 +82,133 @@ def printError(desc):
     f.write('Timestamp: {:%d-%m-%Y %H:%M:%S} #### '.format(datetime.now()) + desc + '\n')
     f.close()
 
+def menu(stdscr, listMenu, titleMenu, flag = None):
+    
+    attr = {}
+    numset = []
+
+    if flag != None:
+        listMenu.append('Abort') # Appendo l'opzione di aborto del menu
+        listMenu.append(None)
+
+    for count in range(int(len(listMenu)/2)): # Tasti ascii per le opzioni numeriche
+        numset.append(49 + count)
+
+    # Colori per le opzioni
+
+    init_pair(1, COLOR_WHITE, COLOR_BLACK)
+    init_pair(2, COLOR_BLACK, COLOR_WHITE)
+    init_pair(3, COLOR_RED, COLOR_BLACK)
+    attr['normal'] = color_pair(1)
+    attr['highlighted'] = color_pair(2)
+    attr['system'] = color_pair(3)
+
+    stdscr.bkgd(' ',color_pair(1))
+    depthMenu = [] # Lista di tutti i menu incontrati
+    depthMenu.append(listMenu)
+
+    depth = 0 # Profondità del menu per selezionare il titolo
+    c=0
+    option = 0 
+    while c != 10: # enter --> esci
+
+        stdscr.clear()
+        stdscr.addstr('\n\t')
+        stdscr.addstr(titleMenu[depth] + '\n', A_UNDERLINE)
+
+        count = 1
+        for i in range(0, len(listMenu), 2):
+
+            if i == option:
+                par = attr['highlighted']
+            elif depth > 0:
+                if flag != None:
+                    if i in [len(listMenu) - 4, len(listMenu) - 2]:
+                        par = attr['system']
+                    else:
+                        par = attr['normal']        
+                else:
+                    if i == len(listMenu) - 2:
+                        par = attr['system']
+                    else:
+                        par = attr['normal']
+            else:
+                if flag != None:
+                    if i == len(listMenu) - 2:
+                        par = attr['system']
+                    else:
+                        par = attr['normal']
+                else:
+                    par = attr['normal']
+
+            stdscr.addstr('\n\t[{0}] '.format(count))         
+            stdscr.addstr(listMenu[i] + '\n', par)
+            count += 1
+        
+        c = stdscr.getch()
+        
+        if c == KEY_UP:
+
+            if option > 0:
+                option -= 2
+            else:
+                option = len(listMenu) - 2
+
+        elif c == KEY_DOWN:
+
+            if option < len(listMenu) - 2:
+                option += 2
+            else:
+                option = 0
+
+        elif c != 10 and c in numset:
+            option = (c - 49) * 2
+
+        elif c == 10:
+            
+            if type(listMenu[option + 1]) != list: # L'elemento non è una lista quindi è quello che cerco
+               
+                return listMenu[option + 1]
+            
+            else:                                  # L'elemento è una lista, quindi prevedo un altro livello di menu
+
+                lenMenu = len(listMenu[option + 1])
+                if listMenu[option + 1] in depthMenu: # Il nuovo menu è già stato incontrato, perciò in realtà è un menu di livello superiore
+
+                    depth -= 1
+                    depthMenu.remove(listMenu)
+
+                    swpList = listMenu[option + 1] 
+
+                    listMenu.remove(listMenu[option + 1])
+                    listMenu.remove('Back')
+
+                    if flag != None:
+                        listMenu.remove('Abort')
+                        listMenu.remove(None)
+
+                    listMenu = swpList # Swap dei due menu
+                
+                else: # Menu inferiore
+                    depth += 1
+
+                    listMenu[option + 1].append('Back')
+                    listMenu[option + 1].append(listMenu)
+                    
+                    if flag != None:
+                        listMenu[option + 1].append('Abort')
+                        listMenu[option + 1].append(None)
+
+                    listMenu = listMenu[option + 1]
+                    depthMenu.append(listMenu)
+
+                    numset = []
+                    for count in range(int(len(listMenu)/2)): # Tasti ascii per le opzioni numeriche
+                        numset.append(49 + count)
+
+                c = 0 # Resetto input e l'opzione scelta
+                option = 0
+
 def updatePeers():
     
     globalLock.acquire()
@@ -94,7 +222,7 @@ def updatePeers():
     listNormal = db.retrievePeers() 
     listSuper = db.retrieveSuperPeers()
 
-    db.deletePeers()
+    #db.deletePeers()
     db.deleteSuperPeers()
     
     config = db.retrieveConfig(('selfV4','selfV6','selfP','ttl'))

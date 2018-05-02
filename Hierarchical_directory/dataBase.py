@@ -184,9 +184,11 @@ class dataBase:
 		con = sqlite3.connect('P2P.db')
 		c = con.cursor()
 
-		c.execute('INSERT INTO superPeers VALUES(?,?)',(ip,port))
-
-		con.commit()
+		try:
+			c.execute('INSERT INTO superPeers VALUES(?,?)',(ip,port))
+			con.commit()
+		except:
+			pass
 
 		res = c.execute('SELECT value FROM config WHERE name = "maxNear"')
 		maxNear = res.fetchone()

@@ -70,6 +70,18 @@ class Download:
         check_file = Path(path_file)
 
         if (check_file.is_file()):
+            
+            res = wrapper(Util.menu,['Yes',True,'No',False],['The file requested already exists. Override it?'])
+
+            if res:
+                os.remove(path_file)
+                file_recv = open(path_file, "ab")
+                for i in self.data_recv:
+                    file_recv.write(i)
+                file_recv.close()
+            else:
+                return
+            '''
             choice_file = input("\nIl file esiste già nel tuo file system, vuoi sovrascriverlo? (Y,n): ")
             if(choice_file == "Y"):
                 os.remove(path_file)
@@ -79,6 +91,7 @@ class Download:
                 file_recv.close()
             else:
                 return
+            '''
         else:
             file_recv = open(path_file,"ab")
             for i in self.data_recv:

@@ -26,7 +26,7 @@ class ThreadFIND(th.Thread):
 
 		if(superpeers):
 			for sp in superpeers:
-				ipv4, ipv6, port = Util.ip_deformatting(sp[0][:15],sp[0][16:],sp[1])
+				ipv4, ipv6, port, ttl = Util.ip_deformatting(sp[0], sp[1], None)
 				conn = Conn(ipv4, ipv6, port)
 				if(conn.connection()):
 					conn.s.send(self.packet.encode())

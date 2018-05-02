@@ -4,6 +4,7 @@ import sys
 import threading as th
 import ipaddress as ipaddr
 from Download import Download
+import curses
 
 class Recv_Afin(th.Thread):
     def __init__(self, numMD5, other_peersocket):
@@ -69,21 +70,128 @@ class Recv_Afin(th.Thread):
                         down.download()
 
     def run(self):
+
+        listPeers = []
+
+        for i in range(0, self.nMd5*2, 2): # Ciclo gli indici pari contenenti l'opzione da visualizzare nel menu
+
+            data = self.other_peersocket.recv(135)  # Ricevo md5, descrizione e numero di copie
+            bytes_read = len(data)
+
+            while (bytes_read < 135):
+                
+                data += self.other_peersocket.recv(135 - bytes_read)
+                bytes_read = len(data)
+
+            md5 = data[:32].decode()
+            desc = data[32:132].decode()
+            nCopy = int(data[132:].decode())
+
+            listPeers.append(desc) # Inserisco descrizione
+            listPeers.append([])                    # Inserisco lista dei peers
+        
+            for j in range(nCopy):  # Per ogni copia dello specifico file
+
+                data = self.other_peersocket.recv(60)  # Ricevo IP e porta del prossimo peer
+                bytes_read = len(data)
+
+                while (bytes_read < 60):
+                
+                    data += self.other_peersocket.recv(60 - bytes_read)
+                    bytes_read = len(data)
+
+                ipV4, ipV6 , port = Util.ip_deformatting(data[:55].decode(), data[55:].decode())
+
+                listPeers[i+1].append(socket.getfqdn(ipV4) + ' (' + ipV4 + ')')
+                listPeers[i+1].append((md5, desc, ipV4, ipV6, port))
+
+        self.other_peersocket.close()
+        
+        b = curses.wrapper(Util.menu, listPeers, ['Select a file:','Select a peer:'], 6) # L'ultimo parametro basta sia diverso da None
+        
+        if b != None:
+
+            down = Download(b[0], b[1], b[2], b[3], b[4])
+            down.download()
+        '''
+        for i in range(0,len(listPeers),2):
+            print('\n\n\n\nNome: ' + listPeers[i])
+            for j in range(0,len(listPeers[i+1]),2):
+                print('\nHost: ' + listPeers[i+1][j])
+                print('\nDati host: ' + str(listPeers[i+1][j+1]))
+
         self.listPeers = []
         for i in range(self.nMd5):
             data = self.other_peersocket.recv(135)  # Ricevo md5, descrizione e numero di copie
-            self.bytes_read = len(data)
+            bytes_read = len(data)
 
-            while (self.bytes_read < 135):
-                data += self.other_peersocket.recv(135 - self.bytes_read)
-                self.bytes_read = len(data)
+            while (bytes_read < 135):
+                data += self.other_peersocket.recv(135 - bytes_read)
+                bytes_read = len(data)
 
             self.listPeers.insert(i, [data[:32].decode(), data[32:132].decode().strip(), int(data[132:].decode()), []])
-            for j in range(0, self.listPeers[i][2]):  # Per ogni copia dello specifico file
+            for j in range(self.listPeers[i][2]):  # Per ogni copia dello specifico file
                 data = self.other_peersocket.recv(60)  # Ricevo IP e porta del prossimo peer
+                bytes_read = len(data)
+
+                while (bytes_read < 60):
+                    data += self.other_peersocket.recv(60 - bytes_read)
+                    bytes_read = len(data)
+
                 data = data.decode()
                 IPv4, IPv6 = data[:55].split('|')
                 self.listPeers[i][3].append([IPv4, IPv6, int(data[55:])])
 
         self.other_peersocket.close()
         self.stampaRicerca()
+        '''
+
+if __name__ == '__main__':
+
+    import Util
+
+    peersocket = socket.socket(socket.AF_INET6, socket.SOCK_STREAM)
+    peersocket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+    peersocket.bind(('', 3000))
+
+    peersocket.listen(20)
+
+    while True:
+
+        Util.printLog("IN ATTESA DI UNA RICHIESTA ")
+        other_peersocket, addr = peersocket.accept()
+        Util.printLog(str(other_peersocket))
+
+        if addr[0] == "::1": # Localhost
+            addrPack = addr[0]
+            Util.printLog("Richiesta in arrivo da: "+addrPack)
+            
+        elif addr[0][:2] == "::":
+            addrPack = addr[0][7:]
+            Util.printLog("Richiesta in arrivo da: "+addrPack)
+
+        else:
+            addrPack=addr[0]
+            Util.printLog("Richiesta in arrivo da: "+addrPack)
+
+        recv_type = other_peersocket.recv(4)
+        if(len(recv_type) != 0):
+            bytes_read = len(recv_type)
+            while (bytes_read < 4):
+
+                recv_type += other_peersocket.recv(4 - bytes_read)
+                bytes_read = len(recv_type)
+
+            if(recv_type.decode() == "AFIN"):
+                recv_packet = other_peersocket.recv(3) # numero di md5 ottenuti
+                bytes_read = len(recv_packet)
+                while (bytes_read < 3):
+                    recv_packet += other_peersocket.recv(3 - bytes_read)
+                    bytes_read = len(recv_packet)
+
+                Util.printLog("RICEVUTO AFIN")
+                recv_afin = Recv_Afin(int(recv_packet.decode()), other_peersocket)
+                recv_afin.start()
+            else:
+                Util.printLog('Pacchetto sconosciuto')
+                other_peersocket.close()
