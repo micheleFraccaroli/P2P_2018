@@ -62,7 +62,7 @@ class ThreadSUPE(th.Thread):
 
 				for neighbor in neighborhood:
 
-					ipv4, ipv6, port, ttl = Util.ip_deformatting(neighbor[0],neighbor[1])
+					ipv4, ipv6, port = Util.ip_deformatting(neighbor[0],neighbor[1])
 
 					if ipv4 != self.ipRequest and ipv6 != self.ipRequest and ipv4 != self.ipv4:
 						con = Conn(ipv4, ipv6, port)
