@@ -42,6 +42,7 @@ class optionsNormal:
 
 		config = db.retrieveConfig(('selfV4','selfV6','selfP'))
 		ip = Util.ip_formatting(config.selfV4, config.selfV6, config.selfP)
+		Util.lock.release()
 
 		if flag == None:
 			
@@ -50,6 +51,7 @@ class optionsNormal:
 		else: # Io sono super peer, quindi uso me stesso
 			db.insertSuperPeers(ip[:55],'03000')
 
+		Util.lock.acquire()
 		listPeers = db.retrieveSuperPeers()
 
 		ipv4, ipv6, port = Util.ip_deformatting(listPeers[0][0],listPeers[0][1])
