@@ -218,6 +218,7 @@ class Central_Thread(th.Thread):
 						nodes.append(lg[0])
 
 					nodes.append(ip_SP)
+					print(nodes)
 					edges = [] # archi della rete
 					sol = [] # archi soluzione (traffico)
 					for e in nodes:
