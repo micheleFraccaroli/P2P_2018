@@ -34,14 +34,3 @@ class ThreadINS(th.Thread):
             Util.lock.release()
             Util.printLog("[ADFF] aggiornato nome file in : "+self.filename)
         del db
-
-if __name__ == '__main__':
-
-    sessionid = '1234'.ljust(16,'1')
-    md5 = 'abcd'.ljust(32,'2')
-    filename = 'ciao'.ljust(100, '3')
-    pkt_ins = 'ADFF'+sessionid+md5+filename
-    lock = th.Lock()
-
-    th_INS = ThreadINS(pkt_ins, lock)
-    th_INS.start()

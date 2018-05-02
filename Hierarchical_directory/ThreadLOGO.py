@@ -40,15 +40,5 @@ class ThreadLOGO(th.Thread):
         Util.printLog("NUMERO DI FILE ELIMINATI ----> " + str(self.count))
         Util.lock.release()
         Util.printLog("[ALGO] disconnessione dell'utente: "+self.sessionid+", file eliminati: "+str(self.count))
-        
         del db
-
         self.answer(self.count, self.info)
-
-if __name__ == '__main__':
-
-    sessionid = '1234'.ljust(16,'1')
-    pkt_logo = 'LOGO'+sessionid
-
-    th_LOGO = ThreaLOGO(pkt_logo)
-    th_LOGO.start()
