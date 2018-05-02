@@ -49,7 +49,7 @@ class optionsNormal:
 		Util.printLog('Nella lock')
 		Util.lock.release()
 
-		ipv4, ipv6, port, = Util.ip_deformatting(listPeers[0][0],listPeers[0][1])
+		ipv4, ipv6, port = Util.ip_deformatting(listPeers[0][0],listPeers[0][1])
 		con = Conn(ipv4, ipv6, port)
 
 		if con.connection():
