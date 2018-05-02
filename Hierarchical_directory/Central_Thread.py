@@ -204,39 +204,9 @@ class Central_Thread(th.Thread):
 
 					Util.printLog("FINE LOGIN NEL CENTRAL THREAD")
 
-					#plotting network graph
-					nodes = [] #peer della rete
-					sp_list = [] #superpeers della rete
-					list_sp = db.retrieveSuperPeers()
-					for lsp in list_sp:
-						lsp_d = Util.ip_deformatting(lsp[0], lsp[1]) 
-						nodes.append(lsp_d[0])
-						sp_list.append(lsp_d[0])
-					my_ip = db.retrieveConfig(('selfV4', 'selfV6'))
-					ip_SP = my_ip.selfV4 + "|" + my_ip.selfV6
+					Util.statusNetwork()
 
-					logged_list = [] # peer logged to supernode
-					logged = dbs.retrieveLOGINsp()
-					for lg in logged:
-						lg_d = Util.ip_deformatting(lg[0],lg[1])
-						nodes.append(lg_d[0])
-						logged_list.append(lg_d[0])
-
-					nodes.insert(0,ip_SP[:15])
-
-					edges = [] # archi della rete
-					sol = [] # archi soluzione (traffico)
-					for e1 in sp_list:
-						edge = (ip_SP[:15],e1)
-						edges.append(edge)
-					for e2 in logged_list:
-						edge = (e2, ip_SP[:15])
-						sol.append(edge)
-
-					num_sp = len(list_sp)
-					num_peer = len(sol)
-					toPlotNetwork.toPlot(nodes, edges, sol, num_sp, num_peer, "save")
-
+					
 				# ALGI ---
 				elif(recv_type.decode() == "ALGI"):
 					recv_packet = other_peersocket.recv(16)

@@ -13,6 +13,7 @@ from Conn import Conn
 from Add_Remove import *
 from incipit_research import *
 from curses import *
+import toPlotNetwork as tpn
 
 class bcolors:
     HEADER = '\033[95m'
@@ -98,7 +99,7 @@ class optionsLogged:
 							'Add a file to connected supernode', self.add,
 							'Remove a file from connected supernode', self.remove,
 							'Logout from supernode', self.logout,
-							'Show network status', print('ciao'),
+							'Show network status', Util.statusNetwork(),
 							'Exit', self.exit
 					   ]
 	def search(self):

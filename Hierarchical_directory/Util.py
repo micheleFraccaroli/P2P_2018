@@ -8,6 +8,8 @@ from datetime import datetime
 from threading import *
 from dataBase import *
 from curses import *
+from dataBase import dataBase
+from dataBase import dataBase
 
 # Variabili globali
 mode = None # Modalità di utilizzo del programma: 'normal', 'super', 'update', 'logged'
@@ -212,6 +214,41 @@ def menu(stdscr, listMenu, titleMenu, flag = None):
                 c = 0 # Resetto input e l'opzione scelta
                 option = 0
 
+#plotting network graph
+def statusNetwork():
+    nodes = [] #peer della rete
+    sp_list = [] #superpeers della rete
+    list_sp = db.retrieveSuperPeers()
+    for lsp in list_sp:
+        lsp_d = ip_deformatting(lsp[0], lsp[1]) 
+        nodes.append(lsp_d[0])
+        sp_list.append(lsp_d[0])
+    my_ip = db.retrieveConfig(('selfV4', 'selfV6'))
+    ip_SP = my_ip.selfV4 + "|" + my_ip.selfV6
+
+    logged_list = [] # peer logged to supernode
+    logged = dbs.retrieveLOGINsp()
+    for lg in logged:
+        lg_d = ip_deformatting(lg[0],lg[1])
+        nodes.append(lg_d[0])
+        logged_list.append(lg_d[0])
+
+    nodes.insert(0,ip_SP[:15])
+
+    edges = [] # archi della rete
+    sol = [] # archi soluzione (traffico)
+    for e1 in sp_list:
+        edge = (ip_SP[:15],e1)
+        edges.append(edge)
+    for e2 in logged_list:
+        edge = (e2, ip_SP[:15])
+        sol.append(edge)
+
+    num_sp = len(list_sp)
+    num_peer = len(sol)
+    toPlotNetwork.toPlot(nodes, edges, sol, num_sp, num_peer, "save")
+
+
 def updatePeers(flag = None):
     
     globalLock.acquire()
@@ -251,15 +288,15 @@ def updatePeers(flag = None):
 
         con = Conn(config.selfV4, config.selfV6, 3000)
 
-        if con.connection()
+        if con.connection():
 
             count += 1
-                con.s.send(pack.encode())
-                printLog("Richiesta SUPE a me ::: " + config.selfV4)
-                con.deconnection()
+            con.s.send(pack.encode())
+            printLog("Richiesta SUPE a me ::: " + config.selfV4)
+            con.deconnection()
             
-            else:
-                printLog("Richiesta SUPE fallita a me ::: " + config.selfV4)
+        else:
+            printLog("Richiesta SUPE fallita a me ::: " + config.selfV4)
     else:
         for peer in listPeers:
 
