@@ -27,7 +27,7 @@ class bcolors:
 class optionsNormal:
 
 	def __init__(self):
-		
+
 		#self.options = {0:['Login to supernode', self.login],1:['Exit', self.exit]}
 		self.options = [
 							'Login to supernode', self.login,
@@ -35,7 +35,7 @@ class optionsNormal:
 					   ]
 
 	def login(self):
-		
+
 		Util.updatePeers()
 
 		db = dataBase()
@@ -53,7 +53,7 @@ class optionsNormal:
 		con = Conn(ipv4, ipv6, port)
 
 		if con.connection():
-		
+
 			packet = 'LOGI' + ip
 			Util.printLog('Richiesta LOGI a vicino ::: ' + ipv4)
 			con.s.send(packet.encode())
@@ -62,16 +62,16 @@ class optionsNormal:
 		else:
 
 			Util.printLog('Richiesta LOGI fallita per ::: ' + ipv4)
-		
+
 		Util.mode = 'logged'
 		time.sleep(1)
 
 	def exit(self):
 
 		db = dataBase()
-		
+
 		Util.lock.acquire()
-		
+
 		config = db.retrieveConfig(('selfV4','selfV6','selfP'))
 
 		db.destroy()
@@ -81,8 +81,8 @@ class optionsNormal:
 		con.connection()
 		con.s.send('EXIT'.encode())
 		con.deconnection()
-		
-		
+
+
 		print('\nBye\n')
 		time.sleep(1)
 
@@ -165,7 +165,7 @@ class optionsLogged:
 		con = Conn(dirV4, dirV6, dirP)
 
 		if con.connection():
-		
+
 			Util.printLog('Richiesta LOGO a vicino ::: ' + dirV4)
 			con.s.send(packet.encode())
 			con.deconnection()
@@ -183,16 +183,16 @@ class optionsLogged:
 		print("### Logout implicito da implementare ###")
 
 		db = dataBase()
-		
+
 		Util.lock.acquire()
-		
+
 		config = db.retrieveConfig(('selfV4','selfV6','selfP'))
 
 		con = Conn(config.selfV4, config.selfV6, config.selfP)
 		con.connection()
 		con.s.send('EXIT'.encode())
 		con.deconnection()
-		
+
 		db.destroy()
 		Util.lock.release()
 
@@ -236,7 +236,7 @@ class optionsSuper:
 	def exit(self):
 
 		db = dataBaseSuper()
-		
+
 		if db.existsLogged() > 0:
 
 			print(bcolors.FAIL + '\nUnable to exit. There are peers still connected to you.\n' + bcolors.ENDC)
@@ -244,9 +244,9 @@ class optionsSuper:
 
 		else:
 			Util.lock.acquire()
-		
+
 			config = db.retrieveConfig(('selfV4','selfV6','selfP'))
-			
+
 			db.destroy()
 			Util.lock.release()
 
@@ -259,15 +259,15 @@ class optionsSuper:
 			con.connection()
 			con.s.send('EXIT'.encode())
 			con.deconnection()
-			
-		
+
+
 			print('\nBye\n')
 			time.sleep(1)
 
 			exit()
 
 if len(sys.argv) > 2:
-	
+
 	print(bcolors.WARNING + 'Syntax: python3 main.py [super]' + bcolors.ENDC)
 	exit()
 
@@ -323,7 +323,7 @@ print("\n----------------------\n")
 
 # background thread for requests
 if Util.mode == 'super':
-	
+
 	central_threadS = Central_Thread(config,3000)
 	central_threadS.start()
 

@@ -71,7 +71,7 @@ class Download:
         check_file = Path(path_file)
 
         if (check_file.is_file()):
-            
+
             res = wrapper(Util.menu,['Yes',True,'No',False],['The file requested already exists. Override it?'])
 
             if res:
@@ -102,7 +102,7 @@ class Download:
         Util.waitMenu.acquire()
         Util.waitMenu.notify()
         Util.waitMenu.release()
-        
+
 '''
 if __name__ == "__main__":
     l = []
@@ -113,5 +113,5 @@ if __name__ == "__main__":
     op = input("'D' for download: ")
     if (op == "D"):
         down.download()
-        print("\n--- END ---") 
+        print("\n--- END ---")
 '''
