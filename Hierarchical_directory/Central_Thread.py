@@ -211,12 +211,13 @@ class Central_Thread(th.Thread):
 					my_ip = db.retrieveConfig(('selfV4', 'selfV6'))
 					ip_SP = my_ip.selfV4 + "|" + my_ip.selfV6
 
-					logged = db.retrieveLOGINsp()
+					logged = dbs.retrieveLOGINsp()
 
 					for lg in logged:
 						nodes.append(lg[0])
 
 					nodes.append(ip_SP)
+					print(nodes)
 					edges = [] # archi della rete
 					sol = [] # archi soluzione (traffico)
 					for e in nodes:

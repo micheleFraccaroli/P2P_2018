@@ -16,11 +16,11 @@ class AddRm:
 
     def aggiunta(self, file):
 
-        self.check_file = Path('./share/' + file)
+        self.check_file = Path('share/' + file)
 
         if (self.check_file.is_file()):
 
-            self.f = open('./share/' + file, 'rb')
+            self.f = open('share/' + file, 'rb')
             self.contenuto = self.f.read()
             self.filename = file
 

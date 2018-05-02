@@ -5,6 +5,7 @@ import threading as th
 import ipaddress as ipaddr
 from Download import Download
 import curses
+import Util
 
 class Recv_Afin(th.Thread):
     def __init__(self, numMD5, other_peersocket):
@@ -84,7 +85,7 @@ class Recv_Afin(th.Thread):
                 bytes_read = len(data)
 
             md5 = data[:32].decode()
-            desc = data[32:132].decode()
+            desc = data[32:132].decode().strip()
             nCopy = int(data[132:].decode())
 
             listPeers.append(desc) # Inserisco descrizione
@@ -103,7 +104,7 @@ class Recv_Afin(th.Thread):
                 ipV4, ipV6 , port = Util.ip_deformatting(data[:55].decode(), data[55:].decode())
 
                 listPeers[i+1].append(socket.getfqdn(ipV4) + ' (' + ipV4 + ')')
-                listPeers[i+1].append((md5, desc, ipV4, ipV6, port))
+                listPeers[i+1].append((ipV4, ipV6, port, md5, desc))
 
         self.other_peersocket.close()
         
