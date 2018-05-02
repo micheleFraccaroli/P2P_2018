@@ -252,7 +252,7 @@ class Central_Thread(th.Thread):
 					recv_packet = recv_type + recv_packet
 
 					Util.printLog("LOGOUT da te stesso")
-					print('Logout done. Eliminated ' + recv_packet.decode() + 'from directory')
+					Util.printLog('Logout done. Eliminated ' + recv_packet.decode() + ' from directory')
 
 					Util.lock.acquire()
 					db.updateConfig('mode','normal')
