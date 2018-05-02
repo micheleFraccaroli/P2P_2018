@@ -37,7 +37,7 @@ class ThreadALGI(th.Thread):
 				packet = "ALGI" + str(self.sid)
 
 				ipv4,ipv6,port = Util.ip_deformatting(self.ip, self.port)
-
+				
 				conn = Conn(ipv4,ipv6,port)
 				conn.connection()
 				conn.s.send(packet.encode())

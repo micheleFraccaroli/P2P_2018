@@ -13,7 +13,6 @@ from Conn import Conn
 from Add_Remove import *
 from incipit_research import *
 from curses import *
-import toPlotNetwork as tpn
 
 class bcolors:
     HEADER = '\033[95m'
@@ -37,23 +36,23 @@ class optionsNormal:
 
 	def login(self, flag = None):
 
-			db = dataBase()
+		db = dataBase()
 
-			Util.lock.acquire()
+		Util.lock.acquire()
 
-			config = db.retrieveConfig(('selfV4','selfV6','selfP'))
-			ip = Util.ip_formatting(config.selfV4, config.selfV6, config.selfP)
+		config = db.retrieveConfig(('selfV4','selfV6','selfP'))
+		ip = Util.ip_formatting(config.selfV4, config.selfV6, config.selfP)
 
 		if flag == None:
 			
 			Util.updatePeers()
 
 		else: # Io sono super peer, quindi uso me stesso
-			db.insertSuperPeers(ip[0],ip[1])
+			db.insertSuperPeers(ip[:55],'03000')
 
-			listPeers = db.retrieveSuperPeers()
+		listPeers = db.retrieveSuperPeers()
 
-			ipv4, ipv6, port = Util.ip_deformatting(listPeers[0][0],listPeers[0][1])
+		ipv4, ipv6, port = Util.ip_deformatting(listPeers[0][0],listPeers[0][1])
 
 		Util.lock.release()
 
@@ -70,7 +69,8 @@ class optionsNormal:
 
 			Util.printLog('Richiesta LOGI fallita per ::: ' + ipv4)
 
-		Util.mode = 'logged'
+		if(flag == None):
+			Util.mode = 'logged'
 		time.sleep(1)
 
 	def exit(self):
@@ -105,7 +105,6 @@ class optionsLogged:
 							'Add a file to connected supernode', self.add,
 							'Remove a file from connected supernode', self.remove,
 							'Logout from supernode', self.logout,
-							'Show network status', Util.statusNetwork(),
 							'Exit', self.exit
 					   ]
 	def search(self):
@@ -225,7 +224,6 @@ class optionsSuper:
 							'Search a File', self.search,
 							'Add a file to connected supernode', self.add,
 							'Remove a file from connected supernode', self.remove,
-							'Show network status', print('ciao'),
 							'Exit', self.exit
 					   ]
 	def search(self):
@@ -364,6 +362,8 @@ print('mode: ',Util.mode)
 print("\n----------------------\n")
 
 # background thread for requests
+central_threadN = Central_Thread(config,config.selfP)
+central_threadN.start()
 if Util.mode == 'super':
 
 	central_threadS = Central_Thread(config,3000)
@@ -372,8 +372,6 @@ if Util.mode == 'super':
 	op = optionsNormal()
 	op.login(True) # Valore non importante, basta sia diverso da None
 
-central_threadN = Central_Thread(config,config.selfP)
-central_threadN.start()
 
 while True: # Menu principale
 

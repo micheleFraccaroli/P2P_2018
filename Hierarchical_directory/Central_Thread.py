@@ -218,12 +218,14 @@ class Central_Thread(th.Thread):
 					Util.printLog('ALGI pre lock')
 					Util.globalLock.acquire()
 					Util.sessionId = recv_packet.decode()
-					Util.mode = 'logged'
+					if(Util.mode != 'super'):
+						Util.mode = 'logged'
 					Util.globalLock.release()
 					Util.printLog('ALGI post lock')
 
 					Util.lock.acquire()
-					db.updateConfig('mode','logged')
+					if(Util.mode != 'super'):
+						db.updateConfig('mode','logged')
 					db.updateConfig('sessionId',Util.sessionId)
 					Util.lock.release()
 

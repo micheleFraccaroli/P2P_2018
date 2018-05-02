@@ -10,6 +10,7 @@ from dataBase import *
 from curses import *
 from dataBase import dataBase
 from dataBase import dataBase
+import toPlotNetwork
 
 # Variabili globali
 mode = None # Modalità di utilizzo del programma: 'normal', 'super', 'update', 'logged'
@@ -216,6 +217,9 @@ def menu(stdscr, listMenu, titleMenu, flag = None):
 
 #plotting network graph
 def statusNetwork():
+    db = dataBase()
+    dbs = dataBaseSuper()
+
     nodes = [] #peer della rete
     sp_list = [] #superpeers della rete
     list_sp = db.retrieveSuperPeers()
@@ -246,7 +250,7 @@ def statusNetwork():
 
     num_sp = len(list_sp)
     num_peer = len(sol)
-    toPlotNetwork.toPlot(nodes, edges, sol, num_sp, num_peer, "save")
+    toPlotNetwork.toPlot(nodes, edges, sol, num_sp, num_peer)
 
 
 def updatePeers():

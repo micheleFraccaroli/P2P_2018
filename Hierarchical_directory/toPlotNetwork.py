@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 import Util
 from matplotlib.lines import Line2D
 
-def toPlot(nodes, edges, sol_edges, num_sp, num_peer, mode):
+def toPlot(nodes, edges, sol_edges, num_sp, num_peer):
 	dict = {}
 	G = nx.DiGraph()
 	G.add_nodes_from(nodes)
@@ -44,14 +44,13 @@ def toPlot(nodes, edges, sol_edges, num_sp, num_peer, mode):
 	#fig, ax = plt.subplots()
 	plt.legend(custom_lines, ['you', 'other superpeer', 'peer logged'])
 
-	if(mode == "save"):
-		plt.savefig("network_status.png")
-	elif(mode == 'show'):
-		plt.show()
+	
+	plt.savefig("network_status.png")
 
 if __name__ == '__main__':
 
 	nodes = ['172.16.8.2','172.16.8.3','172.16.8.4','172.16.8.5']
 	edges = [('172.16.8.2','172.16.8.4'),('172.16.8.2','172.16.8.3'),('172.16.8.5','172.16.8.2')]
 	sol = [('172.16.8.2','172.16.8.4'),('172.16.8.2','172.16.8.3')]
-	toPlot(nodes, edges, sol, 2, 2, "show")
+	mode = "show"
+	toPlot(nodes, edges, sol, 2, 2)
