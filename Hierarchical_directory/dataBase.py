@@ -348,6 +348,18 @@ class dataBaseSuper(dataBase):
 
 		return res
 
+	def retrieveLOGINsp(self):
+
+		con = sqlite3.connect('P2P.db')
+		c = con.cursor()
+
+		res = c.execute('SELECT * FROM login')
+		res = c.fetchall()
+
+		con.close()
+
+		return res
+
 	def retrieveLOGINwithIP(self, ip, port):
 
 		con = sqlite3.connect('P2P.db')
