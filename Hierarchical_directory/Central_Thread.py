@@ -86,7 +86,7 @@ class Central_Thread(th.Thread):
 					db.insertSuperPeers(recv_packet[16:71].decode(), recv_packet[71:].decode())
 					db.insertResponse(recv_packet[:16].decode(),recv_packet[16:71].decode(), recv_packet[71:].decode(),"null","null")
 					Util.lock.release()
-
+					'''
 					#plotting network graph
 					nodes = [] #peer della rete
 					list_sp = db.retrieveSuperPeers()
@@ -101,6 +101,7 @@ class Central_Thread(th.Thread):
 						edge = (ip_SP,e)
 						edges.append(edge)
 					toPlotNetwork.toPlot(nodes, edges, sol)
+					'''
 
 				# QUER ---
 				elif(recv_type.decode() == "QUER"):
@@ -210,7 +211,7 @@ class Central_Thread(th.Thread):
 						nodes.append(lsp[0])
 					my_ip = db.retrieveConfig(('selfV4', 'selfV6'))
 					ip_SP = my_ip.selfV4 + "|" + my_ip.selfV6
-					logged = db.retrieveLOGINsp()
+					logged = dbs.retrieveLOGINsp()
 					for lg in logged:
 						nodes.append(lg[0])
 					nodes.append(ip_SP)
@@ -277,9 +278,10 @@ class Central_Thread(th.Thread):
 				# UPLOAD ---
 				elif(recv_type.decode() == "RETR"):
 					recv_packet = other_peersocket.recv(32) # 36 - 4
-					Util.printLog("RICEVUTA RICHIESTA DI DOWNLOAD DI " + recv_packet.decode() + "DALLA RETE")
+					Util.printLog("RICEVUTA RICHIESTA DI DOWNLOAD DI " + recv_packet.decode() + " DALLA RETE")
 					self.bytes_read = len(recv_packet)
 					while (self.bytes_read < 32):
+						Util.printLog("DENTRO AL CICLO DEL RETR")
 						recv_packet += other_peersocket.recv(32 - self.bytes_read)
 						self.bytes_read = len(recv_packet)
 
