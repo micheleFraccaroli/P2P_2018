@@ -26,7 +26,7 @@ class ThreadFIND(th.Thread):
 
 		if(superpeers):
 			for sp in superpeers:
-				ipv4, ipv6, port = Util.ip_deformatting(sp[0][:15],sp[0][16:],sp[1])
+				ipv4, ipv6, port = Util.ip_deformatting(sp[0],sp[1])
 				conn = Conn(ipv4, ipv6, port)
 				if(conn.connection()):
 					conn.s.send(self.packet.encode())
@@ -54,7 +54,7 @@ class ThreadFIND(th.Thread):
 		addrPeer = db.retrievePeerSid(self.sid)
 		Util.printLog("ADDRPEER " + str(addrPeer))
 		resp = db.retrieveResponse(self.packet[4:20])
-		ipv4, ipv6, port, ttl = Util.ip_deformatting(addrPeer[0][0], addrPeer[0][1], None)
+		ipv4, ipv6, port = Util.ip_deformatting(addrPeer[0][0], addrPeer[0][1])
 		toPeer = "AFIN" + str(len(resp)+len(localFile)).zfill(3)
 		
 		connP = Conn(ipv4, ipv6, port)

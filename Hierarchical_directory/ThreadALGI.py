@@ -20,7 +20,7 @@ class ThreadALGI(th.Thread):
 			
 			packet = "ALGI" + found[2]
 
-			ipv4,ipv6,port,ttl = Util.ip_deformatting(self.ip, self.port, None)
+			ipv4,ipv6,port = Util.ip_deformatting(self.ip, self.port)
 			
 			conn = Conn(ipv4,ipv6,port)
 			conn.connection()
@@ -36,7 +36,7 @@ class ThreadALGI(th.Thread):
 				#generation ALGI packet
 				packet = "ALGI" + str(self.sid)
 
-				ipv4,ipv6,port,ttl = Util.ip_deformatting(self.ip, self.port, None)
+				ipv4,ipv6,port = Util.ip_deformatting(self.ip, self.port)
 
 				conn = Conn(ipv4,ipv6,port)
 				conn.connection()
@@ -44,7 +44,7 @@ class ThreadALGI(th.Thread):
 				conn.deconnection()
 			except:
 				packet = "ALGI" + '0000000000000000'
-				ipv4,ipv6,port,ttl = Util.ip_deformatting(self.ip, self.port, None)
+				ipv4,ipv6,port = Util.ip_deformatting(self.ip, self.port)
 
 				conn = Conn(ipv4,ipv6,port)
 				conn.connection()

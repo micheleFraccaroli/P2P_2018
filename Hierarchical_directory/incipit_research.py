@@ -20,7 +20,7 @@ class incipit_research:
 		#retreive address of superpeer
 		if(Util.mode in ["normal","logged"]):
 			super_ip = db.retrieveSuperPeers()
-			sIpv4, sIpv6, sPort, ttl = Util.ip_deformatting(super_ip[0][0], super_ip[0][1], None)
+			sIpv4, sIpv6, sPort = Util.ip_deformatting(super_ip[0][0], super_ip[0][1])
 			#connection to superpeer
 			con = Conn(sIpv4, sIpv6, sPort)
 

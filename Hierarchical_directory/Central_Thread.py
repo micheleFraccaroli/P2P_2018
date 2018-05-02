@@ -7,6 +7,7 @@ from ThreadSUPE import ThreadSUPE
 from ThreadQUER import ThreadQUER
 from Recv_Afin import Recv_Afin
 from dataBase import dataBase
+from dataBase import dataBaseSuper
 from ThreadINS import ThreadINS
 from ThreadDEL import ThreadDEL
 from ThreadLOGO import ThreadLOGO
@@ -14,6 +15,7 @@ from Response import thread_Response
 from ThreadFIND import ThreadFIND
 from Upload import Upload
 from ThreadALGI import ThreadALGI
+import toPlotNetwork
 
 class Central_Thread(th.Thread):
 	def __init__(self, config, port):
@@ -26,6 +28,7 @@ class Central_Thread(th.Thread):
 
 	def run(self):
 		db = dataBase()
+		dbs = dataBaseSuper()
 		self.config = db.retrieveAllConfig()
 		peersocket = socket.socket(socket.AF_INET6, socket.SOCK_STREAM)
 		peersocket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
@@ -83,6 +86,20 @@ class Central_Thread(th.Thread):
 					db.insertSuperPeers(recv_packet[16:71].decode(), recv_packet[71:].decode())
 					db.insertResponse(recv_packet[:16].decode(),recv_packet[16:71].decode(), recv_packet[71:].decode(),"null","null")
 					Util.lock.release()
+
+					#plotting network graph
+					nodes = [] #peer della rete
+					list_sp = db.retrieveSuperPeers()
+					for lsp in list_sp:
+						nodes.append(lsp[0])
+					my_ip = db.retrieveConfig(('selfV4', 'selfV6'))
+					ip_SP = my_ip.selfV4 + "|" + my_ip.selfV6
+					edges = [] # archi della rete
+					sol = [] # archi soluzione (traffico)
+					for e in nodes:
+						edge = (ip_SP,e)
+						edges.append(edge)
+					toPlotNetwork.toPlot(nodes, edges, sol)
 
 				# QUER ---
 				elif(recv_type.decode() == "QUER"):
@@ -184,6 +201,20 @@ class Central_Thread(th.Thread):
 					#sid = th_ALGI.sid
 
 					Util.printLog("FINE LOGIN NEL CENTRAL THREAD")
+
+					#plotting network graph
+					nodes = [] #peer della rete
+					list_sp = db.retrieveSuperPeers()
+					for lsp in list_sp:
+						nodes.append(lsp[0])
+					my_ip = db.retrieveConfig(('selfV4', 'selfV6'))
+					ip_SP = my_ip.selfV4 + "|" + my_ip.selfV6
+					edges = [] # archi della rete
+					sol = [] # archi soluzione (traffico)
+					for e in nodes:
+						edge = (ip_SP,e)
+						edges.append(edge)
+					toPlotNetwork.toPlot(nodes, edges, sol)
 
 				# ALGI ---
 				elif(recv_type.decode() == "ALGI"):

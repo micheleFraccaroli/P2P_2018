@@ -29,7 +29,7 @@ class ThreadQUER(th.Thread):
 	#risponde al superpeer che ha effettuato una ricerca
 
 	def answer(self, db, file_list, pktid, ip, portB):
-		addr = Util.ip_deformatting(ip, portB, None)
+		addr = Util.ip_deformatting(ip, portB)
 		ip6 = ipad.ip_address(ip[16:])
 		self.con = Conn(addr[0], str(ip6), addr[2])
 
@@ -48,7 +48,7 @@ class ThreadQUER(th.Thread):
 	def search_neighbors(self, db, ip_request, new_quer):
 		self.neighbors = db.retrieveSuperPeers() #mi tiro giù i vicini super
 		for n in self.neighbors:
-			addr = Util.ip_deformatting(n[0], n[1], None)
+			addr = Util.ip_deformatting(n[0], n[1])
 			ip6 = ipad.ip_address(n[0][16:])
 			self.con = Conn(addr[0], str(ip6), addr[2])
 
