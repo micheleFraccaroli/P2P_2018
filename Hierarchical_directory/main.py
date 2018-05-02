@@ -35,22 +35,28 @@ class optionsNormal:
 							'Exit', self.exit
 					   ]
 
-	def login(self):
+	def login(self, flag = None):
 
-		Util.updatePeers()
+			db = dataBase()
 
-		db = dataBase()
+			Util.lock.acquire()
 
-		Util.lock.acquire()
+			config = db.retrieveConfig(('selfV4','selfV6','selfP'))
+			ip = Util.ip_formatting(config.selfV4, config.selfV6, config.selfP)
 
-		config = db.retrieveConfig(('selfV4','selfV6','selfP'))
-		ip = Util.ip_formatting(config.selfV4, config.selfV6, config.selfP)
+		if flag == None:
+			
+			Util.updatePeers()
 
-		listPeers = db.retrieveSuperPeers()
-		Util.printLog('Nella lock')
+		else: # Io sono super peer, quindi uso me stesso
+			db.insertSuperPeers(ip[0],ip[1])
+
+			listPeers = db.retrieveSuperPeers()
+
+			ipv4, ipv6, port = Util.ip_deformatting(listPeers[0][0],listPeers[0][1])
+
 		Util.lock.release()
 
-		ipv4, ipv6, port = Util.ip_deformatting(listPeers[0][0],listPeers[0][1])
 		con = Conn(ipv4, ipv6, port)
 
 		if con.connection():

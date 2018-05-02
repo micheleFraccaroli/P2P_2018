@@ -249,7 +249,7 @@ def statusNetwork():
     toPlotNetwork.toPlot(nodes, edges, sol, num_sp, num_peer, "save")
 
 
-def updatePeers(flag = None):
+def updatePeers():
     
     globalLock.acquire()
     mode = Util.mode
@@ -274,44 +274,29 @@ def updatePeers(flag = None):
     lock.release()
 
     pack = 'SUPE' + idPacket + ip + config.ttl.zfill(2)
-    print('\n'+pack+'\n')
 
     listPeers = listSuper + list(set(listNormal) - set(listSuper))
-    print(listPeers)
+
     globalLock.acquire()
     statusRequest[idPacket] = True
     globalLock.release()
 
     count = 0
 
-    if flag != None:
+    for peer in listPeers:
 
-        con = Conn(config.selfV4, config.selfV6, 3000)
-
+        ipv4, ipv6, port = Util.ip_deformatting(peer[0],peer[1])
+        con = Conn(ipv4, ipv6, port)
+        
         if con.connection():
 
             count += 1
             con.s.send(pack.encode())
-            printLog("Richiesta SUPE a me ::: " + config.selfV4)
+            printLog("Richiesta SUPE a vicino ::: " + ipv4)
             con.deconnection()
-            
+        
         else:
-            printLog("Richiesta SUPE fallita a me ::: " + config.selfV4)
-    else:
-        for peer in listPeers:
-
-            ipv4, ipv6, port = Util.ip_deformatting(peer[0],peer[1])
-            con = Conn(ipv4, ipv6, port)
-            
-            if con.connection():
-
-                count += 1
-                con.s.send(pack.encode())
-                printLog("Richiesta SUPE a vicino ::: " + ipv4)
-                con.deconnection()
-            
-            else:
-                printLog("Richiesta SUPE fallita per ::: " + ipv4)
+            printLog("Richiesta SUPE fallita per ::: " + ipv4)
 
     if count == 0:
 
