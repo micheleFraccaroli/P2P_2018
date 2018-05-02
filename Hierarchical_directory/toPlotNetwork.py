@@ -1,11 +1,15 @@
 import networkx as nx
 import matplotlib.pyplot as plt
+import Util
 
-def toPlot(nodes, edges, sol_edges):
+def toPlot(nodes, edges, sol_edges, num_sp, num_peer):
 	dict = {}
-	G = nx.Graph()
+	G = nx.DiGraph()
 	G.add_nodes_from(nodes)
 	pos=nx.spring_layout(G)
+
+	for ip in nodes:
+		ipv = Util.ip_deformatting()
 
 	for i in edges:
 		trovato = False
@@ -22,7 +26,13 @@ def toPlot(nodes, edges, sol_edges):
 	colors = [G[u][v]['color'] for u,v in edges]
 	weights = [G[u][v]['weight'] for u,v in edges]
 
-	nx.draw(G, pos, edges=edges, edge_color=colors, width=weights,with_labels=True, node_color='r', node_size=400, font_size=10, font_color='black')
+	sizes = [500]
+	for n in range(num_sp):
+		sizes.append(300)
+	for n2 in range(num_peer):
+		sizes.append(100)
+
+	nx.draw(G, pos, edges=edges, edge_color=colors, width=weights, with_labels=True, node_color='r', node_size=sizes, font_size=10, font_color='black')
 
 	nx.draw_networkx_edge_labels(G,pos, dict, clip_on=True)
 
