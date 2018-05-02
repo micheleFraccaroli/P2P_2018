@@ -6,6 +6,7 @@ from pathlib import Path
 from Conn import Conn
 import multiprocessing as mp
 import Util
+from curses import *
 
 class Download:
     def __init__(self, ipp2p_B_4, ipp2p_B_6, pp2p_B, md5, filename):

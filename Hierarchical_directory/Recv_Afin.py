@@ -80,7 +80,7 @@ class Recv_Afin(th.Thread):
             bytes_read = len(data)
 
             while (bytes_read < 135):
-                
+
                 data += self.other_peersocket.recv(135 - bytes_read)
                 bytes_read = len(data)
 
@@ -90,14 +90,14 @@ class Recv_Afin(th.Thread):
 
             listPeers.append(desc) # Inserisco descrizione
             listPeers.append([])                    # Inserisco lista dei peers
-        
+
             for j in range(nCopy):  # Per ogni copia dello specifico file
 
                 data = self.other_peersocket.recv(60)  # Ricevo IP e porta del prossimo peer
                 bytes_read = len(data)
 
                 while (bytes_read < 60):
-                
+
                     data += self.other_peersocket.recv(60 - bytes_read)
                     bytes_read = len(data)
 
@@ -107,9 +107,9 @@ class Recv_Afin(th.Thread):
                 listPeers[i+1].append((ipV4, ipV6, port, md5, desc))
 
         self.other_peersocket.close()
-        
+
         b = curses.wrapper(Util.menu, listPeers, ['Select a file:','Select a peer:'], 6) # L'ultimo parametro basta sia diverso da None
-        
+
         if b != None:
 
             down = Download(b[0], b[1], b[2], b[3], b[4])
@@ -166,7 +166,7 @@ if __name__ == '__main__':
         if addr[0] == "::1": # Localhost
             addrPack = addr[0]
             Util.printLog("Richiesta in arrivo da: "+addrPack)
-            
+
         elif addr[0][:2] == "::":
             addrPack = addr[0][7:]
             Util.printLog("Richiesta in arrivo da: "+addrPack)
