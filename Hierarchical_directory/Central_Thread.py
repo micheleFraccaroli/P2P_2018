@@ -274,7 +274,7 @@ class Central_Thread(th.Thread):
 					Util.lock.acquire()
 					db.updateConfig('mode','normal')
 					Util.lock.release()
-
+					Util.printLog('mode normal?')
 					Util.loggedOut.acquire()
 					Util.loggedOut.notify()
 					Util.loggedOut.release()
