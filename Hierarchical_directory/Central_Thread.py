@@ -235,7 +235,7 @@ class Central_Thread(th.Thread):
 
 					num_sp = len(list_sp)
 					num_peer = len(sol)
-					toPlotNetwork.toPlot(nodes, edges, sol, num_sp, num_peer)
+					toPlotNetwork.toPlot(nodes, edges, sol, num_sp, num_peer, "save")
 
 				# ALGI ---
 				elif(recv_type.decode() == "ALGI"):

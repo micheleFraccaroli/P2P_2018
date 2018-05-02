@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 import Util
 from matplotlib.lines import Line2D
 
-def toPlot(nodes, edges, sol_edges, num_sp, num_peer):
+def toPlot(nodes, edges, sol_edges, num_sp, num_peer, mode):
 	dict = {}
 	G = nx.DiGraph()
 	G.add_nodes_from(nodes)
@@ -37,19 +37,21 @@ def toPlot(nodes, edges, sol_edges, num_sp, num_peer):
 
 	nx.draw_networkx_edge_labels(G,pos, dict, clip_on=True)
 
-	custom_lines = [Line2D([0], [0], color='green', lw=4),
-                Line2D([0], [0], color='red', lw=4),
-                Line2D([0], [0], color='blue', lw=4)]
+	custom_lines = [Line2D([0], [0], marker ='o',color='green', markersize=10, lw=0),
+                Line2D([0], [0], marker ='o',color='red', markersize=10, lw=0),
+                Line2D([0], [0], marker ='o',color='blue', markersize=10, lw=0)]
 
 	#fig, ax = plt.subplots()
 	plt.legend(custom_lines, ['you', 'other superpeer', 'peer logged'])
 
-	plt.savefig("network_status.png")
-	#plt.show()
+	if(mode == "save"):
+		plt.savefig("network_status.png")
+	elif(mode == 'show'):
+		plt.show()
 
 if __name__ == '__main__':
 
 	nodes = ['172.16.8.2','172.16.8.3','172.16.8.4','172.16.8.5']
 	edges = [('172.16.8.2','172.16.8.4'),('172.16.8.2','172.16.8.3'),('172.16.8.5','172.16.8.2')]
-	sol = [('172.16.8.2','172.16.8.4'),('172.16.8.5','172.16.8.2')]
-	toPlot(nodes, edges, sol, 2, 2)
+	sol = [('172.16.8.2','172.16.8.4'),('172.16.8.2','172.16.8.3')]
+	toPlot(nodes, edges, sol, 2, 2, "show")
