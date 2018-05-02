@@ -13,7 +13,7 @@ class Vicini:
 		nears = db.retrieveNeighborhood(self.config)
 		
 		for near in nears:
-			data = Util.ip_deformatting(near[0],near[1],None)
+			data = Util.ip_deformatting(near[0],near[1])
 			connRoot = Conn(data[0],data[1],data[2])
 			connRoot.connection()
 			connRoot.s.send(self.pack.encode())

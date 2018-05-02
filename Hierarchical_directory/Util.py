@@ -245,7 +245,7 @@ def updatePeers():
     count = 0
     for peer in listPeers:
 
-        ipv4, ipv6, port, ttl = Util.ip_deformatting(peer[0],peer[1],None)
+        ipv4, ipv6, port = Util.ip_deformatting(peer[0],peer[1])
         con = Conn(ipv4, ipv6, port)
         
         if con.connection():

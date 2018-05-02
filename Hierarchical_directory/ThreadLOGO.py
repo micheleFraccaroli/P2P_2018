@@ -19,7 +19,7 @@ class ThreadLOGO(th.Thread):
         rows_delete = str(count).rjust(3,'0')
         pkt_algo = "ALGO"+rows_delete
 
-        addr = Util.ip_deformatting(info[0], info[1], None)
+        addr = Util.ip_deformatting(info[0], info[1])
         ip6 = ipad.ip_address(info[0][16:])
         self.con = Conn(addr[0], str(ip6), addr[2])
         try:
