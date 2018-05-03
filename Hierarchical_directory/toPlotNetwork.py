@@ -32,7 +32,7 @@ def toPlot(nodes, edges, sol_edges, num_sp, num_peer):
 	for n2 in range(num_peer):
 		sizes.append(100)
 		colors_node.append('blue')
-
+	Util.printLog("ARRAY COLORI " + str(colors_node))
 	nx.draw(G, pos, edges=edges, edge_color=colors, width=weights, with_labels=True, node_color=colors_node, node_size=sizes, font_size=10, font_color='black')
 
 	nx.draw_networkx_edge_labels(G,pos, dict, clip_on=True)
@@ -45,7 +45,8 @@ def toPlot(nodes, edges, sol_edges, num_sp, num_peer):
 	plt.legend(custom_lines, ['you', 'other superpeer', 'peer logged'])
 
 
-	plt.savefig("network_status.png")
+	#plt.savefig("network_status.png")
+	plt.show()
 
 if __name__ == '__main__':
 

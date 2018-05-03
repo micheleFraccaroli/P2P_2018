@@ -264,8 +264,10 @@ def statusNetwork():
             uniq_ed.append(x)
             seen_ed.add(x)
 
-    num_sp = len(list_sp)
-    num_peer = len(sol)
+    num_sp = len(list_sp)-1
+    Util.printLog("NUMERO SUEPRPEER TROVATI " + str(num_sp))
+    num_peer = len(logged)
+    Util.printLog("NUMERO PEER TROVATI " + str(num_peer))
     pop_myIp = uniq.index(ip_SP)
     uniq.pop(pop_myIp)
     uniq.insert(0,ip_SP)

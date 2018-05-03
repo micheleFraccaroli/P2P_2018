@@ -388,5 +388,4 @@ while True: # Menu principale
 	op = menuMode[Util.mode]()
 
 	fun = wrapper(Util.menu,op.options,['Select an option:'])
-
 	fun()
