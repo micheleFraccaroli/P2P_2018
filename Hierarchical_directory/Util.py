@@ -253,12 +253,9 @@ def statusNetwork():
 
     edges = [] # archi della rete
     sol = [] # archi soluzione (traffico)
-    for e1 in sp_list:
+    for e1 in seen:
         edge = (ip_SP,e1)
         edges.append(edge)
-    for e2 in logged_list:
-        edge = (e2, ip_SP[:15])
-        sol.append(edge)
 
     num_sp = len(list_sp)
     num_peer = len(sol)
@@ -270,7 +267,11 @@ def updatePeers():
 
     globalLock.acquire()
     mode = Util.mode
-    Util.mode = 'update'
+
+    if mode == 'normal': 
+        Util.mode = 'update'
+    else:
+        Util.mode = 'updateS'
     globalLock.release()
 
     lock.acquire()

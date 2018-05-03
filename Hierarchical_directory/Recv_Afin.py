@@ -114,38 +114,10 @@ class Recv_Afin(th.Thread):
 
             down = Download(b[0], b[1], b[2], b[3], b[4])
             down.download()
-        '''
-        for i in range(0,len(listPeers),2):
-            print('\n\n\n\nNome: ' + listPeers[i])
-            for j in range(0,len(listPeers[i+1]),2):
-                print('\nHost: ' + listPeers[i+1][j])
-                print('\nDati host: ' + str(listPeers[i+1][j+1]))
-
-        self.listPeers = []
-        for i in range(self.nMd5):
-            data = self.other_peersocket.recv(135)  # Ricevo md5, descrizione e numero di copie
-            bytes_read = len(data)
-
-            while (bytes_read < 135):
-                data += self.other_peersocket.recv(135 - bytes_read)
-                bytes_read = len(data)
-
-            self.listPeers.insert(i, [data[:32].decode(), data[32:132].decode().strip(), int(data[132:].decode()), []])
-            for j in range(self.listPeers[i][2]):  # Per ogni copia dello specifico file
-                data = self.other_peersocket.recv(60)  # Ricevo IP e porta del prossimo peer
-                bytes_read = len(data)
-
-                while (bytes_read < 60):
-                    data += self.other_peersocket.recv(60 - bytes_read)
-                    bytes_read = len(data)
-
-                data = data.decode()
-                IPv4, IPv6 = data[:55].split('|')
-                self.listPeers[i][3].append([IPv4, IPv6, int(data[55:])])
-
-        self.other_peersocket.close()
-        self.stampaRicerca()
-        '''
+        else:
+            Util.waitMenu.acquire()
+            Util.waitMenu.notify()
+            Util.waitMenu.release()
 
 if __name__ == '__main__':
 
