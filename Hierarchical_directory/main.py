@@ -106,6 +106,7 @@ class optionsLogged:
 							'Search a File', self.search,
 							'Add a file to connected supernode', self.add,
 							'Remove a file from connected supernode', self.remove,
+							'Show network status', Util.statusNetwork,
 							'Logout from supernode', self.logout,
 							'Exit', self.exit
 					   ]
@@ -228,6 +229,7 @@ class optionsSuper:
 							'Search a File', self.search,
 							'Add a file to connected supernode', self.add,
 							'Remove a file from connected supernode', self.remove,
+							'Show network status', Util.statusNetwork,
 							'Exit', self.exit
 					   ]
 	def search(self):
