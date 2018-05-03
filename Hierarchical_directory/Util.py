@@ -266,11 +266,11 @@ def statusNetwork():
 
     num_sp = len(list_sp)
     num_peer = len(sol)
-    pop_myIp = seen.index(ip_SP)
-    seen.pop(pop_myIp)
-    seen.insert(0,ip_SP)
-    Util.printLog("ROBA DEL PLOT: " + "---" + str(seen) + "---" +  str(seen_ed))
-    toPlotNetwork.toPlot(seen, seen_ed, sol, num_sp, num_peer)
+    pop_myIp = uniq.index(ip_SP)
+    uniq.pop(pop_myIp)
+    uniq.insert(0,ip_SP)
+    Util.printLog("ROBA DEL PLOT: " + "---" + str(uniq) + "---" +  str(seen_ed))
+    toPlotNetwork.toPlot(uniq, seen_ed, sol, num_sp, num_peer)
 
 
 def updatePeers():

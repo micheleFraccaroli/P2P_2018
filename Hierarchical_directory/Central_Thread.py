@@ -188,11 +188,12 @@ class Central_Thread(th.Thread):
 					#sid = th_ALGI.sid
 
 					Util.printLog("FINE LOGIN NEL CENTRAL THREAD")
+					'''
 					img_net = Path('network_status.png')
 					if(img_net.is_file()):
 						os.remove('network_status.png')
 					Util.statusNetwork()
-
+					'''
 
 				# ALGI ---
 				elif(recv_type.decode() == "ALGI"):
