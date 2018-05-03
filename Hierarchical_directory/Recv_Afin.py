@@ -114,7 +114,7 @@ class Recv_Afin(th.Thread):
 
             down = Download(b[0], b[1], b[2], b[3], b[4])
             down.download()
-
+            
         else:
             Util.waitMenu.acquire()
             Util.waitMenu.notify()

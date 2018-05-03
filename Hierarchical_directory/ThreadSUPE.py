@@ -40,7 +40,7 @@ class ThreadSUPE(th.Thread):
 			if self.ttl > 1: # Inoltro richiesta ai vicini
 
 
-				if mode == 'update':
+				if mode in ['update', 'updateS']:
 
 					Util.printLog('Update. Prendo vicini da lista')
 					neighborhood = Util.listPeers
