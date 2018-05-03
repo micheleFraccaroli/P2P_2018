@@ -86,22 +86,6 @@ class Central_Thread(th.Thread):
 					db.insertSuperPeers(recv_packet[16:71].decode(), recv_packet[71:].decode())
 					db.insertResponse(recv_packet[:16].decode(),recv_packet[16:71].decode(), recv_packet[71:].decode(),"null","null")
 					Util.lock.release()
-					'''
-					#plotting network graph
-					nodes = [] #peer della rete
-					list_sp = db.retrieveSuperPeers()
-					for lsp in list_sp:
-						nodes.append(lsp[0])
-					my_ip = db.retrieveConfig(('selfV4', 'selfV6'))
-					ip_SP = my_ip.selfV4 + "|" + my_ip.selfV6
-					nodes.append(ip_SP)
-					edges = [] # archi della rete
-					sol = [] # archi soluzione (traffico)
-					for e in nodes:
-						edge = (ip_SP,e)
-						edges.append(edge)
-					toPlotNetwork.toPlot(nodes, edges, sol)
-					'''
 
 				# QUER ---
 				elif(recv_type.decode() == "QUER"):
@@ -203,10 +187,11 @@ class Central_Thread(th.Thread):
 					#sid = th_ALGI.sid
 
 					Util.printLog("FINE LOGIN NEL CENTRAL THREAD")
-
+					#if(os.stat('network_status.png')):
+					#	os.remove('network_status.png')
 					Util.statusNetwork()
 
-					
+
 				# ALGI ---
 				elif(recv_type.decode() == "ALGI"):
 					recv_packet = other_peersocket.recv(16)
@@ -222,7 +207,7 @@ class Central_Thread(th.Thread):
 						Util.mode = 'logged'
 					Util.globalLock.release()
 					Util.printLog('ALGI post lock')
-					
+
 					if Util.mode != 'super':
 						Util.lock.acquire()
 						db.updateConfig('mode','logged')
