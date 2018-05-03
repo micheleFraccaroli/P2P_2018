@@ -242,6 +242,7 @@ def statusNetwork():
         nodes.append(lg_d[0])
         logged_list.append(lg_d[0])
 
+    nodes.insert(0,ip_SP)
     seen = set()
     uniq = []
     for x in nodes:
@@ -249,21 +250,27 @@ def statusNetwork():
             uniq.append(x)
             seen.add(x)
 
-    nodes.insert(0,ip_SP)
-
     edges = [] # archi della rete
     sol = [] # archi soluzione (traffico)
-    for e1 in sp_list:
-        edge = (ip_SP,e1)
-        edges.append(edge)
-    for e2 in logged_list:
-        edge = (e2, ip_SP[:15])
-        sol.append(edge)
+    for e1 in seen:
+        if(ip_SP != e1):
+            edge = (ip_SP,e1)
+            edges.append(edge)
+
+    seen_ed = set()
+    uniq_ed = []
+    for x in edges:
+        if x not in seen_ed:
+            uniq_ed.append(x)
+            seen_ed.add(x)
 
     num_sp = len(list_sp)
     num_peer = len(sol)
-    Util.printLog("ROBA DEL PLOT: " + "---" + str(seen) + "---" + str(edges))
-    toPlotNetwork.toPlot(seen, edges, sol, num_sp, num_peer)
+    pop_myIp = seen.index(ip_SP)
+    seen.pop(pop_myIp)
+    seen.insert(0,ip_SP)
+    Util.printLog("ROBA DEL PLOT: " + "---" + str(seen) + "---" +  str(seen_ed))
+    toPlotNetwork.toPlot(seen, seen_ed, sol, num_sp, num_peer)
 
 
 def updatePeers():

@@ -3,6 +3,7 @@ import socket
 import os
 import threading as th
 from Util import Util
+from pathlib import Path
 from ThreadSUPE import ThreadSUPE
 from ThreadQUER import ThreadQUER
 from Recv_Afin import Recv_Afin
@@ -187,8 +188,9 @@ class Central_Thread(th.Thread):
 					#sid = th_ALGI.sid
 
 					Util.printLog("FINE LOGIN NEL CENTRAL THREAD")
-					#if(os.stat('network_status.png')):
-					#	os.remove('network_status.png')
+					img_net = Path('network_status.png')
+					if(img_net.is_file()):
+						os.remove('network_status.png')
 					Util.statusNetwork()
 
 

@@ -5,7 +5,7 @@ from matplotlib.lines import Line2D
 
 def toPlot(nodes, edges, sol_edges, num_sp, num_peer):
 	dict = {}
-	G = nx.DiGraph()
+	G = nx.Graph()
 	G.add_nodes_from(nodes)
 	pos=nx.spring_layout(G)
 
@@ -44,7 +44,7 @@ def toPlot(nodes, edges, sol_edges, num_sp, num_peer):
 	#fig, ax = plt.subplots()
 	plt.legend(custom_lines, ['you', 'other superpeer', 'peer logged'])
 
-	
+
 	plt.savefig("network_status.png")
 
 if __name__ == '__main__':
