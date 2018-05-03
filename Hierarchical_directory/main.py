@@ -158,6 +158,8 @@ class optionsLogged:
 
 	def logout(self):
 
+		os.remove('File_System.txt')
+
 		db = dataBase()
 
 		Util.lock.acquire()
@@ -279,12 +281,16 @@ class optionsSuper:
 
 		db = dataBaseSuper()
 
-		if db.existsLogged() > 0:
+		if db.existsLogged() > 1:
 
 			print(bcolors.FAIL + '\nUnable to exit. There are peers still connected to you.\n' + bcolors.ENDC)
 			time.sleep(4)
 
 		else:
+
+			op = optionsLogged()
+			op.logout()
+			
 			Util.lock.acquire()
 
 			config = db.retrieveConfig(('selfV4','selfV6','selfP'))
