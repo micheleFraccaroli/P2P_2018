@@ -79,7 +79,7 @@ class ThreadSUPE(th.Thread):
 
 				Util.lock.release() # Non devo inoltrare, ma devo comunque rilasciare la lock
 
-			if mode in ['update','super']: # Sono superpeer e rispondo
+			if mode in ['updateS','super']: # Sono superpeer e rispondo
 
 				self.pack = 'ASUP'+self.pid+self.myIPP
 				Util.printLog('ASUP pacchetto ::: '+str(self.pack))
