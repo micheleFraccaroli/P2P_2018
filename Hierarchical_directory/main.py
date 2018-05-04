@@ -65,6 +65,37 @@ class optionsNormal:
 			packet = 'LOGI' + ip
 			Util.printLog('Richiesta LOGI a vicino ::: ' + ipv4)
 			con.s.send(packet.encode())
+
+			#####################################################
+			recv_type = other_peersocket.recv(4)
+			if(len(recv_type) != 0):
+				self.bytes_read = len(recv_type)
+				while (self.bytes_read < 4):
+					recv_type += other_peersocket.recv(4 - self.bytes_read)
+					self.bytes_read = len(recv_type)
+
+			if(recv_type.decode() == "ALGI"):
+				recv_packet = other_peersocket.recv(16)
+				self.bytes_read = len(recv_packet)
+				while (self.bytes_read < 16):
+					recv_packet += other_peersocket.recv(16 - self.bytes_read)
+					self.bytes_read = len(recv_packet)
+
+				Util.printLog('ALGI pre lock')
+				Util.globalLock.acquire()
+				Util.sessionId = recv_packet.decode()
+				if Util.mode != 'super':
+					Util.mode = 'logged'
+				Util.globalLock.release()
+				Util.printLog('ALGI post lock')
+
+				if Util.mode != 'super':
+					Util.lock.acquire()
+					db.updateConfig('mode','logged')
+					db.updateConfig('sessionId',Util.sessionId)
+					Util.lock.release()
+			#####################################################
+
 			con.deconnection()
 
 		else:
@@ -159,7 +190,8 @@ class optionsLogged:
 
 	def logout(self):
 
-		os.remove('File_System.txt')
+		file = open('File_System.txt','w')
+		file.close()
 
 		db = dataBase()
 
@@ -180,6 +212,36 @@ class optionsLogged:
 
 			Util.printLog('Richiesta LOGO a vicino ::: ' + dirV4)
 			con.s.send(packet.encode())
+
+			#################################################
+			recv_type = other_peersocket.recv(4)
+			if(len(recv_type) != 0):
+				self.bytes_read = len(recv_type)
+				while (self.bytes_read < 4):
+					recv_type += other_peersocket.recv(4 - self.bytes_read)
+					self.bytes_read = len(recv_type)
+
+			if(recv_type.decode() == "ALGO"):
+				recv_packet = other_peersocket.recv(3) # 7 - 4
+				self.bytes_read = len(recv_packet)
+				while (self.bytes_read < 3):
+					recv_packet += other_peersocket.recv(3 - self.bytes_read)
+					self.bytes_read = len(recv_packet)
+				recv_packet = recv_type + recv_packet
+
+				Util.printLog("LOGOUT da te stesso")
+				Util.printLog('Logout done. Eliminated ' + recv_packet.decode() + ' from directory')
+
+				Util.lock.acquire()
+				db.updateConfig('mode','normal')
+				Util.lock.release()
+				Util.printLog('mode normal?')
+				Util.loggedOut.acquire()
+				Util.loggedOut.notify()
+				Util.loggedOut.release()
+
+			#################################################
+
 			con.deconnection()
 
 			# Attendo una risposta al logout

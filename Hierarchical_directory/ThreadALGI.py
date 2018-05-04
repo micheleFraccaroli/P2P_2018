@@ -5,13 +5,13 @@ from dataBase import *
 from Util import Util
 from Conn import Conn
 
-class ThreadALGI(th.Thread):
-	def __init__(self, ip, port):
-		th.Thread.__init__(self)
+class ThreadALGI():
+	def __init__(self, ip, port, other_peersocket):
 		self.ip = ip
 		self.port = port
+		self.other_peersocket = other_peersocket
 
-	def run(self):
+	def ALGI(self):
 		db = dataBaseSuper()
 
 		found = db.retrieveLOGINwithIP(self.ip,self.port)
@@ -20,13 +20,10 @@ class ThreadALGI(th.Thread):
 			
 			packet = "ALGI" + found[2]
 
-			ipv4,ipv6,port = Util.ip_deformatting(self.ip, self.port)
-			
-			conn = Conn(ipv4,ipv6,port)
-			conn.connection()
-			conn.s.send(packet.encode())
-			conn.deconnection()
-			sys.exit()
+			self.other_peersocket.send(packet.encode())
+			Util.printLog("PACCHETTO ALGI REINVIATO "+str(packet))
+			#ipv4,ipv6,port = Util.ip_deformatting(self.ip, self.port)
+
 		else:
 			try:
 				self.sid = Util.ip_packet16() #generation SessionID
@@ -35,19 +32,13 @@ class ThreadALGI(th.Thread):
 
 				#generation ALGI packet
 				packet = "ALGI" + str(self.sid)
-
-				ipv4,ipv6,port = Util.ip_deformatting(self.ip, self.port)
 				
-				conn = Conn(ipv4,ipv6,port)
-				conn.connection()
-				conn.s.send(packet.encode())
-				conn.deconnection()
+				self.other_peersocket.send(packet.encode())
+
+				Util.printLog("PACCHETTO ALGI "+str(packet))
+				#ipv4,ipv6,port = Util.ip_deformatting(self.ip, self.port)
+			
 			except:
 				packet = "ALGI" + '0000000000000000'
-				ipv4,ipv6,port = Util.ip_deformatting(self.ip, self.port)
-
-				conn = Conn(ipv4,ipv6,port)
-				conn.connection()
-				conn.s.send(packet.encode())
-				conn.deconnection()
-				sys.exit()
+				#ipv4,ipv6,port = Util.ip_deformatting(self.ip, self.port)
+				self.other_peersocket.send(packet.encode())

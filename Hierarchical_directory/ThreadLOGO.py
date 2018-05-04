@@ -8,29 +8,24 @@ from dataBase import dataBaseSuper
 from Conn import Conn
 import threading as th
 
-class ThreadLOGO(th.Thread):
-    def __init__(self, pkt_logo):
-        th.Thread.__init__(self)
+class ThreadLOGO():
+    def __init__(self, pkt_logo, other_peersocket):
         self.pkt_logo = pkt_logo
         self.sessionid = self.pkt_logo[4:]
+        self.other_peersocket = other_peersocket
 
     def answer(self, count, info):
 
         rows_delete = str(count).rjust(3,'0')
         pkt_algo = "ALGO"+rows_delete
 
-        addr = Util.ip_deformatting(info[0], info[1])
-        ip6 = ipad.ip_address(info[0][16:])
-        self.con = Conn(addr[0], str(ip6), addr[2])
         try:
-            self.con.connection()
-            self.con.s.send(pkt_algo.encode())
-            self.con.deconnection()
+            self.other_peersocket.send(pkt_algo.encode())
         except IOError as expt:
             print("Errore di connessione")
             print(expt)
 
-    def run(self):
+    def LOGO(self):
         db = dataBaseSuper()
         Util.printLog("DENTRO A THREADLOGO")
         Util.lock.acquire()

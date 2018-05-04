@@ -125,7 +125,7 @@ class Central_Thread(th.Thread):
 					pktid = Util.ip_packet16()
 					addr = Util.ip_formatting(self.ipv4, self.ipv6, self.port)
 
-					Util.printLog("RICEVUTO FIND E TRASFORMO IN QUER")
+					Util.printLog("RICEVUTO FIND E TRASFORMO IN QUER " + str(recv_packet[16:].decode()))
 					new_packet = "QUER" + pktid + addr + str(self.ttl).zfill(2) + recv_packet[16:].decode()
 					Util.printLog("====> PACCHETTO DI QUER <====")
 					Util.printLog(str(new_packet))
@@ -182,19 +182,12 @@ class Central_Thread(th.Thread):
 						recv_packet += other_peersocket.recv(60 - self.bytes_read)
 						self.bytes_read = len(recv_packet)
 
-					th_ALGI = ThreadALGI(recv_packet[:55].decode(),recv_packet[55:].decode())
-					th_ALGI.start()
-
-					#sid = th_ALGI.sid
+					th_ALGI = ThreadALGI(recv_packet[:55].decode(),recv_packet[55:].decode(), other_peersocket)
+					th_ALGI.ALGI()
 
 					Util.printLog("FINE LOGIN NEL CENTRAL THREAD")
-					'''
-					img_net = Path('network_status.png')
-					if(img_net.is_file()):
-						os.remove('network_status.png')
-					Util.statusNetwork()
-					'''
 
+				'''
 				# ALGI ---
 				elif(recv_type.decode() == "ALGI"):
 					recv_packet = other_peersocket.recv(16)
@@ -216,6 +209,7 @@ class Central_Thread(th.Thread):
 						db.updateConfig('mode','logged')
 						db.updateConfig('sessionId',Util.sessionId)
 						Util.lock.release()
+				'''
 
 				# LOGO ---
 				elif(recv_type.decode() == "LOGO"):
@@ -227,9 +221,10 @@ class Central_Thread(th.Thread):
 					recv_packet = recv_type + recv_packet
 
 					Util.printLog("LOGOUT DAL SUPERPEER")
-					th_LOGO = ThreadLOGO(recv_packet.decode())
-					th_LOGO.start()
+					th_LOGO = ThreadLOGO(recv_packet.decode(), other_peersocket)
+					th_LOGO.LOGO()
 
+				'''
 				# ALGO ---
 				elif(recv_type.decode() == "ALGO"):
 					recv_packet = other_peersocket.recv(3) # 7 - 4
@@ -249,6 +244,7 @@ class Central_Thread(th.Thread):
 					Util.loggedOut.acquire()
 					Util.loggedOut.notify()
 					Util.loggedOut.release()
+				'''
 
 				# UPLOAD ---
 				elif(recv_type.decode() == "RETR"):

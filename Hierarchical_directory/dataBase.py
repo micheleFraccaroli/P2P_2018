@@ -187,8 +187,8 @@ class dataBase:
 		try:
 			c.execute('INSERT INTO superPeers VALUES(?,?)',(ip,port))
 			con.commit()
-		except:
-			pass
+		except Exception as e:
+			Util.printLog(str(e))
 
 		res = c.execute('SELECT value FROM config WHERE name = "maxNear"')
 		maxNear = res.fetchone()
