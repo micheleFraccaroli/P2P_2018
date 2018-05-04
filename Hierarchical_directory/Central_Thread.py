@@ -107,11 +107,11 @@ class Central_Thread(th.Thread):
 				elif(recv_type.decode() == "AFIN"):
 					recv_packet = other_peersocket.recv(3) # numero di md5 ottenuti
 					self.bytes_read = len(recv_packet)
+					Util.printLog("RICEVUTO AFIN")
 					while (self.bytes_read < 3):
 						recv_packet += other_peersocket.recv(3 - self.bytes_read)
 						self.bytes_read = len(recv_packet)
 
-					Util.printLog("RICEVUTO AFIN")
 					recv_afin = Recv_Afin(int(recv_packet.decode()), other_peersocket)
 					recv_afin.start()
 
@@ -187,30 +187,6 @@ class Central_Thread(th.Thread):
 
 					Util.printLog("FINE LOGIN NEL CENTRAL THREAD")
 
-				'''
-				# ALGI ---
-				elif(recv_type.decode() == "ALGI"):
-					recv_packet = other_peersocket.recv(16)
-					self.bytes_read = len(recv_packet)
-					while (self.bytes_read < 16):
-						recv_packet += other_peersocket.recv(16 - self.bytes_read)
-						self.bytes_read = len(recv_packet)
-
-					Util.printLog('ALGI pre lock')
-					Util.globalLock.acquire()
-					Util.sessionId = recv_packet.decode()
-					if Util.mode != 'super':
-						Util.mode = 'logged'
-					Util.globalLock.release()
-					Util.printLog('ALGI post lock')
-
-					if Util.mode != 'super':
-						Util.lock.acquire()
-						db.updateConfig('mode','logged')
-						db.updateConfig('sessionId',Util.sessionId)
-						Util.lock.release()
-				'''
-
 				# LOGO ---
 				elif(recv_type.decode() == "LOGO"):
 					recv_packet = other_peersocket.recv(16) # 20 - 4
@@ -223,28 +199,6 @@ class Central_Thread(th.Thread):
 					Util.printLog("LOGOUT DAL SUPERPEER")
 					th_LOGO = ThreadLOGO(recv_packet.decode(), other_peersocket)
 					th_LOGO.LOGO()
-
-				'''
-				# ALGO ---
-				elif(recv_type.decode() == "ALGO"):
-					recv_packet = other_peersocket.recv(3) # 7 - 4
-					self.bytes_read = len(recv_packet)
-					while (self.bytes_read < 3):
-						recv_packet += other_peersocket.recv(3 - self.bytes_read)
-						self.bytes_read = len(recv_packet)
-					recv_packet = recv_type + recv_packet
-
-					Util.printLog("LOGOUT da te stesso")
-					Util.printLog('Logout done. Eliminated ' + recv_packet.decode() + ' from directory')
-
-					Util.lock.acquire()
-					db.updateConfig('mode','normal')
-					Util.lock.release()
-					Util.printLog('mode normal?')
-					Util.loggedOut.acquire()
-					Util.loggedOut.notify()
-					Util.loggedOut.release()
-				'''
 
 				# UPLOAD ---
 				elif(recv_type.decode() == "RETR"):
@@ -264,5 +218,5 @@ class Central_Thread(th.Thread):
 				elif(recv_type.decode() == "EXIT"):
 					sys.exit()
 
-			if(recv_type.decode() != "AFIN"):
+			if(recv_type.decode() not in ['AFIN','FIND']):
 				other_peersocket.close()
