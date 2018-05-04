@@ -67,18 +67,18 @@ class optionsNormal:
 			con.s.send(packet.encode())
 
 			#####################################################
-			recv_type = other_peersocket.recv(4)
+			recv_type = con.s.recv(4)
 			if(len(recv_type) != 0):
 				self.bytes_read = len(recv_type)
 				while (self.bytes_read < 4):
-					recv_type += other_peersocket.recv(4 - self.bytes_read)
+					recv_type += con.s.recv(4 - self.bytes_read)
 					self.bytes_read = len(recv_type)
 
 			if(recv_type.decode() == "ALGI"):
-				recv_packet = other_peersocket.recv(16)
+				recv_packet = con.s.recv(16)
 				self.bytes_read = len(recv_packet)
 				while (self.bytes_read < 16):
-					recv_packet += other_peersocket.recv(16 - self.bytes_read)
+					recv_packet += con.s.recv(16 - self.bytes_read)
 					self.bytes_read = len(recv_packet)
 
 				Util.printLog('ALGI pre lock')
@@ -214,18 +214,18 @@ class optionsLogged:
 			con.s.send(packet.encode())
 
 			#################################################
-			recv_type = other_peersocket.recv(4)
+			recv_type = con.s.recv(4)
 			if(len(recv_type) != 0):
 				self.bytes_read = len(recv_type)
 				while (self.bytes_read < 4):
-					recv_type += other_peersocket.recv(4 - self.bytes_read)
+					recv_type += con.s.recv(4 - self.bytes_read)
 					self.bytes_read = len(recv_type)
 
 			if(recv_type.decode() == "ALGO"):
-				recv_packet = other_peersocket.recv(3) # 7 - 4
+				recv_packet = con.s.recv(3) # 7 - 4
 				self.bytes_read = len(recv_packet)
 				while (self.bytes_read < 3):
-					recv_packet += other_peersocket.recv(3 - self.bytes_read)
+					recv_packet += con.s.recv(3 - self.bytes_read)
 					self.bytes_read = len(recv_packet)
 				recv_packet = recv_type + recv_packet
 

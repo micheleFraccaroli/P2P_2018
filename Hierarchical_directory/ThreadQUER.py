@@ -31,12 +31,14 @@ class ThreadQUER(th.Thread):
 	def answer(self, db, file_list, pktid, ip, portB):
 		addr = Util.ip_deformatting(ip, portB)
 		ip6 = ipad.ip_address(ip[16:])
+		Util.printLog("PARAMETRI VARI PER L'AQUE ========> " + str(addr[0]) + " " + str(str(ip6)) + " " + str(addr[2]))
 		self.con = Conn(addr[0], str(ip6), addr[2])
 
 		if(self.con.connection()):
 			for file in file_list:
 				peer_info = db.retrieveLOGIN(file[0])
 				answer = "AQUE"+pktid+peer_info[0]+peer_info[1]+file[1]+file[2]
+				Util.printLog("AQUE REINVIATO :::: " + str(answer))
 				self.con.s.send(answer.encode())
 				Util.printLog(answer)
 			self.con.deconnection()
@@ -79,12 +81,15 @@ class ThreadQUER(th.Thread):
 		lock.release()
 		if(file_found):
 			#rispondo
+			Util.printLog("INVIO L'AQUE --------> " + str(file_found))
+			Util.printLog("ADDR INVIO AQUE ------> " + str(ip) + "  " + str(peer_port))
 			self.answer(db, file_found, pktid, ip, peer_port)
 		if(ttl>1):
 			Util.printLog("[QUER]: eseguo l'inoltro ai vicini della richiesta")
 			#vado a decrementare il ttl di uno e costruisco la nuova query da inviare ai vicini
 			self.ttl_new = self.new_ttl(ttl)
 			self.new_quer = "QUER"+pktid+ip+peer_port+self.ttl_new+last_part_pkt
+
 			lock.acquire()
 			self.search_neighbors(db, ip_request, self.new_quer)
 			lock.release()
@@ -96,12 +101,12 @@ class ThreadQUER(th.Thread):
 		self.ip  = self.from_peer[20:75]
 		self.peer_port = self.from_peer[75:80]
 		self.ttl = int(self.from_peer[80:82])
-		self.string = self.from_peer[82:].rstrip()
+		self.string = self.from_peer[82:].strip()
 
 		db = dataBaseSuper()
 		Util.lock.acquire()
 		res = db.retrieveCounterRequest(self.pktid, self.ip)
-
+		Util.printLog("THREADQUER DI RES ----------_> " + str(res))
 		if(res == 0):
 			self.timestamp = time.time()
 			db.insertRequest(self.pktid, self.ip, self.timestamp)

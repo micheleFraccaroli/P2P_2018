@@ -42,3 +42,5 @@ class ThreadALGI():
 				packet = "ALGI" + '0000000000000000'
 				#ipv4,ipv6,port = Util.ip_deformatting(self.ip, self.port)
 				self.other_peersocket.send(packet.encode())
+
+		self.other_peersocket.close()
