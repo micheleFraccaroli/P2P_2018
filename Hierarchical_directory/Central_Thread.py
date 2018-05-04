@@ -109,11 +109,11 @@ class Central_Thread(th.Thread):
 				elif(recv_type.decode() == "AFIN"):
 					recv_packet = other_peersocket.recv(3) # numero di md5 ottenuti
 					self.bytes_read = len(recv_packet)
+					Util.printLog("RICEVUTO AFIN")
 					while (self.bytes_read < 3):
 						recv_packet += other_peersocket.recv(3 - self.bytes_read)
 						self.bytes_read = len(recv_packet)
 
-					Util.printLog("RICEVUTO AFIN")
 					recv_afin = Recv_Afin(int(recv_packet.decode()), other_peersocket)
 					recv_afin.start()
 
@@ -189,8 +189,6 @@ class Central_Thread(th.Thread):
 
 					Util.printLog("FINE LOGIN NEL CENTRAL THREAD")
 
-				
-
 				# LOGO ---
 				elif(recv_type.decode() == "LOGO"):
 					recv_packet = other_peersocket.recv(16) # 20 - 4
@@ -203,7 +201,6 @@ class Central_Thread(th.Thread):
 					Util.printLog("LOGOUT DAL SUPERPEER")
 					th_LOGO = ThreadLOGO(recv_packet.decode(), other_peersocket)
 					th_LOGO.LOGO()
-
 
 				# UPLOAD ---
 				elif(recv_type.decode() == "RETR"):
@@ -223,5 +220,5 @@ class Central_Thread(th.Thread):
 				elif(recv_type.decode() == "EXIT"):
 					sys.exit()
 
-			if(recv_type.decode() != "AFIN"):
+			if(recv_type.decode() not in ['AFIN','FIND']):
 				other_peersocket.close()

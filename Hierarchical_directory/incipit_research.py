@@ -5,6 +5,7 @@ import Util
 from Conn import Conn
 import ipaddress as ipad
 from dataBase import dataBase
+from Recv_Afin import Recv_Afin
 
 class incipit_research:
 	def __init__(self, search):
@@ -33,7 +34,24 @@ class incipit_research:
 
 			Util.printLog('Incipit corretto')
 			con.s.send(pack.encode())
-			con.deconnection()
-		
+			
+
+			recv_type = con.s.recv(4)
+			if(len(recv_type) != 0):
+				self.bytes_read = len(recv_type)
+				while (self.bytes_read < 4):
+					recv_type += con.s.recv(4 - self.bytes_read)
+					self.bytes_read = len(recv_type)
+
+			if(recv_type.decode() == "AFIN"):
+				recv_packet = con.s.recv(3) # numero di md5 ottenuti
+				self.bytes_read = len(recv_packet)
+				Util.printLog("RICEVUTO AFIN")
+				while (self.bytes_read < 3):
+					recv_packet += con.s.recv(3 - self.bytes_read)
+					self.bytes_read = len(recv_packet)
+
+				recv_afin = Recv_Afin(int(recv_packet.decode()), con.s)
+				recv_afin.start()		
 		else:
-			Util.printLog('Incipit fallita')
+			Util.printLog('Incipit fallito')

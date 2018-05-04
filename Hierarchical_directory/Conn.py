@@ -19,7 +19,7 @@ class Conn:
         # this is for ipv4 and ipv6
             
         ip = self.ip_choice(0,1) #se 0:ipv4 altrimenti 1:ipv6
-        
+
         if(ip == 1):
             self.ipp2p = self.ipv6
         else:

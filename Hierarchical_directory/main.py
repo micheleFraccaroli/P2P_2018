@@ -244,11 +244,6 @@ class optionsLogged:
 
 			con.deconnection()
 
-			# Attendo una risposta al logout
-			Util.loggedOut.acquire()
-			Util.loggedOut.wait()
-			Util.loggedOut.release()
-
 			# Ripristino la modalità a 'normal'
 			Util.globalLock.acquire()
 			Util.mode = 'normal'
