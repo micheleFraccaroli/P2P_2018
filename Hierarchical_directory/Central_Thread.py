@@ -128,7 +128,7 @@ class Central_Thread(th.Thread):
 					addr = Util.ip_formatting(self.ipv4, self.ipv6, self.port)
 
 					Util.printLog("RICEVUTO FIND E TRASFORMO IN QUER " + str(recv_packet[16:].decode()))
-					new_packet = "QUER" + pktid + addr + str(self.ttl).zfill(2) + recv_packet[16:].decode()
+					new_packet = "QUER" + pktid + addr + str(self.ttl).zfill(2) + recv_packet[16:].decode().ljust(20)
 					Util.printLog("====> PACCHETTO DI QUER <====")
 					Util.printLog(str(new_packet))
 					Util.printLog("=============================")
