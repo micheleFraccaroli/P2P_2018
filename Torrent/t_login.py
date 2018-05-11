@@ -29,4 +29,4 @@ class t_login(th.Thread):
 
 		db.login(ip, port, sid)
 
-		other_peersocket.close()
+		self.other_peersocket.close()

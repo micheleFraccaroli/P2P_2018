@@ -2,7 +2,7 @@ import socket
 import threading as th
 import math
 
-class fchu(th.Thread):
+class t_fchu(th.Thread):
 	def __init__(self, other_peersocket):
 		th.Thread.__init__(self)
 		self.other_peersocket = other_peersocket
@@ -26,4 +26,7 @@ class fchu(th.Thread):
 		packet_resp = "AFCH" + str(hitpeer).zfill(3)
 
 		for k in ip_part_dict.keys():
-			packet_resp = packet_resp + 
+			packet_resp = packet_resp + str(k) + str(ip_part_dict[k])
+
+		self.other_peersocket.s.send(packet_resp.encode())
+		self.other_peersocket.close()

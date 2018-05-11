@@ -22,6 +22,7 @@ lock = Lock()
 globalLock = Lock()
 loggedOut = Condition()
 waitMenu = Condition()
+globalDict = {} # sid : list of md5
 
 def ip_formatting(ipv4,ipv6,port):
 

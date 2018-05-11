@@ -3,6 +3,7 @@ import sys
 import os
 import threading as th
 from t_login import t_login
+from t_fchu import t_fchu
 
 class tracker:
 	def __init__(self):
@@ -41,4 +42,7 @@ class tracker:
 					th_LOGIN = t_login(other_peersocket)
 					th_LOGIN.start()
 
-				
+				# FCHU ---
+				if(recv_type.decode() == "FCHU"):
+					th_FCHU = t_fchu(other_peersocket)
+					th_FCHU.start()
