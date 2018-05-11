@@ -32,3 +32,24 @@ class dataBase:
 			con.commit()
 			con.close()
 			return str(npart)
+
+		def search_file(self, sessionid, md5):
+			con = s3.connect('TorrentDB.db')
+			c = con.cursor()
+
+			res = c.execute('SELECT count(*) FROM file WHERE sessionid=? AND md5=?',(sessionid, md5))
+
+			con.commit()
+			con.close()
+			return res[0]
+
+		def update_file(self, sessionid, md5, name, lenfile, lenpart):
+			con = s3.connect('TorrentDB.db')
+			c = con.cursor()
+			npart = math.ceil((lenfile/lenpart))
+
+			res = c.execute('UPDATE file SET name = ?, lenfile = ?, lenpart = ?, npart = ?,  WHERE md5 = ? AND sessionid = ?', (name, lenfile, lenpart, npart, md5, sessionid))
+
+			con.commit()
+			con.close()
+			return str(npart)

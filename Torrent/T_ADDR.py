@@ -30,8 +30,18 @@ class T_ADDR(th.Thread):
         self.md5 = self.addr_pkt[136:]
 
         db = dataBase()
-        npart = db.insert_file(self.sessionid, self.md5, self.filename, self.lenfile, self.lenpart)
-        self.aadr_pkt = "AADR"+npart
+        Util.lock.acquire()
+        search = db.search_file(self.sessionid, self.md5)
 
-        self.socket.send(self.addr_pkt.encode())
-        self.socket.close()
+        if(serach == 0):
+            npart = db.insert_file(self.sessionid, self.md5, self.filename, self.lenfile, self.lenpart)
+            Util.lock.release()
+            self.aadr_pkt = "AADR"+npart
+            self.socket.send(self.addr_pkt.encode())
+            self.socket.close()
+        else:
+            npart = db.update_file(self.sessionid, self.md5, self.filename, self.lenfile, self.lenpart)
+            self.aadr_pkt = "AADR"+npart
+            Util.lock.release()
+            self.socket.send(self.addr_pkt.encode())
+            self.socket.close()
