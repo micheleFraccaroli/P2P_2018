@@ -29,14 +29,14 @@ class dataBase:
 			con = s3.connect('TorrentDB.db')
 			c = con.cursor()
 
-			res0 = c.execute('SELECT COUNT(*) FROM f_in WHERE md5 = ?', (md5,))
-			res0 = c.fetchone()
-			res1 = c.execute('SELECT id FROM f_in WHERE md5 = ?', (md5,))
-			res1 = c.fetchall()
+			hitpeer = c.execute('SELECT COUNT(*) FROM f_in WHERE md5 = ?', (md5,))
+			hitpeer = c.fetchone()
+			id_list = c.execute('SELECT id FROM f_in WHERE md5 = ?', (md5,))
+			id_list = c.fetchall()
 
 			con.close()
 
-			return res0, res1
+			return hitpeer, id_list
 
 		def getInterestedPartList(self,id):
 			con = s3.connect('TorrentDB.db')
