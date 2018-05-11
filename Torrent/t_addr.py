@@ -24,26 +24,23 @@ class t_addr(th.Thread):
                 self.addr_pkt += self.socket.recv(164-self.bytes_read)
                 self.bytes_read = len(self.addr_pkt)
 
-        self.sessionid = self.addr_pkt[4:20]
-        self.lenfile = self.addr_pkt[20:30]
-        self.lenpart = self.addr_pkt[30:36]
-        self.filename = self.addr_pkt[36:136]
-        self.md5 = self.addr_pkt[136:]
+        self.sessionid = self.addr_pkt[4:20].decode()
+        self.lenfile = self.addr_pkt[20:30].decode()
+        self.lenpart = self.addr_pkt[30:36].decode()
+        self.filename = self.addr_pkt[36:136].decode()
+        self.md5 = self.addr_pkt[136:].decode()
 
         db = dataBase()
-        Util.lock.acquire()
-        search = db.search_file(self.sessionid, self.md5)
+        search = db.check_file(self.sessionid, self.md5)
 
         if(serach == 0):
-            npart = db.insert_file(self.sessionid, self.md5, self.filename, self.lenfile, self.lenpart)
-            Util.lock.release()
+            npart = db.insert_file(self.sessionid, self.md5, self.filename, int(self.lenfile), int(self.lenpart))
             self.aadr_pkt = "AADR"+npart
             self.socket.send(self.addr_pkt.encode())
             self.socket.close()
         else:
-            npart = db.update_file(self.sessionid, self.md5, self.filename, self.lenfile, self.lenpart)
+            npart = db.update_file(self.sessionid, self.md5, self.filename, int(self.lenfile), int(self.lenpart))
             self.aadr_pkt = "AADR"+npart
-            Util.lock.release()
             self.socket.send(self.addr_pkt.encode())
             self.socket.close()
 
@@ -57,5 +54,5 @@ class t_addr(th.Thread):
         db.insertInterested(self.sessionid, peer_addr[0], peer_addr[1])
 
         # insert into bitmapping
-        bits = [] # da riempire, lista degli interi che rappresentano i bits
+        bits = [] # da riempire, lista degli interi che rappresentano i bits. USARE socketc.py
         db.insertBitmapping(self.md5, self.sessionid, bits)

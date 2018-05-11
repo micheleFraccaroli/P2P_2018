@@ -31,6 +31,10 @@ class t_fchu(th.Thread):
 			addr = peer[0] + peer[1]
 			interested_peer[isid] = addr
 
+		'''
+		inserisci in bitmapping tutti zeri qui
+		'''
+
 		packet_resp = "AFCH" + str(hitpeer).zfill(3)
 		self.other_peersocket.s.send(packet_resp.encode())
 
