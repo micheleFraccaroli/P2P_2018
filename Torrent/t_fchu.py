@@ -1,6 +1,8 @@
 import socket
 import threading as th
 import math
+import codecs
+from dataBase import dataBase
 
 class t_fchu(th.Thread):
 	def __init__(self, other_peersocket):
@@ -10,7 +12,9 @@ class t_fchu(th.Thread):
 
 	def run(self):
 		db = dataBase()
-		id_list = []
+		interested_sid = []
+		resp_list = []
+		interested_peer = {}
 		ip_part_dict = {}
 
 		recv_packet = self.other_peersocket.recv(48)
@@ -19,14 +23,23 @@ class t_fchu(th.Thread):
 			recv_packet += other_peersocket.recv(48 - self.bytes_read)
 			self.bytes_read = len(recv_packet)
 
-		hitpeer,id_list = db.getIDf_in(recv_packet[16:].decode())
-
-		ip_part_dict = db.getInterestedPartList(id_list)
+		# retrieving from database
+		hitpeer = db.getHitpeer(recv_packet[16:].decode())
+		interested_sid = db.getInterestedPeers(recv_packet[16:].decode())
+		for isid in interested_sid:
+			peer = db.getPeerBySid(isid[0])
+			addr = peer[0] + peer[1]
+			interested_peer[isid] = addr
 
 		packet_resp = "AFCH" + str(hitpeer).zfill(3)
-
-		for k in ip_part_dict.keys():
-			packet_resp = packet_resp + str(k) + str(ip_part_dict[k])
-
 		self.other_peersocket.s.send(packet_resp.encode())
+
+		for sid in interested_peer.keys():
+			resp_list.append(interested_peer[sid])
+			self.other_peersocket.s.send(packet_resp.encode())
+
+			bits = db.getBitmapping(sid, recv_packet[16:].decode())
+			for b in bits:
+				self.other_peersocket.s.send(codecs.encode(chr(b[0],'iso-8859-1')))
+
 		self.other_peersocket.close()

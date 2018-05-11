@@ -4,6 +4,8 @@ import os
 import threading as th
 from t_login import t_login
 from t_fchu import t_fchu
+from t_addr import t_addr
+from t_rpad import t_rpad
 
 class tracker:
 	def __init__(self):
@@ -46,3 +48,13 @@ class tracker:
 				if(recv_type.decode() == "FCHU"):
 					th_FCHU = t_fchu(other_peersocket)
 					th_FCHU.start()
+
+				# ADDR ---
+				if(recv_type.decode() == "ADDR"):
+					th_ADDR = t_addr(other_peersocket)
+					th_ADDR.start()
+
+				# RPAD ---
+				if(recv_type.decode() == "RPAD"):
+					th_RPAD = t_rpad(other_peersocket)
+					th_RPAD.start()

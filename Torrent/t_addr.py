@@ -13,6 +13,7 @@ class t_addr(th.Thread):
     def __init__(self, socket):
         th.Thread.__init__(self)
         self.socket = socket
+        self.list = [] # lista per dizionario globale
 
     def run(self):
         self.addr_pkt = self.socket.recv(164)
@@ -30,8 +31,31 @@ class t_addr(th.Thread):
         self.md5 = self.addr_pkt[136:]
 
         db = dataBase()
-        npart = db.insert_file(self.sessionid, self.md5, self.filename, self.lenfile, self.lenpart)
-        self.aadr_pkt = "AADR"+npart
+        Util.lock.acquire()
+        search = db.search_file(self.sessionid, self.md5)
 
-        self.socket.send(self.addr_pkt.encode())
-        self.socket.close()
+        if(serach == 0):
+            npart = db.insert_file(self.sessionid, self.md5, self.filename, self.lenfile, self.lenpart)
+            Util.lock.release()
+            self.aadr_pkt = "AADR"+npart
+            self.socket.send(self.addr_pkt.encode())
+            self.socket.close()
+        else:
+            npart = db.update_file(self.sessionid, self.md5, self.filename, self.lenfile, self.lenpart)
+            self.aadr_pkt = "AADR"+npart
+            Util.lock.release()
+            self.socket.send(self.addr_pkt.encode())
+            self.socket.close()
+
+        # insert or update md5 in global dict
+        self.list.append(Util.globalDict[self.sessionid])
+        self.list.append(self.md5)
+        Util.globalDict[self.sessionid] = self.list
+
+        # insert into interested 
+        peer_addr = db.getPeerBySid(self.sessionid)
+        db.insertInterested(self.sessionid, peer_addr[0], peer_addr[1])
+
+        # insert into bitmapping
+        bits = [] # da riempire, lista degli interi che rappresentano i bits
+        db.insertBitmapping(self.md5, self.sessionid, bits)
