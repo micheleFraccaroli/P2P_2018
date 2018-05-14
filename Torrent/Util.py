@@ -11,7 +11,7 @@ from curses import *
 from dataBase import dataBase
 from dataBase import dataBase
 from pathlib import Path
-import toPlotNetwork
+#import toPlotNetwork
 from threading import Semaphore, Lock
 
 # Variabili globali
