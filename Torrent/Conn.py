@@ -2,7 +2,7 @@ import socket
 import random
 
 class Conn:
-    def __init__(self, ipv4, ipv6, port):
+    def __init__(self, ipv4=None, ipv6=None, port=None):
         self.ipv4 = ipv4
         self.ipv6 = ipv6
         self.pp2p = port
@@ -44,3 +44,13 @@ class Conn:
             self.s.close()
         except IOError as expt:
             print (expt)
+
+    def initializeSocket(self):
+
+        peersocket = socket.socket(socket.AF_INET6, socket.SOCK_STREAM)
+        peersocket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        peersocket.bind(('', self.pp2p))
+
+        peersocket.listen(20)
+
+        return peersocket

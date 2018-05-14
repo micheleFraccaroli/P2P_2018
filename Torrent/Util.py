@@ -12,6 +12,7 @@ from dataBase import dataBase
 from dataBase import dataBase
 from pathlib import Path
 import toPlotNetwork
+from threading import Semaphore, Lock
 
 # Variabili globali
 mode = None # Modalità di utilizzo del programma: 'normal', 'super', 'update', 'logged'
@@ -23,6 +24,27 @@ globalLock = Lock()
 loggedOut = Condition()
 waitMenu = Condition()
 globalDict = {} # sid : list of md5
+
+
+# Grafica
+rows = [] # Lista di tags dei file in download
+uniqueIdRow = 0
+
+# Dimensioni rettangoli e linee
+widthPart = 3
+heightPart = 50
+offset = 50
+nameFileHeight = 20
+heightLine = 15
+
+heightRow = heightPart + offset + nameFileHeight + heightLine # Altezza di una barra di un file
+
+# Testo
+LeftPaddingText = 2
+
+activeDownload = 3
+dSem = Semaphore(activeDownload)
+lockGraphics = Lock()
 
 def ip_formatting(ipv4,ipv6,port):
 
@@ -384,6 +406,8 @@ def updatePeers():
     globalLock.acquire()
     Util.mode = mode
     globalLock.release()
+
+
 
 ########################################################################################
 
