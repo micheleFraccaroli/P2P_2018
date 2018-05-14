@@ -3,24 +3,8 @@ import codecs
 from math import *
 import sys
 
-'''
-c = Conn('127.0.0.1','::1',3000)
-
-c.connection()
-a = ['00000001','11111111','11110000','00001111']
-##### int(log(value,2)) potenza massima da controllare
-
-c.s.send('fracca'.encode())
-for el in a:
-
-	charAscii = chr(int(el,2))
-
-	c.s.send(codecs.encode(charAscii,'iso-8859-1'))
-c.s.send('geme'.encode())
-c.deconnection()
-'''
-
 totalBit = int(sys.argv[1])
+tot = totalBit
 byte = []
 
 # Blocchi completi
@@ -43,7 +27,12 @@ print(byte)
 
 c = Conn('127.0.0.1','::1',3000)
 
+box = ceil(tot/8)
+
 c.connection()
+c.s.send(str(box).zfill(3).encode())
+c.s.send(str(tot).zfill(3).encode())
+c.s.send(str(len(byte)//box).zfill(3).encode())
 for el in byte:
 
 	charAscii = chr(el)
