@@ -1,17 +1,47 @@
+import Util
+from Config import Config
 import sqlite3 as s3
 import math
+from pathlib import Path
 
 class dataBase:
 	def __init__(self):
 
-		def create(self):
-			con = s3.connect('TorrentDB.db')
-			c = con.cursor()
+		def create(self, mode):
+			
+			if not Path('TorrentDB.db').is_file():
 
-			c.execute('CREATE TABLE IF NOT EXISTS login (ip VARCHAR(55) NOT NULL, port VARCHAR(5) NOT NULL, idSession VARCHAR(16) NOT NULL,PRIMARY KEY(ip))')
-			c.execute('CREATE TABLE IF NOT EXISTS file (sessionid VARCHAR(16) NOT NULL, md5 VARCHAR(32) NOT NULL, name VARCHAR(100), lenfile VARCHAR(10), lenpart VARCHAR(6), npart VARCHAR(8),PRIMARY KEY(sessionid, md5))')
-			con.commit()
-			con.close()
+				config = Config()
+
+				con = s3.connect('TorrentDB.db')
+				c = con.cursor()
+
+				c.execute('CREATE TABLE IF NOT EXISTS login (ip VARCHAR(55) NOT NULL, port VARCHAR(5) NOT NULL, idSession VARCHAR(16) NOT NULL,PRIMARY KEY(ip))')
+				c.execute('CREATE TABLE IF NOT EXISTS file (sessionid VARCHAR(16) NOT NULL, md5 VARCHAR(32) NOT NULL, name VARCHAR(100), lenfile VARCHAR(10), lenpart VARCHAR(6), npart VARCHAR(8),PRIMARY KEY(sessionid, md5))')
+				c.execute('CREATE TABLE IF NOT EXISTS config (name VARCHAR(20) NOT NULL, value VARCHAR(50) NOT NULL, PRIMARY KEY(name))')
+
+				# Configurazione
+				for el in config.__dict__:
+					c.execute('INSERT INTO config VALUES (?,?)',(el,str(config.__dict__[el])))
+
+				c.execute('INSERT INTO config VALUES ("mode",?)', (mode,))
+				c.execute('INSERT INTO config VALUES ("sessionId","default")')
+				
+				con.commit()
+				con.close()
+
+			else: # Database già esistente, riutilizzo le impostazioni
+
+			Util.sessionId = self.retrieveConfig(('sessionId',))
+
+			sessionMode = self.retrieveConfig(('mode',))
+
+			if sessionMode == mode:
+
+				return ['OK', mode]
+
+			else:
+				return ['ER', sessionMode]
 
 		def login(self, ip, port, sid):
 			con = s3.connect('TorrentDB.db')
