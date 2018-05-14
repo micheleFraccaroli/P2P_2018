@@ -1,9 +1,11 @@
 import socket
 import sys
+import math
 import os
 import ipaddress as ipad
 from dataBase import dataBase
 import threading as th
+import partList_gen as pL
 
 #thread che si occupa della gestione dell'aggiunta di un file proveniente da un peer
 
@@ -11,6 +13,7 @@ class t_addr(th.Thread):
     def __init__(self, socket):
         th.Thread.__init__(self)
         self.socket = socket
+        self.list = [] # lista per dizionario globale
 
     def run(self):
         self.addr_pkt = self.socket.recv(164)
@@ -42,6 +45,19 @@ class t_addr(th.Thread):
             self.socket.send(self.aadr_pkt.encode())
             self.socket.close()
 
+        # insert or update md5 in global dict
+        self.list.append(Util.globalDict[self.sessionid])
+        self.list.append(self.md5)
+        Util.globalDict[self.sessionid] = self.list
+
+        # insert into interested
+        peer_addr = db.getPeerBySid(self.sessionid)
+        db.insertInterested(self.sessionid, peer_addr[0], peer_addr[1])
+
+        # insert into bitmapping
+        totalBit = math.ceil((self.lenfile / self.lenpart))
+        bits = pL.partList_gen(totalBit, 255)
+        db.insertBitmapping(self.md5, self.sessionid, bits)
 
 if __name__ == "__main__":
 
