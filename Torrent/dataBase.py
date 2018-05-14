@@ -37,6 +37,32 @@ class dataBase:
 
 			return hitpeer
 
+		def insertBitmapping(self, md5, sid, bits):
+			con = s3.connect('TorrentDB.db')
+			c = con.cursor()
+			
+			query = 'INSERT INTO bitmapping VALUES('
+
+			for b in bits:
+				query = query + md5 + sid + b + '),'
+
+			query = query[:len(query)-1]
+
+			c.execute(query)
+
+			con.commit()
+			con.close()
+
+		def retrieveBits(self, md5, sid, part):
+			con = s3.connect('TorrentDB.db')
+			c = con.cursor()
+
+			c.execute('SELECT bits FROM bitmapping WHERE md5 = ? AND sid = ? LIMIT 1 OFFSET ?', (md5, sid, (part-1)))
+			res = c.fetchone()
+
+			con.close()
+			return res[0]
+
 		def getBitmapping(self,sid, md5):
 			con = s3.connect('TorrentDB.db')
 			c = con.cursor()
@@ -110,22 +136,6 @@ class dataBase:
 
 			return str(npart)
 
-		def insertBitmapping(self, md5, sid, bits):
-			con = s3.connect('TorrentDB.db')
-			c = con.cursor()
-
-			query = 'INSERT INTO bitmapping VALUES('
-
-			for b in bits:
-				query = query + md5 + sid + b + '),'
-
-			query = query[:len(query)-1]
-
-			c.execute(query)
-
-			con.commit()
-			con.close()
-
 		def updatePart(self, partNum, md5, sid):
 			con = s3.connect('TorrentDB.db')
 			c = con.cursor()
@@ -155,3 +165,13 @@ class dataBase:
 
 			con.close()
 			return nmd5[0], file
+
+		def retrieveInfoFile(self, md5):
+			con = s3.connect('TorrentDB.db')
+			c = con.cursor()
+
+			c.execute('SELECT lenfile, lenpart FROM file WHERE ms5 = ' + md5)
+			res = c.fetchone()
+
+			con.close()
+			return res

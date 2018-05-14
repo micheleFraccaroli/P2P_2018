@@ -1,6 +1,7 @@
 import socket
 import threading as th
 import math
+import partList_gen as pL
 import codecs
 from dataBase import dataBase
 
@@ -31,9 +32,11 @@ class t_fchu(th.Thread):
 			addr = peer[0] + peer[1]
 			interested_peer[isid] = addr
 
-		'''
-		inserisci in bitmapping tutti zeri qui
-		'''
+		# insert into db all 0 
+		infoFile = db.retrieveInfoFile(recv_packet[16:].decode())
+		totalBit = math.ceil((infoFile[0] / infoFile[1]))
+		bits = pL.partList_gen(totalBit, 0)
+		db.insertBitmapping(recv_packet[16:].decode(), recv_packet[:16].decode(), bits)
 
 		packet_resp = "AFCH" + str(hitpeer).zfill(3)
 		self.other_peersocket.s.send(packet_resp.encode())

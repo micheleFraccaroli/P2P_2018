@@ -1,11 +1,13 @@
 import socket
 import Util
 import sys
+import math
 import os
 import ipaddress as ipad
 from dataBase import dataBase
 from Conn import Conn
 import threading as th
+import partList_gen as pL
 
 #thread che si occupa della gestione dell'aggiunta di un file proveniente da un peer
 
@@ -54,5 +56,6 @@ class t_addr(th.Thread):
         db.insertInterested(self.sessionid, peer_addr[0], peer_addr[1])
 
         # insert into bitmapping
-        bits = [] # da riempire, lista degli interi che rappresentano i bits. USARE socketc.py
+        totalBit = math.ceil((self.lenfile / self.lenpart))
+        bits = pL.partList_gen(totalBit, 255)
         db.insertBitmapping(self.md5, self.sessionid, bits)
