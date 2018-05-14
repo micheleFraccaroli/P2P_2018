@@ -1,11 +1,9 @@
 import socket
-import Util
 import sys
 import math
 import os
 import ipaddress as ipad
 from dataBase import dataBase
-from Conn import Conn
 import threading as th
 import partList_gen as pL
 
@@ -26,24 +24,25 @@ class t_addr(th.Thread):
                 self.addr_pkt += self.socket.recv(164-self.bytes_read)
                 self.bytes_read = len(self.addr_pkt)
 
-        self.sessionid = self.addr_pkt[4:20].decode()
-        self.lenfile = self.addr_pkt[20:30].decode()
-        self.lenpart = self.addr_pkt[30:36].decode()
-        self.filename = self.addr_pkt[36:136].decode()
-        self.md5 = self.addr_pkt[136:].decode()
+        self.sessionid = self.addr_pkt[0:16].decode()
+        self.lenfile = int(self.addr_pkt[16:26].decode())
+        self.lenpart = int(self.addr_pkt[26:32].decode())
+        self.filename = self.addr_pkt[32:132].decode().strip(' ')
+        self.md5 = self.addr_pkt[132:].decode()
 
         db = dataBase()
+        db.create()
         search = db.check_file(self.sessionid, self.md5)
 
-        if(serach == 0):
-            npart = db.insert_file(self.sessionid, self.md5, self.filename, int(self.lenfile), int(self.lenpart))
+        if(search == 0):
+            npart = db.insert_file(self.sessionid, self.md5, self.filename, self.lenfile, self.lenpart)
             self.aadr_pkt = "AADR"+npart
-            self.socket.send(self.addr_pkt.encode())
+            self.socket.send(self.aadr_pkt.encode())
             self.socket.close()
         else:
-            npart = db.update_file(self.sessionid, self.md5, self.filename, int(self.lenfile), int(self.lenpart))
+            npart = db.update_file(self.sessionid, self.md5, self.filename, self.lenfile, self.lenpart)
             self.aadr_pkt = "AADR"+npart
-            self.socket.send(self.addr_pkt.encode())
+            self.socket.send(self.aadr_pkt.encode())
             self.socket.close()
 
         # insert or update md5 in global dict
@@ -51,7 +50,7 @@ class t_addr(th.Thread):
         self.list.append(self.md5)
         Util.globalDict[self.sessionid] = self.list
 
-        # insert into interested 
+        # insert into interested
         peer_addr = db.getPeerBySid(self.sessionid)
         db.insertInterested(self.sessionid, peer_addr[0], peer_addr[1])
 
@@ -59,3 +58,15 @@ class t_addr(th.Thread):
         totalBit = math.ceil((self.lenfile / self.lenpart))
         bits = pL.partList_gen(totalBit, 255)
         db.insertBitmapping(self.md5, self.sessionid, bits)
+
+if __name__ == "__main__":
+
+    peersocket = socket.socket(socket.AF_INET6, socket.SOCK_STREAM)
+    peersocket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+    peersocket.bind(('', 3000))
+
+    peersocket.listen(20)
+    other_peersocket, addr = peersocket.accept()
+
+    th_addr =  t_addr(other_peersocket)
+    th_addr.start()
