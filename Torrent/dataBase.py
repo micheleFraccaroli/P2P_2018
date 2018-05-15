@@ -32,16 +32,16 @@ class dataBase:
 
 		else: # Database già esistente, riutilizzo le impostazioni
 
-		Util.sessionId = self.retrieveConfig(('sessionId',))
+			Util.sessionId = self.retrieveConfig(('sessionId',))
 
-		sessionMode = self.retrieveConfig(('mode',))
+			sessionMode = self.retrieveConfig(('mode',))
 
-		if sessionMode == mode:
+			if sessionMode == mode:
 
-			return ['OK', mode]
+				return ['OK', mode]
 
-		else:
-			return ['ER', sessionMode]
+			else:
+				return ['ER', sessionMode]
 
 	def login(self, ip, port, sid):
 		con = s3.connect('TorrentDB.db')

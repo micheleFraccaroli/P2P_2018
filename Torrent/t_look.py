@@ -24,7 +24,7 @@ class t_look(th.Thread):
         self.search = self.look_pkt[16:].decode().strip()
         print(self.search)
         db = dataBase()
-        db.create()
+        #db.create()
         nmd5, res = db.search_files(self.search)
 
         self.aloo_pkt = "ALOO"+str(nmd5).zfill(3)

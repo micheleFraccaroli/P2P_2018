@@ -31,7 +31,7 @@ class t_addr(th.Thread):
         self.md5 = self.addr_pkt[132:].decode()
 
         db = dataBase()
-        db.create()
+        #db.create()
         search = db.check_file(self.sessionid, self.md5)
 
         if(search == 0):
