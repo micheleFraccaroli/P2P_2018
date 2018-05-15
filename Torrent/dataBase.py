@@ -205,7 +205,7 @@ class dataBase:
 	import sqlite3 as s3
 
 def checkLogout(sid):
-		con = s3.connect('TorrentDB_test.db')
+		con = s3.connect('TorrentDB.db')
 		c = con.cursor()
 
 		c.execute('SELECT md5 FROM file WHERE sessionid = "' + sid + '"')
@@ -266,3 +266,13 @@ def checkLogout(sid):
 			return "NLOG", partdown_final
 		else:
 			return "ALOG", partdown_final
+
+		# login del peer
+		def insertSid(self, sid):
+			con = s3.connect('TorrentDB.db')
+			c = con.cursor()
+
+			c.execute('INSERT INTO config VALUES("sid", ?)', (sid,))
+
+			con.commit()
+			con.close()
