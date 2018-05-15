@@ -1,19 +1,47 @@
+import Util
+from Config import Config
 import sqlite3 as s3
 import math
+from pathlib import Path
 
 class dataBase:
-	def create(self):
-		con = s3.connect('TorrentDB.db')
-		c = con.cursor()
 
-		c.execute('CREATE TABLE IF NOT EXISTS login (ip VARCHAR(55) NOT NULL, port VARCHAR(5) NOT NULL, idSession VARCHAR(16) NOT NULL,PRIMARY KEY(ip))')
-		#c.execute('CREATE TABLE IF NOT EXISTS interested (sid VARCHAR(16), ip VARCHAR(55) NOT NULL, port VARCHAR(5) NOT NULL,PRIMARY KEY(sid))')
-		c.execute('CREATE TABLE IF NOT EXISTS f_in (md5 VARCHAR(32), sid VARCHAR(16), FOREIGN KEY(md5) REFERENCES file(md5)')
-		c.execute('CREATE TABLE IF NOT EXISTS file (sessionid VARCHAR(16) NOT NULL, md5 VARCHAR(32) NOT NULL, name VARCHAR(100), lenfile INTEGER(10), lenpart INTEGER(6), npart INTEGER(8),PRIMARY KEY(sessionid, md5))')
-		c.execute('CREATE TABLE IF NOT EXISTS bitmapping (id INTEGER, md5 VARCHAR(32) NOT NULL, sid VARCHAR(16) NOT NULL, bits INTEGER NOT NULL, FOREIGN KEY(md5) REFERENCES file, FOREIGN KEY(sid) REFERENCES f_in)')
-		
-		con.commit()
-		con.close()
+	def create(self, mode):
+
+		if not Path('TorrentDB.db').is_file():
+
+			config = Config()
+
+			con = s3.connect('TorrentDB.db')
+			c = con.cursor()
+
+			c.execute('CREATE TABLE IF NOT EXISTS login (ip VARCHAR(55) NOT NULL, port VARCHAR(5) NOT NULL, idSession VARCHAR(16) NOT NULL,PRIMARY KEY(ip))')
+			c.execute('CREATE TABLE IF NOT EXISTS file (sessionid VARCHAR(16) NOT NULL, md5 VARCHAR(32) NOT NULL, name VARCHAR(100), lenfile INTEGER, lenpart INTEGER, npart INTEGER,PRIMARY KEY(sessionid, md5))')
+			c.execute('CREATE TABLE IF NOT EXISTS config (name VARCHAR(20) NOT NULL, value VARCHAR(50) NOT NULL, PRIMARY KEY(name))')
+			c.execute('CREATE TABLE IF NOT EXISTS f_in (md5 VARCHAR(32), sid VARCHAR(16), FOREIGN KEY(md5) REFERENCES file(md5), FOREIGN KEY(id) REFERENCES interested(id))')
+			c.execute('CREATE TABLE IF NOT EXISTS bitmapping (id INTEGER, md5 VARCHAR(32) NOT NULL, sid VARCHAR(16) NOT NULL, bits INTEGER NOT NULL, FOREIGN KEY(md5) REFERENCES file, FOREIGN KEY(sid) REFERENCES interested)')
+			# Configurazione
+			for el in config.__dict__:
+				c.execute('INSERT INTO config VALUES (?,?)',(el,str(config.__dict__[el])))
+
+			c.execute('INSERT INTO config VALUES ("mode",?)', (mode,))
+			c.execute('INSERT INTO config VALUES ("sessionId","default")')
+
+			con.commit()
+			con.close()
+
+		else: # Database già esistente, riutilizzo le impostazioni
+
+		Util.sessionId = self.retrieveConfig(('sessionId',))
+
+		sessionMode = self.retrieveConfig(('mode',))
+
+		if sessionMode == mode:
+
+			return ['OK', mode]
+
+		else:
+			return ['ER', sessionMode]
 
 	def login(self, ip, port, sid):
 		con = s3.connect('TorrentDB.db')
@@ -110,7 +138,6 @@ class dataBase:
 
 		con.commit()
 		con.close()
-
 
 	def check_file(self, sessionid, md5):
 		con = s3.connect('TorrentDB.db')

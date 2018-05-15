@@ -303,7 +303,7 @@ def updatePeers():
     globalLock.acquire()
     mode = Util.mode
 
-    if mode == 'normal': 
+    if mode == 'normal':
         Util.mode = 'update'
     else:
         Util.mode = 'updateS'
