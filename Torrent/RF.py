@@ -120,14 +120,6 @@ class RF(Thread):
 				Util.w.create_text(Util.offset, Util.offset + (Util.heightRow * rowNumber), anchor="nw", text=descriptor, tags=(descriptor))
 
 				Util.lockGraphics.release()
-				# Ultima riga
-				'''
-				if i == nBit:
-
-					x = x + Util.widthPart * (nBit - i - 1)
-					Util.w.create_line(x, y1, x, y2, tags=(descriptor))
-					Util.w.create_text(x + Util.LeftPaddingText, y2, anchor="sw", text=str(nBit), tags=(descriptor))
-				'''
 
 				#########
 

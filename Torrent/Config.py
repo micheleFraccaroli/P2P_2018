@@ -8,16 +8,11 @@ import random as ran
 class Config:
     
     def __init__(self):
-        whiteList = {'general':{'ttl':self.validateInt,'maxNear':self.validateInt,'timeResearch':self.validateInt,'timeIdPacket':self.validateInt},
-                     'self':{'selfV4':self.validateIP,'selfV6':self.validateIP,'selfP':self.validateInt},
-                     'roots':{'root1V4':self.validateIP,'root1V6':self.validateIP,'root1P':self.validateInt,'root2V4':self.validateIP,'root2V6':self.validateIP,'root2P':self.validateInt}
+        whiteList = {'general':{'timeResearch':self.validateInt, 'timeIdle':self.validateInt, 'lenPart':self.validateInt, 'lenChunk':self.validateInt},
+                     'self':{'selfV4':self.validateIP, 'selfV6':self.validateIP, 'selfP':self.validateInt},
+                     'tracker':{'trackerV4':self.validateIP, 'trackerV6':self.validateIP, 'trackerP':self.validateInt}
                     }
-        '''
-        whiteList = {'general':{'ttl':self.validateInt,'maxNear':self.validateInt,'timeResearch':self.validateInt,'timeIdPacket':self.validateInt},
-                     'self':{'selfV4':self.validateIP,'selfV6':self.validateIP,'selfP':self.validateInt},
-                     'roots':{'root1V4':self.validateIP,'root1V6':self.validateIP,'root1P':self.validateInt}
-                    }
-        '''
+
         print('\nLoading config file......\n')
         time.sleep(2)
         data = config.ConfigParser() # Parser del file di configurazione
@@ -113,17 +108,10 @@ class Config:
     def create(self):
 
         f = open('config.ini','w')
-        f.write('[general]\n\nttl =\nmaxNear =\ntimeResearch =\ntimeIdPacket =\n\n')
+        f.write('[general]\n\ntimeResearch =\ntimeIdle =\nlenPart =\nlenChunk =\n\n')
         f.write('[self]\n\nselfV4 =\nselfV6 =\nselfP =\n\n')
-        f.write('[roots]\n\nroot1V4 =\nroot1V6 =\nroot1P =\n\nroot2V4 =\nroot2V6 =\nroot2P =')
+        f.write('[tracker]\n\ntrackerV4 =\ntrackerV6 =\ntrackerP =')
         f.close()
 
 if __name__=='__main__':
     c=Config()
-
-
-    print(c.__dict__)
-   
-    for el in c.__dict__:
-        print(el,c.__dict__[el])
-   # c.create()

@@ -3,20 +3,100 @@ from queue import *
 import Util
 from time import sleep
 from random import uniform
+from Conn import Conn
+from curses import wrapper
 
 class Worker(Thread):
 
-	def __init__(self, part, workers, lock):
+	def __init__(self, part, workers, listChunk, fileName , missingParts, lock):
 
 		Thread.__init__(self)
 		self.part = part
 		self.workers = workers
 		self.wLock = lock
+		self.listChunk = listChunk
+		self.missingParts = missingParts
 
 	def run(self):
 
 		Util.w.itemconfig(self.part, fill='#0000ff', width=1)
-		sleep(uniform(0.2,1))
+
+		c = Conn(self.ipV4, self.ipV6, self.port)
+
+		if c.connection():
+
+			packet = 'RETP' + self.md5 + str(self.part).zfill(8) # Preparo il pacchetto RETP
+
+			c.s.send(packet.encode()) # Invio richiesta download
+
+			# Lettura della risposta
+
+			nChunk = c.s.recv(10) # 'AREP' + n° chunks
+        	
+        	readB = len(nChunk)
+        	while (readB < 10):
+            
+            	nChunk += c.s.recv(10 - readB)
+            	readB = len(nChunk)
+
+            nChunk = int(nChunk[4:].decode())
+
+            # Elaborazione dei chunk
+
+            for _ in range(nChunk):
+
+            	# Estrazione lunghezza chunk
+
+            	lenChunk = c.s.recv(5)
+
+            	readB = len(lenChunk)
+	        	while (readB < 5):
+	            
+	            	lenChunk += c.s.recv(5 - readB)
+	            	readB = len(lenChunk)
+
+	            lenChunk = int(lenChunk.decode())
+
+	            # Estrazione dati chunk
+
+	            dataChunk = c.s.recv(lenChunk)
+
+            	readB = len(dataChunk)
+	        	while (readB < lenChunk):
+	            
+	            	dataChunk += c.s.recv(lenChunk - readB)
+	            	readB = len(dataChunk)
+
+	            self.listChunk.append(dataChunk) # Lista di chunk
+	            c.deconnection()
+
+	            if Path(fileName).is_file():
+
+	            	res = wrapper(Util.menu,['Yes',True,'No',False],['The file requested already exists. Override it?'])
+
+		            if res:
+		                
+		                os.remove(fileName)
+		                file = open(fileName, "ab")
+
+		                for chunk in self.listChunk:
+		                    
+		                    file.write(chunk)
+		                
+		                file.close()
+		            
+		            else:
+		            	return
+
+		else: # Fallita connessione al peer per scaricare la parte
+
+			self.wLock.acquire()
+			self.missingParts.append(self.part)
+			self.wLock.release()
+
+
+
+
 		Util.w.itemconfig(self.part, fill='#00ff00', width=1)
 
 		self.wLock.acquire()
@@ -56,6 +136,7 @@ class D(Thread):
 		
 		workers = [0] # Numero di workers attivi
 		wLock = Lock()
+		missingParts = [] # Lista delle parti mancanti in caso di errori in download
 
 		while self.pun < len(self.status):
 
@@ -72,10 +153,12 @@ class D(Thread):
 			except Empty:
 
 				pass # Mantengo stato attuale
+
 			Util.dSem.acquire()
-			print(len(self.status))
-			t = Worker(self.status[self.pun] + self.firstId, workers, wLock) # Istanza di download. Aggiungo 1 perchè gli id di tkinter partono da 1
+
+			t = Worker(self.status[self.pun] + self.firstId, workers, missingParts, wLock) # Istanza di download. Aggiungo 1 perchè gli id di tkinter partono da 1
 			t.start()
+
 			self.pun += 1 # Incremento puntatore al prossimo download
 
 			wLock.acquire()
@@ -84,7 +167,7 @@ class D(Thread):
 		# Download terminato, sposto il file scaricato in fondo alla lista
 
 		flag = True
-		while flag:
+		while flag:	# Attendo che i thread abbiano terminato il download
 			wLock.acquire()
 			if workers[0] == 0:
 				flag = False
