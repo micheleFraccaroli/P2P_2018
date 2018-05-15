@@ -10,12 +10,48 @@ from queue import * # Passaggio parametri tra socket
 from D import D
 
 class RF(Thread):
-	def __init__(self,byt):
-		
+	def __init__(self, byt, t_ipv4, t_ipv6, t_port):
+
 		Thread.__init__(self)
 		self.byt = byt.zfill(8)
+		self.search = ""
+		self.t_ipv4 = t_ipv4
+		self.t_ipv6 = t_ipv6
+		self.t_port = t_port
 
 	def run(self):
+		#invio del pacchetto look, inizio ricerca
+		while((self.search == "") and (len(self.search)>20)):
+			self.search = input("input non corretto per iniziare una ricerca")
+
+		self.sessionid = "1234567890123456"
+		self.con = Conn(self.t_ipv4, self.t_ipv6, self.t_port)
+		if(self.con.connection()):
+			self.pkt_look = "LOOK"+self.sessionid+self.search.ljust(20)
+			self.con.s.send(self.pkt_look.encode())
+
+			self.ack_look = self.con.s.recv(7)
+			self.bytes_read = len(self.ack_look)
+
+			while(self.bytes_read < 7):
+				self.ack_look += self.con.s.recv(7 - self.bytes_read)
+				self.bytes_read = len(self.ack_look)
+
+			self.nanswer = int(self.ack_look[4:7].decode())
+			n = 0
+			self.pkt_look = ""
+			while(n < self.nanswer and self.nanswer > 0):
+				self.answer = self.con.s.recv(148)
+				self.bytes_read = len(self.answer)
+				while(self.bytes_read < 148):
+					self.answer += self.con.s.recv(148 - self.bytes_read)
+					self.bytes_read = len(self.answer)
+					self.pkt_look += self.answer.decode()+"\n"
+				n+=1
+			print(self.pkt_look)
+			self.con.deconnection()
+		else:
+			print("Errore durante la connessione...")
 
 		queue = LifoQueue() #Coda LIFO
 		controllerIsAlive = False # Stato del controller di download
@@ -25,9 +61,9 @@ class RF(Thread):
 			c = Conn('127.0.0.1','::1',3000)
 
 			if not c.connection():
-				
+
 				print('Errore di connessione')
-			
+
 			else:
 
 				# Ricezione dati ACHU
@@ -71,17 +107,17 @@ class RF(Thread):
 					x1 = Util.offset + (Util.widthPart * i)
 					x2 = Util.offset + (Util.widthPart * (i + 1))
 					idRec = Util.w.create_rectangle(x1, y1, x2, y2, fill="red", width=1, tags=(descriptor))	# Rettangoli
-				
+
 				# Ridefinizione delle coordinate basate su quelle precedenti
 				y1 = y1 + Util.heightPart	# Coordinata Y in alto
 				y2 = y2 + Util.heightLine	# Coordinata Y in basso
 				for i in range(0, nBit, 10):
-					
+
 					x = Util.offset + Util.widthPart * i
 					Util.w.create_line(x, y1, x, y2, tags=(descriptor))
 					Util.w.create_text(x + Util.LeftPaddingText, y2, anchor="sw", text=str(i + 1), tags=(descriptor))	# Labels
-				
-				Util.w.create_text(Util.offset, Util.offset + (Util.heightRow * rowNumber), anchor="nw", text=descriptor, tags=(descriptor))	
+
+				Util.w.create_text(Util.offset, Util.offset + (Util.heightRow * rowNumber), anchor="nw", text=descriptor, tags=(descriptor))
 
 				Util.lockGraphics.release()
 				# Ultima riga
@@ -98,13 +134,13 @@ class RF(Thread):
 				# Creazione dello stato del file su tutti i peer
 
 				for peer in range(nPeers): # Ciclo per ogni peer
-					
+
 					byte.append([])
 
 					for block in range(nBlock): # Ciclo per ogni blocco di un singolo peer
-						
+
 						offset = peer * nBlock
-						
+
 						byte[peer].append(ord(var[block + offset])) # Blocchi trasformati in interi
 
 				# Creazione di una lista di parti pesata

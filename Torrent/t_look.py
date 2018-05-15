@@ -21,7 +21,8 @@ class t_look(th.Thread):
                 self.look_pkt += self.socket.recv(36-self.bytes_read)
                 self.bytes_read = len(self.look_pkt)
 
-        self.search = self.look_pkt[16:].decode()
+        self.search = self.look_pkt[16:].decode().strip()
+        print(self.search)
         db = dataBase()
         db.create()
         nmd5, res = db.search_files(self.search)
@@ -31,8 +32,8 @@ class t_look(th.Thread):
 
         if(nmd5 > 0):
             for file in res:
-                self.file_md5 = file[0]+file[1]+file[2]+file[3]
-                self.socket.send(self.aloo_pkt.encode())
+                self.file_md5 = file[0]+file[1].ljust(100, ' ')+str(file[2]).zfill(10)+str(file[3]).zfill(6)
+                self.socket.send(self.file_md5.encode())
 
         self.socket.close()
 
@@ -45,5 +46,5 @@ if __name__ == '__main__':
     peersocket.listen(20)
     other_peersocket, addr = peersocket.accept()
 
-    th_addr =  T_ADDR(other_peersocket)
-    th_addr.start()
+    th_look =  t_look(other_peersocket)
+    th_look.start()

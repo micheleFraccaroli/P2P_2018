@@ -11,7 +11,7 @@ from curses import *
 from dataBase import dataBase
 from dataBase import dataBase
 from pathlib import Path
-import toPlotNetwork
+#import toPlotNetwork
 from threading import Semaphore, Lock
 
 # Variabili globali
@@ -303,7 +303,7 @@ def updatePeers():
     globalLock.acquire()
     mode = Util.mode
 
-    if mode == 'normal': 
+    if mode == 'normal':
         Util.mode = 'update'
     else:
         Util.mode = 'updateS'
