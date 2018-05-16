@@ -8,8 +8,6 @@ from datetime import datetime
 from threading import *
 from dataBase import *
 from curses import *
-from dataBase import dataBase
-from dataBase import dataBase
 from pathlib import Path
 #import toPlotNetwork
 from threading import Semaphore, Lock

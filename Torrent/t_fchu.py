@@ -25,28 +25,35 @@ class t_fchu(th.Thread):
 			self.bytes_read = len(recv_packet)
 
 		# retrieving from database
-		hitpeer = db.getHitpeer(recv_packet[16:].decode())
+		hitpeer = db.getHitpeer(recv_packet[16:].decode(), recv_packet[:16].decode())
 		interested_sid = db.getInterestedPeers(recv_packet[16:].decode())
+		
 		for isid in interested_sid:
 			peer = db.getPeerBySid(isid[0])
 			addr = peer[0] + peer[1]
-			interested_peer[isid] = addr
+			interested_peer[isid[0]] = addr
 
 		# insert into db all 0 
 		infoFile = db.retrieveInfoFile(recv_packet[16:].decode())
-		totalBit = math.ceil((infoFile[0] / infoFile[1]))
-		bits = pL.partList_gen(totalBit, 0)
+		
+		#print(infoFile)
+		bits = pL.partList_gen(infoFile[0], 0)
 		db.insertBitmapping(recv_packet[16:].decode(), recv_packet[:16].decode(), bits)
 
 		packet_resp = "AFCH" + str(hitpeer).zfill(3)
-		self.other_peersocket.s.send(packet_resp.encode())
-
+		self.other_peersocket.send(packet_resp.encode())
+		#print(interested_peer)
 		for sid in interested_peer.keys():
-			resp_list.append(interested_peer[sid])
-			self.other_peersocket.s.send(packet_resp.encode())
+			if(sid != recv_packet[:16].decode()):
+				resp_list.append(interested_peer[sid])
+				#print("interessato inviato ---> " + str(interested_peer[sid]))
 
-			bits = db.getBitmapping(sid, recv_packet[16:].decode())
-			for b in bits:
-				self.other_peersocket.s.send(codecs.encode(chr(b[0],'iso-8859-1')))
+				bits = db.getBitmapping(sid, recv_packet[16:].decode())
+				if(bits):
+					self.other_peersocket.send(interested_peer[sid].encode())
+					#print("bit dell'interessato ---> " + str(bits))
+				for b in bits:
+					#print(bytes([b[0]]))
+					self.other_peersocket.send(bytes([b[0]]))
 
 		self.other_peersocket.close()
