@@ -18,8 +18,8 @@ class dataBase:
 			c.execute('CREATE TABLE IF NOT EXISTS login (ip VARCHAR(55) NOT NULL, port VARCHAR(5) NOT NULL, idSession VARCHAR(16) NOT NULL,PRIMARY KEY(ip))')
 			c.execute('CREATE TABLE IF NOT EXISTS file (sessionid VARCHAR(16) NOT NULL, md5 VARCHAR(32) NOT NULL, name VARCHAR(100), lenfile INTEGER, lenpart INTEGER, npart INTEGER,PRIMARY KEY(sessionid, md5))')
 			c.execute('CREATE TABLE IF NOT EXISTS config (name VARCHAR(20) NOT NULL, value VARCHAR(50) NOT NULL, PRIMARY KEY(name))')
-			c.execute('CREATE TABLE IF NOT EXISTS f_in (md5 VARCHAR(32), sid VARCHAR(16), FOREIGN KEY(md5) REFERENCES file(md5), FOREIGN KEY(id) REFERENCES interested(id))')
-			c.execute('CREATE TABLE IF NOT EXISTS bitmapping (id INTEGER, md5 VARCHAR(32) NOT NULL, sid VARCHAR(16) NOT NULL, bits INTEGER NOT NULL, FOREIGN KEY(md5) REFERENCES file, FOREIGN KEY(sid) REFERENCES interested)')
+			#c.execute('CREATE TABLE IF NOT EXISTS f_in (md5 VARCHAR(32), sid VARCHAR(16), FOREIGN KEY(md5) REFERENCES file(md5))')
+			c.execute('CREATE TABLE IF NOT EXISTS bitmapping (md5 VARCHAR(32) NOT NULL, sid VARCHAR(16) NOT NULL, bits INTEGER NOT NULL, FOREIGN KEY(md5) REFERENCES file)')
 			# Configurazione
 			for el in config.__dict__:
 				c.execute('INSERT INTO config VALUES (?,?)',(el,str(config.__dict__[el])))
@@ -52,11 +52,11 @@ class dataBase:
 		con.commit()
 		con.close()
 
-	def getHitpeer(self, md5):
+	def getHitpeer(self, md5, my_sid):
 		con = s3.connect('TorrentDB.db')
 		c = con.cursor()
 
-		hitpeer = c.execute('SELECT COUNT(*) FROM f_in WHERE md5 = ?', (md5,))
+		hitpeer = c.execute('SELECT count(DISTINCT sid) FROM bitmapping WHERE md5 = ? and sid <> ?', (md5,my_sid))
 		hitpeer = c.fetchone()
 
 		con.close()
@@ -67,23 +67,26 @@ class dataBase:
 		con = s3.connect('TorrentDB.db')
 		c = con.cursor()
 
-		query = 'INSERT INTO bitmapping VALUES('
+		c.execute('SELECT COUNT(*) FROM bitmapping WHERE md5 = ? AND sid = ?',(md5,sid))
+		cc = c.fetchone()
 
-		for b in bits:
-			query = query + md5 + sid + b + '),'
+		if(cc[0] == 0):
 
-		query = query[:len(query)-1]
+			query = 'INSERT INTO bitmapping VALUES('
 
-		c.execute(query)
+			for b in bits:
+				query = query + '"' + md5 + '","' + sid + '",' + str(b) + '),('
+			query = query[:len(query)-2]
 
-		con.commit()
-		con.close()
+			c.execute(query)
+
+			con.commit()
+			con.close()
 
 	def retrieveBits(self, md5, sid, part):
 		con = s3.connect('TorrentDB.db')
 		c = con.cursor()
-
-		c.execute('SELECT bits FROM bitmapping WHERE md5 = ? AND sid = ? LIMIT 1 OFFSET ?', (md5, sid, (part-1)))
+		c.execute('SELECT bits FROM bitmapping WHERE md5 = ? AND sid = ? LIMIT 1 OFFSET ?', (md5, sid, part))
 		res = c.fetchone()
 
 		con.close()
@@ -95,7 +98,7 @@ class dataBase:
 
 		c.execute('SELECT bits FROM bitmapping WHERE md5 = ? AND sid = ? ORDER BY sid', (md5, sid))
 		res = c.fetchall()
-
+		#print("Ritorno della query dei bits ---> " + str(res))
 		con.close()
 		return res
 
@@ -103,7 +106,7 @@ class dataBase:
 		con = s3.connect('TorrentDB.db')
 		c = con.cursor()
 
-		c.execute('SELECT ip, port FROM login WHERE idSession = ' + sid)
+		c.execute('SELECT ip, port FROM login WHERE idSession = ?', (sid,))
 		res = c.fetchone()
 
 		con.close()
@@ -113,7 +116,7 @@ class dataBase:
 		con = s3.connect('TorrentDB.db')
 		c = con.cursor()
 
-		c.execute('SELECT sid FROM f_in WHERE md5 = ' + md5)
+		c.execute('SELECT sid FROM f_in WHERE md5 = ?', (md5,))
 		sid_int = c.fetchall()
 
 		con.close()
@@ -130,11 +133,11 @@ class dataBase:
 		con.close()
 		return str(npart).zfill(8)
 
-	def insertInterested(self, sid, ip, port):
+	def insertInterested(self, sid, md5):
 		con = s3.connect('TorrentDB.db')
 		c = con.cursor()
 
-		c.execute('INSERT INTO interested VALUES(?,?,?)',(sid,ip,port))
+		c.execute('INSERT INTO f_in VALUES(?,?)',(md5, sid))
 
 		con.commit()
 		con.close()
@@ -162,22 +165,23 @@ class dataBase:
 		return str(npart).zfill(8)
 
 
-	def updatePart(self, partNum, md5, sid):
+	def updatePart(self, part, md5, sid, updated):
 		con = s3.connect('TorrentDB.db')
 		c = con.cursor()
 
 		c.execute('SELECT bits FROM bitmapping WHERE md5 = ? AND sid = ?', (md5, sid))
 		res = c.fetchall()
 
-		part = partNum//8
+		#part = partNum//8
+		#print("part database -->" + str(part))
 		toUpdate = res[part][0]
-		Updated = '' # bit aggiornati
-		c.execute('UPDATE bitmapping SET bits = ? WHERE bits = ?', (Updated, toUpdate))
+		#print("toUpdate database ---> " + str(toUpdate))
+		c.execute('UPDATE bitmapping SET bits = ? WHERE bits = ? AND sid = ?', (updated, toUpdate, sid))
 
 		con.commit()
 		con.close()
 
-		return str(npart).zfill(8)
+		#return str(npart).zfill(8)
 
 	def search_files(self, string):
 		con = s3.connect('TorrentDB.db')
@@ -196,8 +200,87 @@ class dataBase:
 		con = s3.connect('TorrentDB.db')
 		c = con.cursor()
 
-		c.execute('SELECT lenfile, lenpart FROM file WHERE ms5 = ' + md5)
+		c.execute('SELECT npart, lenfile, lenpart FROM file WHERE md5 = ?', (md5,))
 		res = c.fetchone()
 
 		con.close()
 		return res
+
+	import sqlite3 as s3
+
+def checkLogout(sid):
+		con = s3.connect('TorrentDB.db')
+		c = con.cursor()
+
+		c.execute('SELECT md5 FROM file WHERE sessionid = "' + sid + '"')
+		res = c.fetchall()
+
+		partdown = 0
+		partdown_final = 0
+		#print(res)
+		for md5 in res:
+			#print("md5 --> " + str(md5))
+			c.execute('SELECT bits FROM bitmapping WHERE md5 = ? AND sid = ?', (md5[0], sid))
+			my = c.fetchall()
+			my_l = []
+			for m in my:
+				my_l.append(m[0])
+			#print("mio --> " + str(my_l))
+
+			c.execute('SELECT sid FROM f_in WHERE md5 = "' + md5[0] + '" AND sid <> "' + sid + '"')
+			res2 = c.fetchall()
+			#print("sid interessati --> " + str(res2))
+			list_matching = []
+			for sidf in res2:
+				c.execute('SELECT bits FROM bitmapping WHERE md5 = ? AND sid = ?', (md5[0], sidf[0]))
+				st = c.fetchall()
+				list_matching.append(st)
+			i = 0
+			k = 0
+			buffer = []
+			buffer_in = []
+			#print("\nlist_matching ---> " + str(list_matching))
+			if(list_matching):
+				for r in list_matching[0]:
+					for lm in range(len(list_matching)):
+						buffer_in.append(list_matching[lm][i][0])
+					#print("buffer_in ---> " + str(buffer_in))
+					i = i + 1
+					buffer.append(buffer_in)
+					buffer_in = []
+
+			j = 0
+			buf_res_list = []
+			#print("buffer ---> " + str(buffer))
+			for buf in buffer:
+				buf_res = 0
+				for b in range(len(buf)):
+					#print("b " + str(b))
+					#print("buf[b] ---> " + str(buf[b]))
+					buf_res = buf_res | buf[b]
+					#print("buf_res " + str(buf_res))
+					partdown = bin(buf_res)[2:].count('1')
+				partdown_final = partdown_final + partdown		
+				#print("partdown_final ---> " + str(partdown_final))
+				buf_res_list.append(buf_res)
+				#print("buf_res_list ---> " + str(buf_res_list))
+				j = j + 1
+			
+		if(my_l != buf_res_list):
+			return "NLOG", partdown_final
+		else:
+			return "ALOG", partdown_final
+
+		# login del peer
+		def insertSid(self, sid):
+			con = s3.connect('TorrentDB.db')
+			c = con.cursor()
+
+			c.execute('INSERT INTO config VALUES("sid", ?)', (sid,))
+
+			con.commit()
+			con.close()
+
+if __name__ == "__main__":
+	db = dataBase()
+	db.create("tracker")

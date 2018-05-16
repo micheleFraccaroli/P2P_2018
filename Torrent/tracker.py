@@ -2,6 +2,7 @@ import socket
 import sys
 import os
 import threading as th
+from Conn import Conn
 from t_login import t_login
 from t_fchu import t_fchu
 from t_addr import t_addr
@@ -13,11 +14,8 @@ class tracker:
 		# some parameters
 		#
 	def body(self):
-		peersocket = socket.socket(socket.AF_INET6, socket.SOCK_STREAM)
-		peersocket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-		peersocket.bind(('', 3000))
-
-		peersocket.listen(20)
+		open_conn = Conn(port = 3000)
+		peersocket = open_conn.initializeSocket()
 
 		while True:
 			Util.printLog("###### IN ATTESA DI UNA RICHIESTA #######")

@@ -31,7 +31,7 @@ class t_addr(th.Thread):
         self.md5 = self.addr_pkt[132:].decode()
 
         db = dataBase()
-        db.create()
+        #db.create()
         search = db.check_file(self.sessionid, self.md5)
 
         if(search == 0):
@@ -51,8 +51,8 @@ class t_addr(th.Thread):
         Util.globalDict[self.sessionid] = self.list
 
         # insert into interested
-        peer_addr = db.getPeerBySid(self.sessionid)
-        db.insertInterested(self.sessionid, peer_addr[0], peer_addr[1])
+        #peer_addr = db.getPeerBySid(self.sessionid)
+        db.insertInterested(self.sessionid, self.md5)
 
         # insert into bitmapping
         totalBit = math.ceil((self.lenfile / self.lenpart))
