@@ -32,7 +32,9 @@ class Upload(Thread):
 	        part = download[36:].decode()
 
 	        #dal database devo estrarre i chunk relativi alla parte (e i dati per l'invio)
+	        db = dataBase()
 
+	        infoFile = retrieveInfoFile(md5)
 
 
 
