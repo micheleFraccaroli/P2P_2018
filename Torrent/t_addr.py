@@ -5,7 +5,7 @@ import os
 import ipaddress as ipad
 from dataBase import dataBase
 import threading as th
-#import partList_gen as pL
+import partList_gen as pL
 
 #thread che si occupa della gestione dell'aggiunta di un file proveniente da un peer
 
@@ -44,11 +44,11 @@ class t_addr(th.Thread):
             self.aadr_pkt = "AADR"+npart
             self.socket.send(self.aadr_pkt.encode())
             self.socket.close()
-        '''
+        
         # insert or update md5 in global dict
-        self.list.append(Util.globalDict[self.sessionid])
-        self.list.append(self.md5)
-        Util.globalDict[self.sessionid] = self.list
+        #self.list.append(Util.globalDict[self.sessionid])
+        #self.list.append(self.md5)
+        #Util.globalDict[self.sessionid] = self.list
 
         # insert into interested
         #peer_addr = db.getPeerBySid(self.sessionid)
@@ -58,7 +58,7 @@ class t_addr(th.Thread):
         totalBit = math.ceil((self.lenfile / self.lenpart))
         bits = pL.partList_gen(totalBit, 255)
         db.insertBitmapping(self.md5, self.sessionid, bits)
-        '''
+        
 if __name__ == "__main__":
 
     peersocket = socket.socket(socket.AF_INET6, socket.SOCK_STREAM)

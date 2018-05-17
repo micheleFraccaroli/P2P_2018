@@ -5,9 +5,7 @@ import math
 from pathlib import Path
 
 class dataBase:
-
 	def create(self, mode):
-
 		if not Path('TorrentDB.db').is_file():
 
 			config = Config()
@@ -71,13 +69,11 @@ class dataBase:
 		cc = c.fetchone()
 
 		if(cc[0] == 0):
-
 			query = 'INSERT INTO bitmapping VALUES('
-
 			for b in bits:
 				query = query + '"' + md5 + '","' + sid + '",' + str(b) + '),('
+			
 			query = query[:len(query)-2]
-
 			c.execute(query)
 
 			con.commit()
@@ -173,10 +169,10 @@ class dataBase:
 		res = c.fetchall()
 
 		#part = partNum//8
-		#print("part database -->" + str(part))
+		print("part database -->" + str(part))
 		toUpdate = res[part][0]
-		#print("toUpdate database ---> " + str(toUpdate))
-		c.execute('UPDATE bitmapping SET bits = ? WHERE bits = ? AND sid = ?', (updated, toUpdate, sid))
+		print("toUpdate database ---> " + str(toUpdate))
+		c.execute('UPDATE bitmapping SET bits = ? WHERE md5 = ? AND sid = ? LIMIT 1 OFFSET ?', (updated, md5, sid, part))
 
 		con.commit()
 		con.close()
@@ -206,80 +202,97 @@ class dataBase:
 		con.close()
 		return res
 
-	import sqlite3 as s3
-
-def checkLogout(sid):
+	def deleteAll(self, sid):
 		con = s3.connect('TorrentDB.db')
 		c = con.cursor()
 
-		c.execute('SELECT md5 FROM file WHERE sessionid = "' + sid + '"')
-		res = c.fetchall()
+		c.execute('DELETE FROM login WHERE idSession = ?', (sid,))
+		c.execute('DELETE FROM f_in WHERE sid = ?', (sid,))
+		c.execute('DELETE FROM bitmapping WHERE sid = ?', (sid,))
+		c.execute('DELETE FROM file WHERE sessionid = ?', (sid,))
 
-		partdown = 0
-		partdown_final = 0
-		#print(res)
-		for md5 in res:
-			#print("md5 --> " + str(md5))
-			c.execute('SELECT bits FROM bitmapping WHERE md5 = ? AND sid = ?', (md5[0], sid))
-			my = c.fetchall()
-			my_l = []
-			for m in my:
-				my_l.append(m[0])
-			#print("mio --> " + str(my_l))
+		con.commit()
 
-			c.execute('SELECT sid FROM f_in WHERE md5 = "' + md5[0] + '" AND sid <> "' + sid + '"')
-			res2 = c.fetchall()
-			#print("sid interessati --> " + str(res2))
-			list_matching = []
-			for sidf in res2:
-				c.execute('SELECT bits FROM bitmapping WHERE md5 = ? AND sid = ?', (md5[0], sidf[0]))
-				st = c.fetchall()
-				list_matching.append(st)
-			i = 0
-			k = 0
-			buffer = []
-			buffer_in = []
-			#print("\nlist_matching ---> " + str(list_matching))
-			if(list_matching):
-				for r in list_matching[0]:
-					for lm in range(len(list_matching)):
-						buffer_in.append(list_matching[lm][i][0])
-					#print("buffer_in ---> " + str(buffer_in))
-					i = i + 1
-					buffer.append(buffer_in)
-					buffer_in = []
+		con.close()
 
-			j = 0
-			buf_res_list = []
-			#print("buffer ---> " + str(buffer))
-			for buf in buffer:
-				buf_res = 0
-				for b in range(len(buf)):
-					#print("b " + str(b))
-					#print("buf[b] ---> " + str(buf[b]))
-					buf_res = buf_res | buf[b]
-					#print("buf_res " + str(buf_res))
-					partdown = bin(buf_res)[2:].count('1')
-				partdown_final = partdown_final + partdown		
-				#print("partdown_final ---> " + str(partdown_final))
-				buf_res_list.append(buf_res)
-				#print("buf_res_list ---> " + str(buf_res_list))
-				j = j + 1
-			
-		if(my_l != buf_res_list):
-			return "NLOG", partdown_final
-		else:
-			return "ALOG", partdown_final
-
-		# login del peer
-		def insertSid(self, sid):
+	def checkLogout(self, sid):
 			con = s3.connect('TorrentDB.db')
 			c = con.cursor()
 
-			c.execute('INSERT INTO config VALUES("sid", ?)', (sid,))
+			c.execute('SELECT md5 FROM file WHERE sessionid = "' + sid + '"')
+			res = c.fetchall()
 
-			con.commit()
-			con.close()
+			partdown = 0
+			partdown_final = 0
+
+			if(res):
+				#print(res)
+				for md5 in res:
+					#print("md5 --> " + str(md5))
+					c.execute('SELECT bits FROM bitmapping WHERE md5 = ? AND sid = ?', (md5[0], sid))
+					my = c.fetchall()
+					my_l = []
+					for m in my:
+						my_l.append(m[0])
+					#print("mio --> " + str(my_l))
+
+					c.execute('SELECT sid FROM f_in WHERE md5 = "' + md5[0] + '" AND sid <> "' + sid + '"')
+					res2 = c.fetchall()
+					#print("sid interessati --> " + str(res2))
+					list_matching = []
+					for sidf in res2:
+						c.execute('SELECT bits FROM bitmapping WHERE md5 = ? AND sid = ?', (md5[0], sidf[0]))
+						st = c.fetchall()
+						list_matching.append(st)
+					i = 0
+					k = 0
+					buffer = []
+					buffer_in = []
+					#print("\nlist_matching ---> " + str(list_matching))
+					if(list_matching):
+						for r in list_matching[0]:
+							for lm in range(len(list_matching)):
+								buffer_in.append(list_matching[lm][i][0])
+							#print("buffer_in ---> " + str(buffer_in))
+							i = i + 1
+							buffer.append(buffer_in)
+							buffer_in = []
+
+					j = 0
+					buf_res_list = []
+					#print("buffer ---> " + str(buffer))
+					for buf in buffer:
+						buf_res = 0
+						for b in range(len(buf)):
+							#print("b " + str(b))
+							#print("buf[b] ---> " + str(buf[b]))
+							buf_res = buf_res | buf[b]
+							#print("buf_res " + str(buf_res))
+							partdown = bin(buf_res)[2:].count('1')
+						partdown_final = partdown_final + partdown		
+						#print("partdown_final ---> " + str(partdown_final))
+						buf_res_list.append(buf_res)
+						#print("buf_res_list ---> " + str(buf_res_list))
+						j = j + 1
+					
+				if(my_l != buf_res_list):
+					return "NLOG", partdown_final
+				else:
+					self.deleteAll(sid)
+					return "ALOG", partdown_final
+			else:
+				self.deleteAll(sid)
+				return "ALOG", partdown_final
+
+			# login del peer
+			def insertSid(self, sid):
+				con = s3.connect('TorrentDB.db')
+				c = con.cursor()
+
+				c.execute('INSERT INTO config VALUES("sid", ?)', (sid,))
+
+				con.commit()
+				con.close()
 
 if __name__ == "__main__":
 	db = dataBase()
