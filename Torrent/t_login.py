@@ -22,7 +22,7 @@ class t_login(th.Thread):
 
 		packet = "ALGI" + str(sid)
 
-		self.other_peersocket.s.send(packet.encode())
+		self.other_peersocket.send(packet.encode())
 
 		ip = recv_packet[:55].decode()
 		port = recv_packet[55:].decode()

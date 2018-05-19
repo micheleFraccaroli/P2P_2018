@@ -2,17 +2,16 @@ import socket
 import sys
 import os
 import threading as th
+import Util
 from Conn import Conn
 from t_login import t_login
 from t_fchu import t_fchu
 from t_addr import t_addr
 from t_rpad import t_rpad
+from t_logout import t_logout
+from t_look import t_look
 
 class tracker:
-	def __init__(self):
-		# 
-		# some parameters
-		#
 	def body(self):
 		open_conn = Conn(port = 3000)
 		peersocket = open_conn.initializeSocket()
@@ -42,6 +41,16 @@ class tracker:
 					th_LOGIN = t_login(other_peersocket)
 					th_LOGIN.start()
 
+				# LOGOUT ---
+				if(recv_type.decode() == "LOGO"):
+					t_LOGOUT = t_logout(other_peersocket)
+					t_LOGOUT.start()
+
+				# LOOK ---
+				if(recv_type.decode() == "LOOK"):
+					t_LOOK = t_look(other_peersocket)
+					t_LOOK.start()
+
 				# FCHU ---
 				if(recv_type.decode() == "FCHU"):
 					th_FCHU = t_fchu(other_peersocket)
@@ -56,3 +65,7 @@ class tracker:
 				if(recv_type.decode() == "RPAD"):
 					th_RPAD = t_rpad(other_peersocket)
 					th_RPAD.start()
+
+if __name__ == "__main__":
+	t = tracker()
+	t.body()

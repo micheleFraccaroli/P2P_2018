@@ -23,13 +23,15 @@ class t_rpad(th.Thread):
 		
 		# retrieving part for update
 		part_recv = recv_packet[48:].decode()
-		part = int(part_recv)//8
+		part = (int(part_recv)-1)//8
 		toUpdateBits = db.retrieveBits(recv_packet[16:48].decode(), recv_packet[:16].decode(), int(part))
 		specificBit = int(part_recv) % 8
-
-		#print("part --> " + str(part))
-		#print("toUpdateBits --> " + str(toUpdateBits))
-		#print("specific bit --> " + str(specificBit))
+		if(specificBit == 0):
+			specificBit = 8
+		
+		Util.printLog("part --> " + str(part))
+		Util.printLog("toUpdateBits --> " + str(toUpdateBits))
+		Util.printLog("specific bit --> " + str(specificBit))
 
 		up = uB.updateBits(toUpdateBits, specificBit)
 		
