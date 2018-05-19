@@ -41,6 +41,33 @@ class dataBase:
 			else:
 				return ['ER', sessionMode]
 
+	def retrieveConfig(self,lPars):
+
+		if len(lPars) == 1:
+			lPars = str(lPars)
+			lPars = lPars.replace(',','') # Elimino la virgola dalla tupla con un solo elemento
+		else:
+			lPars = str(lPars)
+
+		con = s3.connect('TorrentDB.db')
+		c = con.cursor()
+		#c.execute('SELECT * FROM config WHERE name IN ("mode")')
+		c.execute('SELECT * FROM config WHERE name IN '+ lPars)
+		res = c.fetchall()
+
+		class Container(object):
+			pass
+
+		if len(res) > 1: # Ritorno un oggetto con gli attributi di config
+
+			container = Container()
+			for par in res:
+				setattr(container,par[0],par[1])
+
+			return container
+		else: # Ritorno il singolo parametro richiesto
+			return res[0][1]
+
 	def login(self, ip, port, sid):
 		con = s3.connect('TorrentDB.db')
 		c = con.cursor()
@@ -196,7 +223,7 @@ class dataBase:
 		con = s3.connect('TorrentDB.db')
 		c = con.cursor()
 
-		c.execute('SELECT npart, lenfile, lenpart FROM file WHERE md5 = ?', (md5,))
+		c.execute('SELECT npart, lenfile, lenpart, name FROM file WHERE md5 = ?', (md5,))
 		res = c.fetchone()
 
 		con.close()
@@ -216,6 +243,7 @@ class dataBase:
 		con.close()
 
 	def checkLogout(self, sid):
+
 			con = s3.connect('TorrentDB.db')
 			c = con.cursor()
 
@@ -282,17 +310,18 @@ class dataBase:
 					return "ALOG", partdown_final
 			else:
 				self.deleteAll(sid)
+
 				return "ALOG", partdown_final
 
-			# login del peer
-			def insertSid(self, sid):
-				con = s3.connect('TorrentDB.db')
-				c = con.cursor()
+	# login del peer
+	def insertSid(self, sid):
+		con = s3.connect('TorrentDB.db')
+		c = con.cursor()
 
-				c.execute('INSERT INTO config VALUES("sid", ?)', (sid,))
+		c.execute('INSERT INTO config VALUES("sid", ?)', (sid,))
 
-				con.commit()
-				con.close()
+		con.commit()
+		con.close()
 
 if __name__ == "__main__":
 	db = dataBase()

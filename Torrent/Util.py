@@ -9,7 +9,6 @@ from threading import *
 from dataBase import *
 from curses import *
 from pathlib import Path
-#import toPlotNetwork
 from threading import Semaphore, Lock
 
 # Variabili globali
@@ -36,13 +35,15 @@ nameFileHeight = 20
 heightLine = 15
 
 heightRow = heightPart + offset + nameFileHeight + heightLine # Altezza di una barra di un file
+lockGraphics = Lock()
 
 # Testo
 LeftPaddingText = 2
 
+# Download
+
 activeDownload = 3
 dSem = Semaphore(activeDownload)
-lockGraphics = Lock()
 
 def ip_formatting(ipv4,ipv6,port):
 
@@ -239,173 +240,61 @@ def menu(stdscr, listMenu, titleMenu, flag = None):
                 c = 0 # Resetto input e l'opzione scelta
                 option = 0
 
-#plotting network graph
-def statusNetwork():
-    db = dataBase()
-    dbs = dataBaseSuper()
+def analyzeFile(nameFile, lenPart):  # Analizzo il file per terminare il download dopo un crash
 
-    nodes = [] #peer della rete
-    sp_list = [] #superpeers della rete
-    list_sp = db.retrieveSuperPeers()
-    Util.printLog("LIST_SP " + str(list_sp))
-    for lsp in list_sp:
-        lsp_d = ip_deformatting(lsp[0], lsp[1])
-        nodes.append(lsp_d[0])
-        sp_list.append(lsp_d[0])
-    my_ip = db.retrieveConfig(('selfV4', 'selfV6'))
-    ip_SP = my_ip.selfV4
+    
+    f = open('Files/' + nameFile, 'rb')
 
-    logged_list = [] # peer logged to supernode
-    logged = dbs.retrieveLOGINsp()
-    Util.printLog("LOGGED_LIST " + str(logged_list))
-    for lg in logged:
-        lg_d = ip_deformatting(lg[0],lg[1])
-        nodes.append(lg_d[0])
-        logged_list.append(lg_d[0])
+    if lenPart > 1024:
 
-    nodes.insert(0,ip_SP)
-    seen = set()
-    uniq = []
-    for x in nodes:
-        if x not in seen:
-            uniq.append(x)
-            seen.add(x)
+        db = dataBase()
 
-    edges = [] # archi della rete
-    sol = [] # archi soluzione (traffico)
-    for e1 in seen:
-        if(ip_SP != e1):
-            edge = (ip_SP,e1)
-            edges.append(edge)
+        lenChunk = int(db.retrieveConfig(('lenChunk',)))
+        nChunk = ceil(lenPart/lenChunk)
 
-    seen_ed = set()
-    uniq_ed = []
-    for x in edges:
-        if x not in seen_ed:
-            uniq_ed.append(x)
-            seen_ed.add(x)
-
-    num_sp = len(list_sp)-1
-    Util.printLog("NUMERO SUEPRPEER TROVATI " + str(num_sp))
-    num_peer = len(logged)
-    Util.printLog("NUMERO PEER TROVATI " + str(num_peer))
-    pop_myIp = uniq.index(ip_SP)
-    uniq.pop(pop_myIp)
-    uniq.insert(0,ip_SP)
-    Util.printLog("ROBA DEL PLOT: " + "---" + str(uniq) + "---" +  str(seen_ed))
-    toPlotNetwork.toPlot(uniq, seen_ed, sol, num_sp, num_peer)
-
-
-def updatePeers():
-
-    globalLock.acquire()
-    mode = Util.mode
-
-    if mode == 'normal':
-        Util.mode = 'update'
     else:
-        Util.mode = 'updateS'
-    globalLock.release()
+        lenChunk = lenPart # Prevedo 1 chunk per parte
+        nChunk = 1
 
-    lock.acquire()
-    db = dataBase()
+    missingParts = [] # Indici delle parti mancanti
+    statusPart = [] # lista coi valori di tutti i chunk di una parte
 
-    listNormal = db.retrievePeers()
-    listSuper = db.retrieveSuperPeers()
+    indexPart = 0
+    while True:
+        for _ in range(nChunk - 1):
+            
+            r = f.read(lenChunk)
 
-    #db.deletePeers()
-    db.deleteSuperPeers()
+            if r == b'':
 
-    config = db.retrieveConfig(('selfV4','selfV6','selfP','ttl'))
-    idPacket = ip_packet16()
-    ip = ip_formatting(config.selfV4, config.selfV6, config.selfP)
+                f.close()
+                return missingParts # Ho finito, ritorno le parti mancanti
+        
+            else:
+                statusPart.append(int.from_bytes(r,'big')) # Accumulo il valore dei chunk
 
-    db.insertRequest(idPacket, ip[:55],time.time())
+        # Leggo l'ultimo chunk (probabilmente non è completamente pieno)
 
-    lock.release()
+        remainder = lenPart % lenChunk # Byte rimasti da leggere
 
-    pack = 'SUPE' + idPacket + ip + config.ttl.zfill(2)
+        if remainder == 0: # Chunk completamente pieno
+            remainder = lenChunk
+        
+        r = f.read(remainder)
 
-    listPeers = listSuper + list(set(listNormal) - set(listSuper))
+        if r == b'':
 
-    globalLock.acquire()
-    statusRequest[idPacket] = True
-    globalLock.release()
+            f.close()
+            return missingParts # Ho finito, ritorno le parti mancanti
+        
+        statusPart.append(int.from_bytes(r,'big'))
 
-    count = 0
+        if sum(statusPart) == 0: # Tutti i chunk sono nulli: parte mancante
 
-    for peer in listPeers:
-
-        ipv4, ipv6, port = Util.ip_deformatting(peer[0],peer[1])
-        con = Conn(ipv4, ipv6, port)
-
-        if con.connection():
-
-            count += 1
-            con.s.send(pack.encode())
-            printLog("Richiesta SUPE a vicino ::: " + ipv4)
-            con.deconnection()
-
-        else:
-            printLog("Richiesta SUPE fallita per ::: " + ipv4)
-
-    if count == 0:
-
-        print("                              .-.                                         ")
-        print("                             (  o)-.                                      ")
-        print("                              ) )\|\)                                     ")
-        print("                           _./ (,_                                        ")
-        print("                          ( '**\"  )                                      ")
-        print("                          \\\\\   ///                                     ")
-        print("                           \\\\\|///                                      ")
-        print("                     _______//|\\\\____________               .           ")
-        print("                   ,'______///|\\\\\________,'|            \  :  /        ")
-        print("     _ _           |  ____________________|,'             ' _ '           ")
-        print("    ' Y ' _ _      | ||              |                -= ( (_) )=-        ")
-        print("    _ _  ' Y '     | ||              |                    .   .           ")
-        print("   ' Y '_ _        | ||              |                   /  :  \          ")
-        print("       ( Y )       | ||              8                      '             ")
-        print("                   | ||              8                                    ")
-        print("                   | ||        /\/\  8                                    ")
-        print("                   | ||      .'   ``/|                                    ")
-        print("                   | ||      | x   ``|                                    ")
-        print("                   | ||      |  /. `/`                                    ")
-        print("                   | ||      '_/|  /```                 .-.               ")
-        print("                   | ||        (_,' ````                |.|               ")
-        print("  |J               | ||         |       \             /)|`|(\             ")
-        print(" L|                | ||       ,'         \           (.(|'|)`)            ")
-        print("  |                | ||     ,','| .'      \           `\`'./'             ")
-        print("~~~~~~~~~~~~~~~~~~~| ||~~~~~||~~||.        \~~~~~~~~~~~~|.|~~~~~~~~~~~    ")
-        print("                   | ||     ||  || \        \          ,|`|.              ")
-        print("  ~~               | ||     \"\"  \"\"  \        \          \"'\"   ~~    ")
-        print("                   | ||              )   .   )                            ")
-        print("                   | ||             / ,   ),'|      ~~                    ")
-        print("             ~~    | ||         ___/ /   ,'  |              (_)           ")
-        print("      ((__))       | ||   ~~   I____/  ,'    |              /\"/          ")
-        print("      ( 0 0)       | ||         I____,'      *             ^~^            ")
-        print("       `\_\\\\       | ||                          ~~                     ")
-        print("         \"'\"'      | ||                                                 ")
-        print("  ~~               | ||         ~~                          ~~            ")
-        print("                   |_|/                                                   ")
-        print("                                                                          ")
-
-        print('\nNobody found after update. Sorry, you\'re on your own\n')
-        exit()
-
-    cond = Condition()
-    cond.acquire()
-    cond.wait(20)
-    cond.release()
-
-    globalLock.acquire()
-    statusRequest[idPacket] = False
-    globalLock.release()
-
-    globalLock.acquire()
-    Util.mode = mode
-    globalLock.release()
-
-
+            missingParts.append(indexPart)
+        
+        statusPart = [] # Reset degli stati
+        indexPart += 1
 
 ########################################################################################
 

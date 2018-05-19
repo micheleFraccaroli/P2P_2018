@@ -32,8 +32,7 @@ class Conn:
 #            self.s.setblocking(0)
             self.s.connect(self.infoS[0][4])
 
-        except IOError as e:
-            print(e)
+        except IOError:
             return False
         
         else:
@@ -42,8 +41,8 @@ class Conn:
     def deconnection(self):
         try:
             self.s.close()
-        except IOError as expt:
-            print (expt)
+        except IOError:
+            pass
 
     def initializeSocket(self):
 
