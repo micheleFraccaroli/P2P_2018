@@ -10,6 +10,8 @@ from Track import Track
 from RF import RF
 from queue import *
 from D import D
+from Upload import Upload
+from random import shuffle
 
 nThread = 1
 
@@ -21,12 +23,16 @@ print(t.daemon)
 t.start()
 '''
 # Thread del tracket che poduce lo stato di un file
-#t = Track()
-#t.start()
+t = Upload('127.0.0.1','::1',3500)
+t.daemon = True
+t.start()
 
 input('Press to start thread...')
 q = LifoQueue()
-t = D( [0,6,5,4,3,2,1,9,7,8], q, 'test', 200, 'carudio.jpg', 200)
+status = [a for a in range(159)]
+print(status)
+shuffle(status)
+t = D( status, q, 'test', 200, 'baboon.png', 4096, 'qwertyuiopqwertyuiopqwertyuiopad')
 t.start()
 print('started...')
 t.join()

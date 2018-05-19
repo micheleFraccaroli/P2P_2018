@@ -43,6 +43,33 @@ class dataBase:
 			else:
 				return ['ER', sessionMode]
 
+	def retrieveConfig(self,lPars):
+
+		if len(lPars) == 1:
+			lPars = str(lPars)
+			lPars = lPars.replace(',','') # Elimino la virgola dalla tupla con un solo elemento
+		else:
+			lPars = str(lPars)
+
+		con = s3.connect('TorrentDB.db')
+		c = con.cursor()
+		#c.execute('SELECT * FROM config WHERE name IN ("mode")')
+		c.execute('SELECT * FROM config WHERE name IN '+ lPars)
+		res = c.fetchall()
+
+		class Container(object):
+			pass
+
+		if len(res) > 1: # Ritorno un oggetto con gli attributi di config
+
+			container = Container()
+			for par in res:
+				setattr(container,par[0],par[1])
+
+			return container
+		else: # Ritorno il singolo parametro richiesto
+			return res[0][1]
+
 	def login(self, ip, port, sid):
 		con = s3.connect('TorrentDB.db')
 		c = con.cursor()
@@ -200,86 +227,84 @@ class dataBase:
 		con = s3.connect('TorrentDB.db')
 		c = con.cursor()
 
-		c.execute('SELECT npart, lenfile, lenpart FROM file WHERE md5 = ?', (md5,))
+		c.execute('SELECT npart, lenfile, lenpart, name FROM file WHERE md5 = ?', (md5,))
 		res = c.fetchone()
 
 		con.close()
 		return res
 
-	import sqlite3 as s3
-
-def checkLogout(sid):
-		con = s3.connect('TorrentDB.db')
-		c = con.cursor()
-
-		c.execute('SELECT md5 FROM file WHERE sessionid = "' + sid + '"')
-		res = c.fetchall()
-
-		partdown = 0
-		partdown_final = 0
-		#print(res)
-		for md5 in res:
-			#print("md5 --> " + str(md5))
-			c.execute('SELECT bits FROM bitmapping WHERE md5 = ? AND sid = ?', (md5[0], sid))
-			my = c.fetchall()
-			my_l = []
-			for m in my:
-				my_l.append(m[0])
-			#print("mio --> " + str(my_l))
-
-			c.execute('SELECT sid FROM f_in WHERE md5 = "' + md5[0] + '" AND sid <> "' + sid + '"')
-			res2 = c.fetchall()
-			#print("sid interessati --> " + str(res2))
-			list_matching = []
-			for sidf in res2:
-				c.execute('SELECT bits FROM bitmapping WHERE md5 = ? AND sid = ?', (md5[0], sidf[0]))
-				st = c.fetchall()
-				list_matching.append(st)
-			i = 0
-			k = 0
-			buffer = []
-			buffer_in = []
-			#print("\nlist_matching ---> " + str(list_matching))
-			if(list_matching):
-				for r in list_matching[0]:
-					for lm in range(len(list_matching)):
-						buffer_in.append(list_matching[lm][i][0])
-					#print("buffer_in ---> " + str(buffer_in))
-					i = i + 1
-					buffer.append(buffer_in)
-					buffer_in = []
-
-			j = 0
-			buf_res_list = []
-			#print("buffer ---> " + str(buffer))
-			for buf in buffer:
-				buf_res = 0
-				for b in range(len(buf)):
-					#print("b " + str(b))
-					#print("buf[b] ---> " + str(buf[b]))
-					buf_res = buf_res | buf[b]
-					#print("buf_res " + str(buf_res))
-					partdown = bin(buf_res)[2:].count('1')
-				partdown_final = partdown_final + partdown		
-				#print("partdown_final ---> " + str(partdown_final))
-				buf_res_list.append(buf_res)
-				#print("buf_res_list ---> " + str(buf_res_list))
-				j = j + 1
-			
-		if(my_l != buf_res_list):
-			return "NLOG", partdown_final
-		else:
-			return "ALOG", partdown_final
-
-		# login del peer
-		def insertSid(self, sid):
+	def checkLogout(sid):
 			con = s3.connect('TorrentDB.db')
 			c = con.cursor()
 
-			c.execute('INSERT INTO config VALUES("sid", ?)', (sid,))
+			c.execute('SELECT md5 FROM file WHERE sessionid = "' + sid + '"')
+			res = c.fetchall()
 
-			con.commit()
-			con.close()
+			partdown = 0
+			partdown_final = 0
+			#print(res)
+			for md5 in res:
+				#print("md5 --> " + str(md5))
+				c.execute('SELECT bits FROM bitmapping WHERE md5 = ? AND sid = ?', (md5[0], sid))
+				my = c.fetchall()
+				my_l = []
+				for m in my:
+					my_l.append(m[0])
+				#print("mio --> " + str(my_l))
+
+				c.execute('SELECT sid FROM f_in WHERE md5 = "' + md5[0] + '" AND sid <> "' + sid + '"')
+				res2 = c.fetchall()
+				#print("sid interessati --> " + str(res2))
+				list_matching = []
+				for sidf in res2:
+					c.execute('SELECT bits FROM bitmapping WHERE md5 = ? AND sid = ?', (md5[0], sidf[0]))
+					st = c.fetchall()
+					list_matching.append(st)
+				i = 0
+				k = 0
+				buffer = []
+				buffer_in = []
+				#print("\nlist_matching ---> " + str(list_matching))
+				if(list_matching):
+					for r in list_matching[0]:
+						for lm in range(len(list_matching)):
+							buffer_in.append(list_matching[lm][i][0])
+						#print("buffer_in ---> " + str(buffer_in))
+						i = i + 1
+						buffer.append(buffer_in)
+						buffer_in = []
+
+				j = 0
+				buf_res_list = []
+				#print("buffer ---> " + str(buffer))
+				for buf in buffer:
+					buf_res = 0
+					for b in range(len(buf)):
+						#print("b " + str(b))
+						#print("buf[b] ---> " + str(buf[b]))
+						buf_res = buf_res | buf[b]
+						#print("buf_res " + str(buf_res))
+						partdown = bin(buf_res)[2:].count('1')
+					partdown_final = partdown_final + partdown		
+					#print("partdown_final ---> " + str(partdown_final))
+					buf_res_list.append(buf_res)
+					#print("buf_res_list ---> " + str(buf_res_list))
+					j = j + 1
+				
+			if(my_l != buf_res_list):
+				return "NLOG", partdown_final
+			else:
+				return "ALOG", partdown_final
+
+			# login del peer
+			def insertSid(self, sid):
+				con = s3.connect('TorrentDB.db')
+				c = con.cursor()
+
+				c.execute('INSERT INTO config VALUES("sid", ?)', (sid,))
+
+				con.commit()
+				con.close()
 
 if __name__ == "__main__":
 	db = dataBase()

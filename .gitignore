@@ -5,4 +5,5 @@
 **/*.log
 **/*.txt
 **/img
+**/Files
 **/*.png
