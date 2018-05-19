@@ -10,9 +10,10 @@ from random import shuffle
 from operator import itemgetter # Per il sorting
 from queue import * # Passaggio parametri tra socket
 from D import D
+import curses
 
 class RF(Thread):
-	def __init__(self, byt, t_ipv4, t_ipv6, t_port):
+	def __init__(self, t_ipv4, t_ipv6, t_port):
 		Thread.__init__(self)
 		self.search = ""
 		self.t_ipv4 = t_ipv4
@@ -20,18 +21,17 @@ class RF(Thread):
 		self.t_port = t_port
 		self.list_answers = []
 		self.md5_lfile_lpart = ()
-		self.lenfile = 0
-		self.lenpart = 0
 
 	def run(self):
 		#LOOK
 		while((self.search == "") or (len(self.search)>20)):
 			self.search = input("input non corretto per iniziare una ricerca: ")
 		db = dataBase()
-		self.sessionid = db.retrieveConfig(('sessionId,'))
+		self.sessionid = db.retrieveConfig(('sessionId',))
 		self.con = Conn(self.t_ipv4, self.t_ipv6, self.t_port)
 		if(self.con.connection()):
-			self.pkt_look = self.sessionid+self.search.ljust(20)
+			print('connesso')
+			self.pkt_look = 'LOOK'+self.sessionid+self.search.ljust(20)
 			self.con.s.send(self.pkt_look.encode())
 
 			self.ack_look = self.con.s.recv(7)
@@ -58,8 +58,10 @@ class RF(Thread):
 
 			if(md5 != None):
 				self.pkt_fchu = "FCHU"+self.sessionid+md5[0]
-				self.lenfile = int(md5[1])
-				self.lenpart = int(md5[2])
+				lenfile = int(md5[1])
+				lenpart = int(md5[2])
+				nBit = int(math.ceil(lenfile/lenpart))
+
 				#self.con.s.send(self.pkt_fchu.encode())
 			else:
 				print("Non faccio nulla...")
@@ -67,7 +69,7 @@ class RF(Thread):
 		else:
 			print("Errore durante la connessione...")
 		#FINE LOOK
-
+		print('fine look')
 		queue = LifoQueue() #Coda LIFO
 		controllerIsAlive = False # Stato del controller di download
 
@@ -106,7 +108,7 @@ class RF(Thread):
 
 		while True:
 
-			c = Conn('127.0.0.1','::1',3000)
+			c = Conn(self.t_ipv4, self.t_ipv6, self.t_port)
 
 			if not c.connection():
 
@@ -120,16 +122,15 @@ class RF(Thread):
 
 				byte = []
 
-				self.ack_afch = c.s.recv(7)
-				self.bytes_read = len(self.ack_afch)
+				hitPeers = c.s.recv(7)
+				readB = len(hitPeers)
 
-				while(self.bytes_read < 7):
-					self.ack_afch += self.con.s.recv(7 - self.bytes_read)
-					self.bytes_read = len(self.ack_afch)
+				while(readB < 7):
+					hitPeers += c.s.recv(7 - readB)
+					readB = len(hitPeers)
 
-				nBlock = int(math.ceil(lenfile/lenpart))//8
-				nBit = int(math.ceil(lenfile/lenpart))
-				nPeers = int(self.bytes_read[4:7].decode())
+				nBlock = math.ceil(nBit/8)
+				nPeers = int(hitPeers[4:7].decode())
 
 				c.deconnection()
 

@@ -16,12 +16,12 @@ from random import shuffle
 nThread = 1
 
 # Demone grafico
-'''
+
 t = Graphics()
 t.daemon = True
-print(t.daemon)
+#print(t.daemon)
 t.start()
-'''
+
 # Thread del tracket che poduce lo stato di un file
 t = Upload('127.0.0.1','::1',3500)
 t.daemon = True
@@ -32,7 +32,8 @@ q = LifoQueue()
 status = [a for a in range(159)]
 print(status)
 shuffle(status)
-t = D( status, q, 'test', 200, 'baboon.png', 4096, 'qwertyuiopqwertyuiopqwertyuiopad')
+#t = D( status, q, 'test', 200, 'baboon.png', 4096, 'qwertyuiopqwertyuiopqwertyuiopad')
+t=RF('127.0.0.1','::1',3000)
 t.start()
 print('started...')
 t.join()

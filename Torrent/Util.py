@@ -24,6 +24,7 @@ globalDict = {} # sid : list of md5
 
 
 # Grafica
+
 rows = [] # Lista di tags dei file in download
 uniqueIdRow = 0
 
