@@ -72,8 +72,11 @@ class dataBase:
 		con = s3.connect('TorrentDB.db')
 		c = con.cursor()
 
-		res = c.execute('INSERT INTO login VALUES (?,?,?)', (ip, port, sid))
-
+		try:
+			res = c.execute('INSERT INTO login VALUES (?,?,?)', (ip, port, sid))
+		except:
+			print("Just logged!")
+			
 		con.commit()
 		con.close()
 
@@ -322,6 +325,18 @@ class dataBase:
 
 		con.commit()
 		con.close()
+
+	def checkLogged(self):
+		con = s3.connect("TorrentDB.db")
+		c = con.cursor()
+
+		c.execute("SELECT ip, port FROM login")
+		res = c.fetchall()
+
+
+
+		con.close()
+		return res
 
 if __name__ == "__main__":
 	db = dataBase()
