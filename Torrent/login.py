@@ -13,6 +13,7 @@ class login:
 
     def send_login(self):
         con = Conn(self.ip4_t, self.ip6_t, self.port_t)
+
         if con.connection():
 
             addr = Util.ip_formatting(self.ip4_l, self.ip6_l, self.port_l)
@@ -23,7 +24,11 @@ class login:
 
             recv_packet = con.s.recv(20)
             if(recv_packet[:4].decode() == 'ALGI'):
-                db.insertSid(recv_packet[4:].decode())
+                db = dataBase()
+                db.updateConfig('sessionId',recv_packet[4:].decode())
+                db.updateConfig('mode','logged')
+                Util.sessionId = recv_packet[4:].decode()
+                del db
                 Util.mode = "logged"
             else:
                 Util.printLog(recv_packet)
