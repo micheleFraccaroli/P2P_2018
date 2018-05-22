@@ -94,6 +94,8 @@ class RF(Thread):
 			
 			con.deconnection()
 
+			Util.searchLock.aquire()
+
 			# Menù
 			md5 = curses.wrapper(Util.menu, list_answers, ['Select a file:'])
 
@@ -124,12 +126,16 @@ class RF(Thread):
 			else:
 				
 				Util.printLog("Download aborted...")
+				Util.searchLock.release()
 				exit()
 		else:
 
 			Util.printLog("Error. Unable to connect to the tracker")
+			Util.searchLock.release()
 			exit()
 
+		Util.searchLock.release()
+		
 		#FINE LOOK
 		
 		queue = LifoQueue() #Coda LIFO
