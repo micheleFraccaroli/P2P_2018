@@ -6,6 +6,7 @@ import math
 from time import sleep
 from dataBase import dataBase
 from math import log
+from Config import Config
 from random import shuffle
 from operator import itemgetter # Per il sorting
 from queue import * # Passaggio parametri tra socket
@@ -15,12 +16,12 @@ from pathlib import Path
 from tkinter import Button, PhotoImage
 
 def pauseAndplay(b, cond, queue):
-	
+
 	if b['image'] == 'pyimage1': # Sono in play
 
 		queue.put('pause')
 		b['image'] = Util.play
-	
+
 	else: # Sono in pause
 
 		b['image'] = Util.pause
@@ -38,60 +39,59 @@ def stop(cond, queue):
 	cond.release()
 
 class RF(Thread):
-
-	def __init__(self, t_ipv4, t_ipv6, t_port):
+	def __init__(self, config, search):
 		Thread.__init__(self)
-		self.search = ""
-		self.t_ipv4 = t_ipv4
-		self.t_ipv6 = t_ipv6
-		self.t_port = t_port
+		self.t_ipv4 = config.trackerV4
+		self.t_ipv6 = config.trackerV6
+		self.t_port = config.trackerP
 
 	def run(self):
-		
+
 		#LOOK
 
-		list_answers = [] # Lista per il menù
-		
+		ers = [] # Lista per il menù
+
 		search = input("Research >> ")
 		while len(search) == 0 or len(search) > 20:
-			
+
 			search = input("Research >> ")
-		
+
 		db = dataBase()
 		sessionid = db.retrieveConfig(('sessionId',))
-		
+
 		con = Conn(self.t_ipv4, self.t_ipv6, self.t_port)
 		if con.connection():
-			
+
 			pkt_look = 'LOOK' + sessionid + search.ljust(20)
-			
+
 			con.s.send(pkt_look.encode())
 
 			ack_look = con.s.recv(7)	# Ricezione intestazione
 			bytes_read = len(ack_look)
 
 			while bytes_read < 7:
-				
+
 				ack_look += con.s.recv(7 - bytes_read)
 				bytes_read = len(ack_look)
 
 			nanswer = int(ack_look[4:7].decode())
-			
+			list_answers = []
+
 			for _ in range(nanswer):	# Per ogni md5
-				
+
 				answer = con.s.recv(148)
 				bytes_read = len(answer)
-				
+
 				while bytes_read < 148:
-					
+
 					answer += con.s.recv(148 - bytes_read)
 					bytes_read = len(answer)
-				
+				md5_lfile_lpart = ()
 				md5_lfile_lpart = (answer[:32].decode(), answer[132:142].decode(), answer[142:148].decode())
 				list_answers.extend((answer[32:132].decode().strip(),md5_lfile_lpart))
-			
+
 			list_answers.extend(("Abort",None))
-			
+
 			con.deconnection()
 
 			Util.searchLock.aquire()
@@ -114,7 +114,7 @@ class RF(Thread):
 						exit()
 
 				pkt_fchu = "FCHU" + sessionid + md5[0]
-				
+
 				lenfile = int(md5[1])
 				lenpart = int(md5[2])
 				md5 = md5[0]
@@ -124,7 +124,7 @@ class RF(Thread):
 				infoFile = infoFile[3] # Mi tengo solo il nome del file
 
 			else:
-				
+
 				Util.printLog("Download aborted...")
 				Util.searchLock.release()
 				exit()
@@ -137,7 +137,7 @@ class RF(Thread):
 		Util.searchLock.release()
 		
 		#FINE LOOK
-		
+
 		queue = LifoQueue() #Coda LIFO
 		controllerIsAlive = False # Stato del controller di download
 
@@ -180,7 +180,7 @@ class RF(Thread):
 		#b.pack()
 		b['command'] = lambda: pauseAndplay(b, dCond, queue)
 		b.place(x=0, y=Util.offsety + (Util.heightRow * rowNumber))
-		
+
 		b2 = Button(Util.master, height='10', width='10', image=Util.stop)
 		#b2.pack(ipadx=20, ipady=Util.offsety + (Util.heightRow * rowNumber))
 		b2['command'] = lambda: stop(dCond, queue)
@@ -216,8 +216,8 @@ class RF(Thread):
 				hitPeers = c.s.recv(7)	# Intestazione pacchetto AFCH
 				readB = len(hitPeers)
 
-				listPeers = [] # Tutti i peer 
-				
+				listPeers = [] # Tutti i peer
+
 				while(readB < 7):
 					hitPeers += c.s.recv(7 - readB)
 					readB = len(hitPeers)
@@ -225,7 +225,7 @@ class RF(Thread):
 				nBlock = math.ceil(nBit/8)
 				nPeers = int(hitPeers[4:7].decode())
 				toReadB = 60 + nBlock # Ip + stato
-				
+
 				for peer in range(nPeers): # Per ogni peer
 
 					infoPeer = c.s.recv(toReadB)

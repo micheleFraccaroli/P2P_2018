@@ -8,10 +8,10 @@ from Conn import Conn
 #e sessionid che se ne sta occupando CESO
 #aggiunta del file lato peer
 class Add:
-    def __init__(self, t_ipv4, t_ipv6, t_port, sid):
-        self.t_ipv4 = t_ipv4
-        self.t_ipv6 = t_ipv6
-        self.t_port = t_port
+    def __init__(self, config, sid):
+        self.t_ipv4 = config.trackerV4
+        self.t_ipv6 = config.trackerV6
+        self.t_port = config.trackerP
         self.sid = sid
         self.lenpart = "262144"
         self.con = Conn(self.t_ipv4, self.t_ipv6, self.t_port)
@@ -34,8 +34,6 @@ class Add:
                 self.f_name = self.filename.ljust(100, ' ')
 
             if(self.con.connection()):
-                #db = dataBase()
-                #self.sid = db.retrieveConfig((sessionId,))
                 self.data_add_file = self.sid + self.size + self.lenpart + self.f_name + self.FileHash.hexdigest()
                 self.con.s.send(self.data_add_file.encode())
 
@@ -46,11 +44,13 @@ class Add:
                     self.ack_aadr += self.con.s.recv(12 - self.bytes_read)
                     self.bytes_read = len(self.ack_aadr)
 
+                    print('Added file ' + nameFile + 'to tracker')
+
                 self.con.deconnection()
             else:
-                print("Errore di connessione, riprovare...")
+                print("Connection refused...")
         else:
-            print("Non ho trovato nessun file con il seguente nome nella cartella img")
+            print("Thre isn't no file with this name in your directory img")
 
 if __name__ == '__main__':
     aggiunta = Add("127.0.0.1","::1",3000, "1234567891234567")
