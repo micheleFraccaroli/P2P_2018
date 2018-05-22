@@ -5,16 +5,17 @@ from dataBase import *
 #Classe per l'invio della richiesta di logout da parte del peer
 
 class logout:
-    def _init_(self, config, sid):
+    def __init__(self, config):
         self.t_ipv4 = config.trackerV4
         self.t_ipv6 = config.trackerV6
         self.t_port = config.trackerP
-        self.sid = sid
+        self.sid = Util.sessionId
         self.con = Conn(self.t_ipv4, self.t_ipv6, self.t_port)
 
-    def send_logout():
+    def send_logout(self):
         if(self.con.connection()):
-            self.log_pkt = "LOGO"+sid
+            db = dataBase()
+            self.log_pkt = "LOGO"+self.sid
             self.con.s.send(self.log_pkt.encode())
 
             self.ack_log = self.con.s.recv(14)
@@ -23,14 +24,12 @@ class logout:
             while(self.bytes_read < 14):
                 self.ack_log += self.con.s.recv(14 - self.bytes_read)
                 self.bytes_read = len(self.ack_log)
-            print(self.ack_log.encode())
-            if(self.ack_log[0:4].encode() == "NLOG"):
-                Util.mode = 'logged'
-            else:
-                db = dataBase()
-                db.destroy()
-                del db
+
+            if(self.ack_log[0:4].decode() != "NLOG"):
+                db.updateConfig('mode','normal')
+                db.deleteAll(self.sid)
                 Util.mode = 'normal'
+                del db
             self.con.deconnection()
         else:
             print("Connection refused...")
