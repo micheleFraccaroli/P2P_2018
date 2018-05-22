@@ -11,7 +11,7 @@ class plot_net:
     G = nx.Graph()
     pos = nx.spring_layout(G)
     fig, ax = plt.subplots(figsize=(10,6))
-    t = 'T'
+    t = 'Tracker'
     G.add_node(t)
     edges = []
 

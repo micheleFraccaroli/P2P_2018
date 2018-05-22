@@ -42,7 +42,6 @@ class tracker:
 				pause(0.5)
 
 		while True:
-			
 			Util.printLog("###### IN ATTESA DI UNA RICHIESTA #######")
 			other_peersocket, addr = peersocket.accept()
 			if addr[0][:2] == "::":
