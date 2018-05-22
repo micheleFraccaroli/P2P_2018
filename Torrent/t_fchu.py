@@ -4,6 +4,7 @@ import math
 import partList_gen as pL
 import codecs
 from dataBase import dataBase
+from plot_net import plot_net
 
 class t_fchu(th.Thread):
 	def __init__(self, other_peersocket):
