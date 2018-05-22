@@ -14,6 +14,16 @@ from plot_net import plot_net
 from matplotlib.pyplot import pause
 from dataBase import dataBase
 
+class bcolors:
+    HEADER = '\033[95m'
+    OKBLUE = '\033[94m'
+    OKGREEN = '\033[92m'
+    MAGENTA = '\033[1;35m'
+    CYAN = '\033[1;36m'
+    WARNING = '\033[93m'
+    FAIL = '\033[91m'
+    ENDC = '\033[0m'
+
 class tracker:
 	def body(self):
 		open_conn = Conn(port = 3000)
@@ -34,9 +44,7 @@ class tracker:
 		while True:
 			
 			Util.printLog("###### IN ATTESA DI UNA RICHIESTA #######")
-			print('RICHISTA')
 			other_peersocket, addr = peersocket.accept()
-			print('ancora')
 			if addr[0][:2] == "::":
 				addrPack = addr[0][7:]
 				Util.printLog("Richiesta in arrivo da: "+addrPack)
@@ -107,5 +115,13 @@ class tracker:
 					th_RPAD.start()
 
 if __name__ == "__main__":
+
+	print(bcolors.MAGENTA + "____________________________      ________   ______   " + bcolors.ENDC)
+	print(bcolors.MAGENTA + "\______   \_____  \______   \    /  _____/  /  __  \  " + bcolors.ENDC)
+	print(bcolors.OKBLUE  + " |     ___//  ____/|     ___/   /   \  ___  >      <  " + bcolors.ENDC)
+	print(bcolors.OKBLUE  + " |    |   /       \|    |       \    \_\  \/   --   \ " + bcolors.ENDC)
+	print(bcolors.CYAN    + " |____|   \_______ \____|        \______  /\______  / " + bcolors.ENDC)
+	print(bcolors.CYAN    + "                  \/                    \/        \/  " + bcolors.ENDC)
+
 	t = tracker()
 	t.body()

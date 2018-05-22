@@ -11,7 +11,7 @@ class plot_net:
     G = nx.Graph()
     pos = nx.spring_layout(G)
     fig, ax = plt.subplots(figsize=(10,6))
-    t = '1'
+    t = 'T'
     G.add_node(t)
     edges = []
 
@@ -22,28 +22,24 @@ class plot_net:
         self.G.add_edge(self.t, node, color='black')
         edges = self.G.edges()
         colors = [self.G[u][v]['color'] for u,v in edges]
-        nx.draw(self.G, edges=edges, edge_color=colors, with_labels=True, node_color = c, font_size=10, font_color='black')
+        nx.draw(self.G, with_labels=True, node_color = c, node_shape="s", alpha=0.5, font_size=10, font_color='black')
 
-        custom_lines = [Line2D([0], [0], marker ='o',color='black', markersize=10, lw=0),
-                    Line2D([0], [0], marker ='o',color='green', markersize=10, lw=0),
-                    Line2D([0], [0], marker ='o',color='orange', markersize=10, lw=0),
-                    Line2D([0], [0], marker ='o',color='red', markersize=10, lw=0),
-                    Line2D([0], [0], marker ='o',color='blue', markersize=10, lw=0)]
+        custom_lines = [Line2D([0], [0], marker ='o',color='black',alpha=0.5, markersize=10, lw=0),
+                    Line2D([0], [0], marker ='o',color='green', alpha=0.5, markersize=10, lw=0)]
 
-        plt.legend(custom_lines, ['Tracker', 'peer logged', 'fchu', 'rpad', 'addr'])
+        plt.title('Tracker')
+        plt.legend(custom_lines, ['Tracker', 'peer logged'])
 
     def removePeer(self, node, c):
         self.ax.clear()
         self.G.remove_node(node)
-        nx.draw(self.G, with_labels=True, node_color = c, font_size=10, font_color='black')
+        nx.draw(self.G, with_labels=True, node_color = c, node_shape="s", alpha=0.5,font_size=10, font_color='black')
 
-        custom_lines = [Line2D([0], [0], marker ='o',color='black', markersize=10, lw=0),
-                    Line2D([0], [0], marker ='o',color='green', markersize=10, lw=0),
-                    Line2D([0], [0], marker ='o',color='orange', markersize=10, lw=0),
-                    Line2D([0], [0], marker ='o',color='red', markersize=10, lw=0),
-                    Line2D([0], [0], marker ='o',color='blue', markersize=10, lw=0)]
+        custom_lines = [Line2D([0], [0], marker ='o',color='black',alpha=0.5, markersize=10, lw=0),
+                    Line2D([0], [0], marker ='o',color='green', alpha=0.5, markersize=10, lw=0)]
 
-        plt.legend(custom_lines, ['Tracker', 'peer logged', 'fchu', 'rpad', 'addr'])
+        plt.title('Tracker')
+        plt.legend(custom_lines, ['Tracker', 'peer logged'])
 
 if __name__ == "__main__":    
     pn = plot_net()
