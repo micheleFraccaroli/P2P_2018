@@ -27,6 +27,9 @@ class dataBase:
 
 			con.commit()
 			con.close()
+			print(mode,mode)
+
+			return ['OK', mode]
 
 		else: # Database già esistente, riutilizzo le impostazioni
 

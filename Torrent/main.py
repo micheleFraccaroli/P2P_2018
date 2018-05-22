@@ -123,6 +123,7 @@ time.sleep(2)
 
 db = dataBase()
 Util.mode = 'normal'
+
 code,dbMode = db.create(Util.mode)
 
 if code != 'OK': # C'è ancora una sessione salvata
@@ -145,7 +146,7 @@ while True: # Menu principale
 	op = menuMode[Util.mode]()
 
 	Util.searchLock.acquire()
-	while activeSearch > 0:
+	while Util.activeSearch > 0:
 
 		Util.searchLock.release()
 		
