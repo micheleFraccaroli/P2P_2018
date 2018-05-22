@@ -6,18 +6,19 @@ import math
 from time import sleep
 from dataBase import dataBase
 from math import log
+from Config import Config
 from random import shuffle
 from operator import itemgetter # Per il sorting
 from queue import * # Passaggio parametri tra socket
 from D import D
 
 class RF(Thread):
-	def __init__(self, byt, t_ipv4, t_ipv6, t_port):
+	def __init__(self, config, search):
 		Thread.__init__(self)
-		self.search = ""
-		self.t_ipv4 = t_ipv4
-		self.t_ipv6 = t_ipv6
-		self.t_port = t_port
+		self.search = search
+		self.t_ipv4 = config.trackerV4
+		self.t_ipv6 = config.trackerV6
+		self.t_port = config.trackerP
 		self.list_answers = []
 		self.md5_lfile_lpart = ()
 		self.lenfile = 0
@@ -26,7 +27,7 @@ class RF(Thread):
 	def run(self):
 		#LOOK
 		while((self.search == "") or (len(self.search)>20)):
-			self.search = input("input non corretto per iniziare una ricerca: ")
+			self.search = input("input incorrect, try again >>")
 		db = dataBase()
 		self.sessionid = db.retrieveConfig(('sessionId,'))
 		self.con = Conn(self.t_ipv4, self.t_ipv6, self.t_port)
