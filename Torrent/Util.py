@@ -12,7 +12,7 @@ from pathlib import Path
 from threading import Semaphore, Lock
 
 # Variabili globali
-mode = None # Modalità di utilizzo del programma: 'normal', 'super', 'update', 'logged'
+mode = None # Modalità di utilizzo del programma: 'normal', 'logged'
 sessionId = None # Id sesion da loggati
 statusRequest = {} # Dizionario per lo stato delle richieste: true: valida false: invalida
 listPeers = [] # Lista dei peers utilizzata durante l'aggiornamento delle tabelle dei peers

@@ -123,7 +123,7 @@ time.sleep(2)
 
 db = dataBase()
 Util.mode = 'normal'
-print(Util.mode)
+
 code,dbMode = db.create(Util.mode)
 
 if code != 'OK': # C'è ancora una sessione salvata
