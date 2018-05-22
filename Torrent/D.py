@@ -208,8 +208,8 @@ class D(Thread):
 			else:
 
 				Util.dSem.acquire()
-				#self.status[self.pun][1]
-				t = Worker(self.status[self.pun][0] + self.firstId, self.status[self.pun][0] + 1, data, self.fileName, f, self.lenPart, [['127.0.0.1','::1',3500]], missingParts, self.md5, self.tag, wLock, fLock) # Istanza di download. Aggiungo 1 perchè gli id di tkinter partono da 1
+				
+				t = Worker(self.status[self.pun][0] + self.firstId, self.status[self.pun][0] + 1, data, self.fileName, f, self.lenPart, self.status[self.pun][1], missingParts, self.md5, self.tag, wLock, fLock) # Istanza di download. Aggiungo 1 perchè gli id di tkinter partono da 1
 				t.start()
 
 				self.pun += 1 # Incremento puntatore al prossimo download
