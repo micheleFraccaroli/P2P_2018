@@ -21,6 +21,20 @@ class t_rpad(th.Thread):
 			recv_packet += other_peersocket.recv(56 - self.bytes_read)
 			self.bytes_read = len(recv_packet)
 		
+		flag = True
+		check = db.getInterestedPeers(recv_packet[16:48].decode())
+		Util.printLog("CHECK → " + str(check))
+		for c in check:
+			Util.printLog("c → " + str(c[0]))
+			if(c[0] == recv_packet[:16].decode()):
+				flag = False
+
+		if(flag):
+			db.insertInterested(recv_packet[:16].decode(), recv_packet[16:48].decode())
+			Util.printLog("INSERITO IN F_IN")
+		else:
+			Util.printLog("NON INSERITO IN F_IN")
+			
 		# retrieving part for update
 		part_recv = recv_packet[48:].decode()
 		part = (int(part_recv)-1)//8
