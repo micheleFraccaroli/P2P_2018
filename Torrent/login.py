@@ -24,5 +24,8 @@ class login:
             recv_packet = con.s.recv(20)
             if(recv_packet[:4].decode() == 'ALGI'):
                 db.insertSid(recv_packet[4:].decode())
+                Util.mode = "logged"
+            else:
+                Util.printLog(recv_packet)
         else:
             Util.printLog('Richiesta LOGO fallita')
