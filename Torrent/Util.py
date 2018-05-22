@@ -23,6 +23,9 @@ waitMenu = Condition()
 globalDict = {} # sid : list of md5
 activeSearch = 0 # Numero di ricerche attualmente pronte
 searchLock = Lock() # Lock per le ricerche
+menuLock = Lock() # Lock per i menu
+searchIncoming = Condition()
+
 # Grafica
 
 rows = [] # Lista di tags dei file in download
