@@ -21,7 +21,10 @@ globalLock = Lock()
 loggedOut = Condition()
 waitMenu = Condition()
 globalDict = {} # sid : list of md5
-
+activeSearch = 0 # Numero di ricerche attualmente pronte
+searchLock = Lock() # Lock per le ricerche
+menuLock = Lock() # Lock per i menu
+searchIncoming = Condition()
 
 # Grafica
 
@@ -141,7 +144,9 @@ def menu(stdscr, listMenu, titleMenu, flag = None):
     attr['highlighted'] = color_pair(2)
     attr['system'] = color_pair(3)
 
-    stdscr.bkgd(' ',color_pair(1))
+    stdscr.timeout(1000)
+
+    #stdscr.bkgd(' ',color_pair(1)) # Colore background
     depthMenu = [] # Lista di tutti i menu incontrati
     depthMenu.append(listMenu)
 
@@ -180,7 +185,11 @@ def menu(stdscr, listMenu, titleMenu, flag = None):
                     par = attr['normal']
 
             stdscr.addstr('\n\t[{0}] '.format(count))
-            stdscr.addstr(listMenu[i] + '\n', par)
+
+            if par != attr['normal']:
+                stdscr.addstr(listMenu[i] + '\n', par)
+            else: # Non specificando la coppia di colore, uso i colori standard
+                stdscr.addstr(listMenu[i] + '\n')
             count += 1
 
         c = stdscr.getch()
@@ -246,6 +255,12 @@ def menu(stdscr, listMenu, titleMenu, flag = None):
 
                 c = 0 # Resetto input e l'opzione scelta
                 option = 0
+
+        else:
+
+            if activeSearch > 0 and current_thread() != main_thread(): # Ho delle ricerche    
+            
+                return None
 
 def analyzeFile(nameFile, lenPart):  # Analizzo il file per terminare il download dopo un crash
 

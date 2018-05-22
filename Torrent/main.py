@@ -144,5 +144,21 @@ while True: # Menu principale
 
 	op = menuMode[Util.mode]()
 
+	Util.searchLock.acquire()
+	while activeSearch > 0:
+
+		Util.searchLock.release()
+		
+		Util.searchIncoming.acquire()
+		Util.searchIncoming.wait()
+		Util.searchIncoming.release()
+
+		Util.searchLock.acquire()
+
+	Util.searchLock.release()
+	Util.menuLock.acquire()
 	fun = wrapper(Util.menu,op.options,['Select an option:'])
-	fun()
+	Util.menuLock.release()
+
+	if fun != None:
+		fun()
