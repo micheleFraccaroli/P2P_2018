@@ -38,10 +38,9 @@ class optionsNormal:
 
         db = dataBase()
         config = db.retrieveConfig(('selfV4','selfV6','selfP','trackerV4','trackerV6','trackerP'))
-        login = login(config)
-        login.send_login()
+        login_tracker = login(config)
+        login_tracker.send_login()
         del db
-        Util.mode = 'logged'
         time.sleep(1)
 
     def exit(self):
@@ -137,7 +136,7 @@ Util.mode = dbMode
 c = db.retrieveConfig(('timeResearch',))
 
 print("--- Configurations ---\n")
-print('timeResearch: ',c.timeResearch)
+print('timeResearch: ', c)
 print('mode: ',Util.mode)
 print("\n----------------------\n")
 
