@@ -20,23 +20,27 @@ class Graphics(Thread):
 
 	def run(self):
 		
-		master = Tk()
+		Util.master = Tk()
 
-		master.bind('<Button>', self.pb)
+		Util.master.bind('<Button>', self.pb)
 
-		yscrollbar = Scrollbar(master)
+		yscrollbar = Scrollbar(Util.master)
 		yscrollbar.pack(side=RIGHT, fill=Y)
 
-		xscrollbar = Scrollbar(master, orient=HORIZONTAL)
+		xscrollbar = Scrollbar(Util.master, orient=HORIZONTAL)
 		xscrollbar.pack(side=BOTTOM, fill=X)
 
-		masterHeight = master.winfo_screenheight()
-		masterWidth = master.winfo_screenwidth()
+		masterHeight = Util.master.winfo_screenheight()
+		masterWidth = Util.master.winfo_screenwidth()
 
-		Util.w = Canvas(master, width=masterWidth/2, height=masterHeight/2, scrollregion=(0, 0, masterWidth*10, masterHeight*10), yscrollcommand=yscrollbar.set, xscrollcommand=xscrollbar.set)
+		Util.w = Canvas(Util.master, width=masterWidth/2, height=masterHeight/2, scrollregion=(0, 0, masterWidth*10, masterHeight*10), yscrollcommand=yscrollbar.set, xscrollcommand=xscrollbar.set)
 		Util.w.pack()
 
 		yscrollbar.config(command=Util.w.yview)
 		xscrollbar.config(command=Util.w.xview)
 
-		master.mainloop()
+		Util.pause = PhotoImage(file='pause.png')
+		Util.play = PhotoImage(file='play.png')
+		Util.stop = PhotoImage(file='x.png')
+
+		Util.master.mainloop()

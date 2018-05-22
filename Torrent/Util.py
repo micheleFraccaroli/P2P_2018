@@ -26,16 +26,22 @@ globalDict = {} # sid : list of md5
 # Grafica
 
 rows = [] # Lista di tags dei file in download
+buttonsList = [] # Tutti i bottoni
 uniqueIdRow = 0
 
 # Dimensioni rettangoli e linee
-widthPart = 3
-heightPart = 50
-offset = 50
-nameFileHeight = 20
-heightLine = 15
+widthPart = 3           # Larghezza dei rettangoli
+heightPart = 50         # Altezza dei rettangoli
+offsety = 50            # Offset y dei blocchi
+offsetx = 200           # Offset x dei blocchi
 
-heightRow = heightPart + offset + nameFileHeight + heightLine # Altezza di una barra di un file
+labelOffsetx = 5        # Offset x delle statistiche
+labelDistance = 20      # Distanza tra i label
+
+nameFileHeight = 20     # Altezza del testo del nome del file
+heightLine = 15         # Altezza della riga per delineare i numeri delle parti
+
+heightRow = heightPart + offsety + nameFileHeight + heightLine # Altezza di una barra di un file
 lockGraphics = Lock()
 
 # Testo
