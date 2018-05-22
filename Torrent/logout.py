@@ -27,7 +27,7 @@ class logout:
 
             if(self.ack_log[0:4].decode() != "NLOG"):
                 db.updateConfig('mode','normal')
-                db.deleteAll(self.sid)
+                db.deleteAll()
                 Util.mode = 'normal'
                 del db
             self.con.deconnection()
