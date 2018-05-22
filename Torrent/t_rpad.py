@@ -8,7 +8,7 @@ class t_rpad(th.Thread):
 	def __init__(self, other_peersocket):
 		th.Thread.__init__(self)
 		self.other_peersocket = other_peersocket
-		self.bytes:read = 0
+		self.bytes_read = 0
 
 	def run(self):
 		db = dataBase()

@@ -34,9 +34,9 @@ class tracker:
 		while True:
 			
 			Util.printLog("###### IN ATTESA DI UNA RICHIESTA #######")
-
+			print('RICHISTA')
 			other_peersocket, addr = peersocket.accept()
-
+			print('ancora')
 			if addr[0][:2] == "::":
 				addrPack = addr[0][7:]
 				Util.printLog("Richiesta in arrivo da: "+addrPack)
@@ -89,6 +89,7 @@ class tracker:
 				if(recv_type.decode() == "LOOK"):
 					t_LOOK = t_look(other_peersocket)
 					t_LOOK.start()
+					print('LOOK')
 
 				# FCHU ---
 				if(recv_type.decode() == "FCHU"):

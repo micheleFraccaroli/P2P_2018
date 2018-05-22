@@ -2,7 +2,7 @@ import socket
 import threading as th
 import math
 import partList_gen as pL
-import codecs
+import Util
 from dataBase import dataBase
 from plot_net import plot_net
 
@@ -43,7 +43,7 @@ class t_fchu(th.Thread):
 
 		packet_resp = "AFCH" + str(hitpeer).zfill(3)
 		self.other_peersocket.send(packet_resp.encode())
-		Util.printLog(interested_peer)
+		Util.printLog(str(interested_peer))
 		for sid in interested_peer.keys():
 			if(sid != recv_packet[:16].decode()):
 				resp_list.append(interested_peer[sid])
