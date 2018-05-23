@@ -9,7 +9,7 @@ from threading import *
 from dataBase import *
 from curses import *
 from pathlib import Path
-from threading import Semaphore, Lock
+from threading import main_thread
 
 # Variabili globali
 mode = None # Modalità di utilizzo del programma: 'normal', 'logged'
@@ -120,6 +120,23 @@ def printError(desc):
     f.write('Timestamp: {:%d-%m-%Y %H:%M:%S} #### '.format(datetime.now()) + desc + '\n')
     f.close()
 
+def menuInput(stdscr, desc):
+    
+    echo()
+    stdscr.timeout(-1)
+
+    stdscr.clear()
+    stdscr.addstr(desc)
+    inp = stdscr.getstr(20)
+
+    while len(inp) == 0:
+        
+        stdscr.clear()
+        stdscr.addstr(desc)
+        inp = stdscr.getstr(20)
+    
+    return string
+
 def menu(stdscr, listMenu, titleMenu, flag = None):
 
     attr = {}
@@ -144,6 +161,7 @@ def menu(stdscr, listMenu, titleMenu, flag = None):
     attr['highlighted'] = color_pair(2)
     attr['system'] = color_pair(3)
 
+    noecho()
     stdscr.timeout(1000)
 
     #stdscr.bkgd(' ',color_pair(1)) # Colore background
@@ -214,8 +232,8 @@ def menu(stdscr, listMenu, titleMenu, flag = None):
         elif c == 10:
 
             if type(listMenu[option + 1]) != list: # L'elemento non è una lista quindi è quello che cerco
-
-                return listMenu[option + 1]
+                if current_thread() == main_thread():
+                    return listMenu[option + 1]
 
             else:                                  # L'elemento è una lista, quindi prevedo un altro livello di menu
 
@@ -257,9 +275,9 @@ def menu(stdscr, listMenu, titleMenu, flag = None):
                 option = 0
 
         else:
-
-            if activeSearch > 0 and current_thread() != main_thread(): # Ho delle ricerche    
             
+             if activeSearch > 0 and current_thread() == main_thread(): # Ho delle ricerche    
+
                 return None
 
 def analyzeFile(nameFile, lenPart):  # Analizzo il file per terminare il download dopo un crash

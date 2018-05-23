@@ -44,17 +44,13 @@ class RF(Thread):
 		self.t_ipv4 = config.trackerV4
 		self.t_ipv6 = config.trackerV6
 		self.t_port = config.trackerP
+		self.search = search
 
 	def run(self):
 
-		#LOOK
+		# LOOK
 
 		ers = [] # Lista per il menù
-
-		search = input("Research >> ")
-		while len(search) == 0 or len(search) > 20:
-
-			search = input("Research >> ")
 
 		db = dataBase()
 		sessionid = db.retrieveConfig(('sessionId',))
@@ -62,7 +58,7 @@ class RF(Thread):
 		con = Conn(self.t_ipv4, self.t_ipv6, self.t_port)
 		if con.connection():
 
-			pkt_look = 'LOOK' + sessionid + search.ljust(20)
+			pkt_look = 'LOOK' + sessionid + self.search.ljust(20)
 
 			con.s.send(pkt_look.encode())
 
@@ -86,8 +82,8 @@ class RF(Thread):
 
 					answer += con.s.recv(148 - bytes_read)
 					bytes_read = len(answer)
-				md5_lfile_lpart = ()
-				md5_lfile_lpart = (answer[:32].decode(), answer[132:142].decode(), answer[142:148].decode())
+
+				md5_lfile_lpart = (answer[:32].decode(), answer[132:142].decode(), answer[142:148].decode(), answer[32:132].decode())
 				list_answers.extend((answer[32:132].decode().strip(),md5_lfile_lpart))
 
 			list_answers.extend(("Abort",None))
@@ -95,9 +91,8 @@ class RF(Thread):
 			con.deconnection()
 
 			Util.searchLock.acquire()
-			activeSearch += 1
-			Util.searchLock.acquire()
-
+			Util.activeSearch += 1
+			Util.searchLock.release()
 			Util.menuLock.acquire()
 			# Menù
 			md5 = curses.wrapper(Util.menu, list_answers, ['Select a file:'])
@@ -105,9 +100,7 @@ class RF(Thread):
 			# md5[0] -> md5, md5[1] -> lenFile, md5[2] -> lenPart
 			if md5 != None:
 
-				fileName = db.retrieveInfoFile(md5[0])
-
-				if Path('Files/' + fileName[3]).is_file():
+				if Path('Files/' + md5[3]).is_file():
 
 					res = curses.wrapper(Util.menu,['Yes',True,'No',False],['The file requested already exists. Override it?'])
 
@@ -122,26 +115,35 @@ class RF(Thread):
 				lenpart = int(md5[2])
 				md5 = md5[0]
 				nBit = int(math.ceil(lenfile/lenpart))
-
-				infoFile = db.retrieveInfoFile(md5)
-				infoFile = infoFile[3] # Mi tengo solo il nome del file
+				infoFile = md5[3] # Mi tengo solo il nome del file
 
 			else:
 
 				Util.printLog("Download aborted...")
 				Util.menuLock.release()
+
+				Util.searchLock.acquire()
+				Util.activeSearch -= 1
+				if Util.activeSearch == 0:
+
+					Util.searchIncoming.acquire()
+					Util.searchIncoming.notify()
+					Util.searchIncoming.release()
+
+				Util.searchLock.release()
+
 				exit()
 		else:
 
 			Util.printLog("Error. Unable to connect to the tracker")
-			Util.menuLock.release()
 			exit()
 
 		Util.menuLock.release()
 		
 		Util.searchLock.acquire()
-		activeSearch -= 1
-		if activeSearch == 0:
+		Util.activeSearch -= 1
+		
+		if Util.activeSearch == 0:
 
 			Util.searchIncoming.acquire()
 			Util.searchIncoming.notify()
@@ -230,6 +232,7 @@ class RF(Thread):
 				readB = len(hitPeers)
 
 				listPeers = [] # Tutti i peer
+				listStatus = []
 
 				while(readB < 7):
 					hitPeers += c.s.recv(7 - readB)
@@ -238,6 +241,11 @@ class RF(Thread):
 				nBlock = math.ceil(nBit/8)
 				nPeers = int(hitPeers[4:7].decode())
 				toReadB = 60 + nBlock # Ip + stato
+
+				if nPeers == 0:
+
+					Util.printLog('No peer found...')
+					exit()
 
 				for peer in range(nPeers): # Per ogni peer
 

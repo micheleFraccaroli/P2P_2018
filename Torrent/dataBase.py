@@ -258,7 +258,10 @@ class dataBase:
 		
 		else:
 
-			c.execute('DELETE FROM login; DELETE FROM f_in; DELETE FROM bitmapping; DELETE FROM file')
+			c.execute('DELETE FROM login')
+			c.execute('DELETE FROM f_in')
+			c.execute('DELETE FROM bitmapping')
+			c.execute('DELETE FROM file')
 		
 		con.commit()
 
