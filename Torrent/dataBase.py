@@ -258,8 +258,11 @@ class dataBase:
 
 		else:
 
-			c.execute('DELETE FROM login; DELETE FROM f_in; DELETE FROM bitmapping; DELETE FROM file')
-
+			c.execute('DELETE FROM login')
+			c.execute('DELETE FROM f_in')
+			c.execute('DELETE FROM bitmapping')
+			c.execute('DELETE FROM file')
+		
 		con.commit()
 
 		con.close()
@@ -320,7 +323,7 @@ class dataBase:
 							Util.printLog("buf_res " + str(buf_res))
 							partdown = bin(buf_res)[2:].count('1')
 
-						partdown_final = partdown_final + partdown		
+						partdown_final = partdown_final + partdown
 						Util.printLog("partdown_final ---> " + str(partdown_final))
 
 						buf_res_list.append(buf_res)

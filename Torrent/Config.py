@@ -8,7 +8,7 @@ import random as ran
 class Config:
     
     def __init__(self):
-        whiteList = {'general':{'timeResearch':self.validateInt, 'timeIdle':self.validateInt, 'lenPart':self.validateInt, 'lenChunk':self.validateInt},
+        whiteList = {'general':{'lenPart':self.validateInt, 'lenChunk':self.validateInt},
                      'self':{'selfV4':self.validateIP, 'selfV6':self.validateIP, 'selfP':self.validateInt},
                      'tracker':{'trackerV4':self.validateIP, 'trackerV6':self.validateIP, 'trackerP':self.validateInt}
                     }

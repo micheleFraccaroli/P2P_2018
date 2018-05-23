@@ -14,6 +14,7 @@ from curses import *
 from login import login
 from logout import logout
 from threading import *
+from Graphics import Graphics
 
 class bcolors:
     HEADER = '\033[95m'
@@ -69,11 +70,11 @@ class optionsLogged:
         config = db.retrieveConfig(('trackerV4','trackerV6','trackerP'))
 
         del db
+        
+        search = wrapper(Util.menuInput, 'Search >> ')
 
-        research = input('Insert file name >> ')
-
-        search = RF(config, research)
-        search.start()
+        searchRF = RF(config, search)
+        searchRF.start()
 
     def add(self):
 
@@ -83,11 +84,11 @@ class optionsLogged:
 
         del db
 
-        nameFile = input('Insert name file for add operation >> ')
+        nameFile = wrapper(Util.menuInput, 'Insert name file for add operation >> ')
 
         add = Add(config, Util.sessionId)
 
-        add.add_file()
+        add.add_file(nameFile)
 
     def logout_from_tracker(self):
 
@@ -105,6 +106,14 @@ class optionsLogged:
         time.sleep(1)
 
         exit()
+
+Util.ffff = True
+
+# Demone grafico
+
+t = Graphics()
+t.daemon = True
+t.start()
 
 menuMode = {'normal': optionsNormal,'logged': optionsLogged} # Associazione tra modalità di utilizzo e classe associata per il menu
 
@@ -134,13 +143,6 @@ else:
 
 Util.mode = dbMode
 
-c = db.retrieveConfig(('timeResearch',))
-
-print("--- Configurations ---\n")
-print('timeResearch: ', c)
-print('mode: ',Util.mode)
-print("\n----------------------\n")
-
 while True: # Menu principale
 
 	op = menuMode[Util.mode]()
@@ -151,7 +153,9 @@ while True: # Menu principale
 		Util.searchLock.release()
 
 		Util.searchIncoming.acquire()
+
 		Util.searchIncoming.wait()
+
 		Util.searchIncoming.release()
 
 		Util.searchLock.acquire()
