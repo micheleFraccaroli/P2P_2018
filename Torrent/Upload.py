@@ -2,6 +2,7 @@ from threading import *
 from Conn import Conn
 from dataBase import dataBase
 from math import ceil
+import Util
 import os
 
 class Worker(Thread):
@@ -28,7 +29,7 @@ class Worker(Thread):
 		db = dataBase()
 
 		lenPart = db.retrieveInfoFile(md5)
-
+		Util.printLog(lenPart)
 		nameFile = lenPart[3] 	# Nome del file 
 		lenPart = lenPart[2] 	# Lunghezza della parte
 

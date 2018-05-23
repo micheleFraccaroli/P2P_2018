@@ -292,7 +292,7 @@ class RF(Thread):
 
 					Util.printLog('DOWNLOAD ATTIVATO')
 					controllerIsAlive = True
-					print(statusParts);sleep(20)
+
 					idPartOne = idRec - (nBit - 1) # Id del primo rettagolo
 					t = D(statusParts, queue, descriptor, idPartOne, infoFile, lenpart, md5, dCond, b, b2)
 					t.start()

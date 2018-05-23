@@ -105,7 +105,7 @@ class Worker(Thread):
 			
 			self.wLock.acquire()
 			self.missingParts.append(self.part - 1)
-			print('job failed for :',current_thread())
+			Util.printLog('job failed for : ' + str(current_thread()))
 			self.wLock.release()
 
 		self.wLock.acquire()
@@ -174,7 +174,7 @@ class D(Thread):
 				newStatus = self.queue.get(False) # Prelevo elemento dalla coda senza bloccarmi 
 
 				if type(newStatus) != str:
-					print('UPDATE')
+
 					toDelete = self.status[:self.pun] # Parti già scaricate
 
 					self.status = toDelete + [part for part in newStatus if part not in toDelete] # Elimino le parti già scaricate dallo stato e gliele pre concateno
@@ -206,7 +206,7 @@ class D(Thread):
 			else:
 
 				Util.dSem.acquire()
-				print(self.status[self.pun][0] + self.firstId);sleep(4)
+
 				t = Worker(self.status[self.pun][0] + self.firstId, self.status[self.pun][0] + 1, data, self.fileName, f, self.lenPart, self.status[self.pun][1], missingParts, self.md5, self.tag, wLock, fLock) # Istanza di download. Aggiungo 1 perchè gli id di tkinter partono da 1
 				t.start()
 
