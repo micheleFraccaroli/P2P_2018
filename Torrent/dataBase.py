@@ -27,7 +27,7 @@ class dataBase:
 
 			con.commit()
 			con.close()
-			print(mode,mode)
+			#print(mode,mode)
 
 			return ['OK', mode]
 
@@ -88,7 +88,7 @@ class dataBase:
 		try:
 			res = c.execute('INSERT INTO login VALUES (?,?,?)', (ip, port, sid))
 		except:
-			print("Just logged!")
+			Util.printLog("Just logged!")
 
 		con.commit()
 		con.close()
@@ -258,7 +258,7 @@ class dataBase:
 		
 		else:
 
-			.execute('DELETE FROM login; DELETE FROM f_in; DELETE FROM bitmapping; DELETE FROM file')
+			c.execute('DELETE FROM login; DELETE FROM f_in; DELETE FROM bitmapping; DELETE FROM file')
 		
 		con.commit()
 
