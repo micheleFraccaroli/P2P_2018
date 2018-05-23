@@ -2,6 +2,7 @@ from threading import *
 from Conn import Conn
 from dataBase import dataBase
 from math import ceil
+import Util
 import os
 
 class Worker(Thread):
@@ -30,9 +31,9 @@ class Worker(Thread):
 		lenPart = db.retrieveInfoFile(md5)
 
 		nameFile = lenPart[3] 	# Nome del file 
+		lenFile = lenPart[1]
 		lenPart = lenPart[2] 	# Lunghezza della parte
 
-		lenFile = os.stat('Files/' + nameFile).st_size
 		seekPosition = lenPart * (part - 1) # Posiziono la testina sulla parte interessata
 
 		if lenPart > 1024:
@@ -73,16 +74,15 @@ class Worker(Thread):
 		
 		self.sock.send(str(len(r)).zfill(5).encode() + r)
 
+		self.sock.close()
 		f.close()
 
 class Upload(Thread):
 
-	def __init__(self, ipv4, ipv6, port):
+	def __init__(self, port):
 
 		Thread.__init__(self)
-		self.ipv4 = ipv4
-		self.ipv6 = ipv6
-		self.port = port
+		self.port = int(port)
 
 	def run(self):
 

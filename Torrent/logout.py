@@ -30,6 +30,8 @@ class logout:
                 db.deleteAll()
                 Util.mode = 'normal'
                 del db
+            else:
+                Util.printLog("Logout failed: "+self.ack_log.decode())
             self.con.deconnection()
         else:
-            print("Connection refused...")
+            Util.printlog("Connection refused...")

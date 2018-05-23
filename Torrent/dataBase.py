@@ -255,12 +255,12 @@ class dataBase:
 		c = con.cursor()
 
 		if sid != None:
-			
+
 			c.execute('DELETE FROM login WHERE idSession = ?', (sid,))
 			c.execute('DELETE FROM f_in WHERE sid = ?', (sid,))
 			c.execute('DELETE FROM bitmapping WHERE sid = ?', (sid,))
 			c.execute('DELETE FROM file WHERE sessionid = ?', (sid,))
-		
+
 		else:
 
 			c.execute('DELETE FROM login')
@@ -328,7 +328,7 @@ class dataBase:
 							Util.printLog("buf_res " + str(buf_res))
 							partdown = bin(buf_res)[2:].count('1')
 
-						partdown_final = partdown_final + partdown		
+						partdown_final = partdown_final + partdown
 						Util.printLog("partdown_final ---> " + str(partdown_final))
 
 						buf_res_list.append(buf_res)

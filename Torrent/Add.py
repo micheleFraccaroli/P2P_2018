@@ -23,8 +23,10 @@ class Add:
         self.con = Conn(self.t_ipv4, self.t_ipv6, self.t_port)
 
     def add_file(self, file):
-
+        print('Files/'+file)
         self.check_file = Path('Files/'+file)
+
+        db = dataBase()
 
         if (self.check_file.is_file()):
             self.f = open('Files/'+file, 'rb')
@@ -50,8 +52,8 @@ class Add:
                     print(self.bytes_read)
                     self.ack_aadr += self.con.s.recv(12 - self.bytes_read)
                     self.bytes_read = len(self.ack_aadr)
-
-                    print('Added file ' + nameFile + 'to tracker')
+                if(self.ack_aadr[0:4].decode() == "AADR"):
+                    npart = db.insert_file(self.sid, self.FileHash.hexdigest(), self.filename, int(self.size), int(self.lenpart))
 
                 self.con.deconnection()
             else:

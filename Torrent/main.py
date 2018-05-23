@@ -10,6 +10,7 @@ from tqdm import tqdm
 from Conn import Conn
 from Add import Add
 from RF import RF
+from Upload import Upload
 from curses import *
 from login import login
 from logout import logout
@@ -46,9 +47,9 @@ class optionsNormal:
 
     def exit(self):
 
-        print('\nBye\n')
+        print('\nByie\n')
         time.sleep(1)
-
+        print(current_thread(),enumerate())
         exit()
 
 class optionsLogged:
@@ -107,8 +108,6 @@ class optionsLogged:
 
         exit()
 
-Util.ffff = True
-
 # Demone grafico
 
 t = Graphics()
@@ -142,6 +141,13 @@ else:
 	time.sleep(2)
 
 Util.mode = dbMode
+
+# Demone Upload
+port = db.retrieveConfig(('selfP',))
+
+t2 = Upload(port)
+t2.daemon = True
+t2.start()
 
 while True: # Menu principale
 
