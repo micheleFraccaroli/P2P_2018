@@ -31,6 +31,6 @@ class login:
                 del db
                 Util.mode = "logged"
             else:
-                Util.printLog(recv_packet)
+                Util.printLog("login failed: "+recv_packet.decode())
         else:
-            Util.printLog('Richiesta LOGO fallita')
+            Util.printLog('Connection refused...')

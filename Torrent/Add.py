@@ -50,8 +50,8 @@ class Add:
                     print(self.bytes_read)
                     self.ack_aadr += self.con.s.recv(12 - self.bytes_read)
                     self.bytes_read = len(self.ack_aadr)
-
-                    print('Added file ' + nameFile + 'to tracker')
+                if(self.ack_aadr[0:4].decode() == "AADR"):
+                    npart = db.insert_file(self.sessionid, self.md5, self.filename, self.lenfile, self.lenpart)
 
                 self.con.deconnection()
             else:
