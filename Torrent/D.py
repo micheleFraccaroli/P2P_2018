@@ -95,6 +95,7 @@ class Worker(Thread):
 			self.data['downloadedParts'] += 1
 			self.wLock.release()
 
+			db = dataBase()
 			track = db.retrieveConfig(('trackerV4','trackerV6','trackerP', 'sessionId'))
 
 			c = Conn(track.trackerV4, track.trackerV6, track.trackerP)
