@@ -93,12 +93,34 @@ class Worker(Thread):
 			self.data['downloadedParts'] += 1
 			self.wLock.release()
 
+			track = db.retrieveConfig(('trackerV4','trackerV6','trackerP', 'sessionId'))
+
+			c = Conn(track.trackerV4, track.trackerV6, track.trackerP)
+
+			maxNumTracker = 5
+			for count in range(maxNumTracker):
+
+				if c.connection():
+
+					c.s.send('RPAD' + track.sessionId + self.md5 + str(self.part).zfill(8))
+
+					apad = c.s.recv(8)
+
+					readB = len(apad)
+
+					while(readB < 8):
+						apad += c.s.recv(8 - readB)
+						readB = len(apad)
+
+				else:
+
+					Util.printLog('Connessione al tracker fallita...')
+
 			percent, parts = Util.w.find_withtag(self.tag)[-3:-1] # Terzultimo e penultimo
 
 			Util.w.itemconfig(percent, text='Progress: \t\t' + '{0:.2f}'.format(self.data['downloadedParts'] / self.data['totalParts'] * 100) + '%')
 			Util.w.itemconfig(parts, text='Downloaded: \t' + str(self.data['downloadedParts']))
 			Util.w.itemconfig(self.idRect, fill='#00ff00', width=1)
-
 		else: # Fallita connessione al peer per scaricare la parte
 
 			Util.w.itemconfig(self.idRect, fill='#ff0000', width=1)
