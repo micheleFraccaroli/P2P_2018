@@ -27,6 +27,9 @@ class dataBase:
 
 			con.commit()
 			con.close()
+			print(mode,mode)
+
+			return ['OK', mode]
 
 		else: # Database già esistente, riutilizzo le impostazioni
 
@@ -68,6 +71,16 @@ class dataBase:
 		else: # Ritorno il singolo parametro richiesto
 			return res[0][1]
 
+	def updateConfig(self, attr, value):
+
+		con = s3.connect('TorrentDB.db')
+		c = con.cursor()
+
+		c.execute("UPDATE config SET value = ? WHERE name = ?", (value, attr))
+
+		con.commit()
+		con.close()
+
 	def login(self, ip, port, sid):
 		con = s3.connect('TorrentDB.db')
 		c = con.cursor()
@@ -76,7 +89,7 @@ class dataBase:
 			res = c.execute('INSERT INTO login VALUES (?,?,?)', (ip, port, sid))
 		except:
 			print("Just logged!")
-			
+
 		con.commit()
 		con.close()
 
@@ -102,7 +115,7 @@ class dataBase:
 			query = 'INSERT INTO bitmapping VALUES('
 			for b in bits:
 				query = query + '"' + md5 + '","' + sid + '",' + str(b) + '),('
-			
+
 			query = query[:len(query)-2]
 			c.execute(query)
 
@@ -232,15 +245,21 @@ class dataBase:
 		con.close()
 		return res
 
-	def deleteAll(self, sid):
+	def deleteAll(self, sid=None):
 		con = s3.connect('TorrentDB.db')
 		c = con.cursor()
 
-		c.execute('DELETE FROM login WHERE idSession = ?', (sid,))
-		c.execute('DELETE FROM f_in WHERE sid = ?', (sid,))
-		c.execute('DELETE FROM bitmapping WHERE sid = ?', (sid,))
-		c.execute('DELETE FROM file WHERE sessionid = ?', (sid,))
+		if sid != None:
+			
+			c.execute('DELETE FROM login WHERE idSession = ?', (sid,))
+			c.execute('DELETE FROM f_in WHERE sid = ?', (sid,))
+			c.execute('DELETE FROM bitmapping WHERE sid = ?', (sid,))
+			c.execute('DELETE FROM file WHERE sessionid = ?', (sid,))
+		
+		else:
 
+			.execute('DELETE FROM login; DELETE FROM f_in; DELETE FROM bitmapping; DELETE FROM file')
+		
 		con.commit()
 
 		con.close()
@@ -300,12 +319,14 @@ class dataBase:
 							buf_res = buf_res | buf[b]
 							Util.printLog("buf_res " + str(buf_res))
 							partdown = bin(buf_res)[2:].count('1')
+
 						partdown_final = partdown_final + partdown		
 						Util.printLog("partdown_final ---> " + str(partdown_final))
+
 						buf_res_list.append(buf_res)
 						Util.printLog("buf_res_list ---> " + str(buf_res_list))
 						j = j + 1
-					
+
 				if(my_l != buf_res_list):
 					return "NLOG", partdown_final
 				else:

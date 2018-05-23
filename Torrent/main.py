@@ -30,11 +30,11 @@ class optionsNormal:
     def __init__(self):
         #self.options = {0:['Login to supernode', self.login],1:['Exit', self.exit]}
         self.options = [
-            'Login to tracker', self.login,
+            'Login to tracker', self.login_to_tracker,
             'Exit', self.exit
         ]
 
-    def login(self):
+    def login_to_tracker(self):
 
         db = dataBase()
         config = db.retrieveConfig(('selfV4','selfV6','selfP','trackerV4','trackerV6','trackerP'))
@@ -58,7 +58,7 @@ class optionsLogged:
         self.options = [
             'Search a File', self.search,
             'Add a file to tracker', self.add,
-            'Logout from tracker', self.logout,
+            'Logout from tracker', self.logout_from_tracker,
             'Exit', self.exit
         ]
 
@@ -89,15 +89,15 @@ class optionsLogged:
 
         add.add_file()
 
-    def logout(self):
+    def logout_from_tracker(self):
 
         db = dataBase()
 
         config = db.retrieveConfig(('trackerV4','trackerV6','trackerP'))
 
-        logout = logout(config, Util.sessionId)
+        logout_tracker = logout(config)
 
-        logout.send_logout()
+        logout_tracker.send_logout()
 
     def exit(self):
 
@@ -123,6 +123,7 @@ time.sleep(2)
 
 db = dataBase()
 Util.mode = 'normal'
+
 code,dbMode = db.create(Util.mode)
 
 if code != 'OK': # C'è ancora una sessione salvata
@@ -145,10 +146,10 @@ while True: # Menu principale
 	op = menuMode[Util.mode]()
 
 	Util.searchLock.acquire()
-	while activeSearch > 0:
+	while Util.activeSearch > 0:
 
 		Util.searchLock.release()
-		
+
 		Util.searchIncoming.acquire()
 		Util.searchIncoming.wait()
 		Util.searchIncoming.release()
