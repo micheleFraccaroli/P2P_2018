@@ -29,7 +29,7 @@ class Worker(Thread):
 		db = dataBase()
 
 		lenPart = db.retrieveInfoFile(md5)
-		Util.printLog(str(lenPart))
+
 		nameFile = lenPart[3] 	# Nome del file 
 		lenFile = lenPart[1]
 		lenPart = lenPart[2] 	# Lunghezza della parte
@@ -53,7 +53,7 @@ class Worker(Thread):
 		nparts = ceil(lenFile/lenPart)
 
 		# Preparo ed invio il pacchetto
-		Util.printLog('Sono qui')
+
 		self.sock.send(('AREP' + str(nChunk).zfill(6)).encode()) # Intestazione pacchetto AREP
 
 		f = open('Files/' + nameFile, 'rb')
@@ -73,7 +73,7 @@ class Worker(Thread):
 		r = f.read(remainder)
 		
 		self.sock.send(str(len(r)).zfill(5).encode() + r)
-		Util.printLog('finito')
+
 		self.sock.close()
 		f.close()
 
@@ -93,6 +93,6 @@ class Upload(Thread):
 		while True: # Ciclo di connessioni
 
 			other_peer, addr = peer.accept()
-			Util.printLog('Connessione arrivata...')
+
 			t = Worker(other_peer)
 			t.start()
