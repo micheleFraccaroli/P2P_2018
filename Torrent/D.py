@@ -32,7 +32,7 @@ class Worker(Thread):
 		for peers in self.listPeers:
 
 			peer = Util.ip_deformatting(peers[:55],peers[55:])
-
+			Util.printLog(str(peer))
 			c = Conn(peer[0], peer[1], peer[2]) # ipv4 ipv6 port
 
 			if c.connection():
@@ -86,6 +86,8 @@ class Worker(Thread):
 				c.deconnection()
 				jobDone = True
 				break
+			else:
+				Util.printLog('Connessione peer fallita...')
 
 		if jobDone: # Job completato
 			sleep(uniform(0.5,1))

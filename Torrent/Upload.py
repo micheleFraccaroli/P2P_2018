@@ -29,11 +29,11 @@ class Worker(Thread):
 		db = dataBase()
 
 		lenPart = db.retrieveInfoFile(md5)
-		Util.printLog(lenPart)
+		Util.printLog(str(lenPart))
 		nameFile = lenPart[3] 	# Nome del file 
+		lenFile = lenPart[1]
 		lenPart = lenPart[2] 	# Lunghezza della parte
 
-		lenFile = os.stat('Files/' + nameFile).st_size
 		seekPosition = lenPart * (part - 1) # Posiziono la testina sulla parte interessata
 
 		if lenPart > 1024:
@@ -53,7 +53,7 @@ class Worker(Thread):
 		nparts = ceil(lenFile/lenPart)
 
 		# Preparo ed invio il pacchetto
-
+		Util.printLog('Sono qui')
 		self.sock.send(('AREP' + str(nChunk).zfill(6)).encode()) # Intestazione pacchetto AREP
 
 		f = open('Files/' + nameFile, 'rb')
@@ -73,16 +73,15 @@ class Worker(Thread):
 		r = f.read(remainder)
 		
 		self.sock.send(str(len(r)).zfill(5).encode() + r)
-
+		Util.printLog('finito')
+		self.sock.close()
 		f.close()
 
 class Upload(Thread):
 
-	def __init__(self, ipv4, ipv6, port):
+	def __init__(self, port):
 
 		Thread.__init__(self)
-		self.ipv4 = ipv4
-		self.ipv6 = ipv6
 		self.port = int(port)
 
 	def run(self):
@@ -94,6 +93,6 @@ class Upload(Thread):
 		while True: # Ciclo di connessioni
 
 			other_peer, addr = peer.accept()
-
+			Util.printLog('Connessione arrivata...')
 			t = Worker(other_peer)
 			t.start()

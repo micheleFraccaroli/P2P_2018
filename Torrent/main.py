@@ -143,9 +143,9 @@ else:
 Util.mode = dbMode
 
 # Demone Upload
-config = db.retrieveConfig(('selfV4','selfV6','selfP'))
+port = db.retrieveConfig(('selfP',))
 
-t2 = Upload(config.selfV4, config.selfV6, config.selfP)
+t2 = Upload(port)
 t2.daemon = True
 t2.start()
 
