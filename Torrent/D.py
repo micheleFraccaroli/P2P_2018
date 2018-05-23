@@ -5,16 +5,16 @@ from time import sleep
 from random import uniform
 from Conn import Conn
 from curses import wrapper
+from dataBase import dataBase
 
 class Worker(Thread):
 
-	def __init__(self, idRect, part, data, fileName, fileDescriptor, lenPart, listPeers , missingParts, md5, tag, wLock, fLock):
+	def __init__(self, idRect, part, data, fileName, lenPart, listPeers , missingParts, md5, tag, wLock):
 
 		Thread.__init__(self)
 		self.idRect = idRect					# Id del rettangolo grafico
 		self.part = part 						# Numero della parte da scaricare
 		self.data = data						# Dati condivisi
-		self.fileDescriptor = fileDescriptor	# Descrittore del file in scrittura
 		self.fileName = fileName 				# Nome del file
 		self.lenPart = lenPart					# Lunghezza di una parte in byte
 		self.listPeers = listPeers				# Lista dei peers disponibili per la parte
@@ -22,7 +22,6 @@ class Worker(Thread):
 		self.md5 = md5 							# MD5 del file
 		self.tag = tag 							# Tag del file
 		self.wLock = wLock 						# Lock sulle variabili globali
-		self.fLock = fLock 						# Lock sulle operazioni del file
 
 	def run(self):
 
@@ -54,9 +53,9 @@ class Worker(Thread):
 				nChunk = int(nChunk[4:].decode())
 
 				# Elaborazione dei chunk
-				self.fLock.acquire()
+				fileDescriptor = open('Files/' + self.fileName, 'r+b')
 
-				self.fileDescriptor.seek(self.lenPart * (self.part - 1)) # Sposto il puntatore nell'area corretta
+				fileDescriptor.seek(self.lenPart * (self.part - 1)) # Sposto il puntatore nell'area corretta
 				
 				for _ in range(nChunk):
 
@@ -80,9 +79,8 @@ class Worker(Thread):
 						
 						dataChunk += c.s.recv(lenChunk - readB)
 						readB = len(dataChunk)
-					self.fileDescriptor.write(dataChunk) # Scrivo il chunk su file
+					fileDescriptor.write(dataChunk) # Scrivo il chunk su file
 
-				self.fLock.release()
 				c.deconnection()
 				jobDone = True
 				break
@@ -90,7 +88,7 @@ class Worker(Thread):
 				Util.printLog('Connessione peer fallita...')
 
 		if jobDone: # Job completato
-			sleep(uniform(0.5,1))
+			sleep(uniform(0.2,0.5))
 			self.wLock.acquire()
 			self.data['downloadedParts'] += 1
 			self.wLock.release()
@@ -105,7 +103,7 @@ class Worker(Thread):
 
 				if c.connection():
 
-					c.s.send('RPAD' + track.sessionId + self.md5 + str(self.part).zfill(8))
+					c.s.send(('RPAD' + track.sessionId + self.md5 + str(self.part).zfill(8)).encode())
 
 					apad = c.s.recv(8)
 
@@ -188,7 +186,7 @@ class D(Thread):
 		Util.rows.remove(self.tag)
 		Util.lockGraphics.release()
 
-	def spawnWorker(self, data, f, missingParts, wLock, fLock):
+	def spawnWorker(self, data, missingParts, wLock):
 
 		while self.pun < len(self.status):
 
@@ -232,7 +230,7 @@ class D(Thread):
 
 				Util.dSem.acquire()
 
-				t = Worker(self.status[self.pun][0] + self.firstId, self.status[self.pun][0] + 1, data, self.fileName, f, self.lenPart, self.status[self.pun][1], missingParts, self.md5, self.tag, wLock, fLock) # Istanza di download. Aggiungo 1 perchè gli id di tkinter partono da 1
+				t = Worker(self.status[self.pun][0] + self.firstId, self.status[self.pun][0] + 1, data, self.fileName, self.lenPart, self.status[self.pun][1], missingParts, self.md5, self.tag, wLock) # Istanza di download. Aggiungo 1 perchè gli id di tkinter partono da 1
 				t.start()
 
 				self.pun += 1 # Incremento puntatore al prossimo download
@@ -259,12 +257,12 @@ class D(Thread):
 		data['downloadedParts'] = 0				# Numero di parti scaricate
 
 		wLock = Lock()
-		fLock = Lock()
 		missingParts = [] # Lista delle parti mancanti in caso di errori in download
 
-		f = open(self.fileName, "wb") # Apro il file, pronto per scrivere
-		
-		self.spawnWorker(data, f, missingParts, wLock, fLock)
+		Util.printLog(self.fileName)
+		f = open('Files/' + self.fileName, "w") # Apro il file, pronto per scrivere
+		f.close()
+		self.spawnWorker(data, missingParts, wLock)
 
 		# Se al termine del download ci sono parti che non ho potuto scaricare
 		# tento di riscaricarle
@@ -275,7 +273,7 @@ class D(Thread):
 			self.pun = len(self.status) - len(missingParts) # Indice del lla prima parte mancante
 			missingParts = [] 	# Risetto la lista delle parte mancanti per il prossimo ciclo
 			sleep(4) 			# Attendo 10 seondi prima di ricominciare il download
-			self.spawnWorker(data, f, missingParts, wLock, fLock)
+			self.spawnWorker(data, missingParts, wLock)
 
 		print('Terminato!')
 		f.close()

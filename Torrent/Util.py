@@ -162,7 +162,7 @@ def menu(stdscr, listMenu, titleMenu, flag = None):
     attr['system'] = color_pair(3)
 
     noecho()
-    stdscr.timeout(10000)
+    stdscr.timeout(1000)
 
     #stdscr.bkgd(' ',color_pair(1)) # Colore background
     depthMenu = [] # Lista di tutti i menu incontrati

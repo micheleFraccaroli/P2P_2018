@@ -83,7 +83,7 @@ class RF(Thread):
 					answer += con.s.recv(148 - bytes_read)
 					bytes_read = len(answer)
 
-				md5_lfile_lpart = (answer[:32].decode(), answer[132:142].decode(), answer[142:148].decode(), answer[32:132].decode())
+				md5_lfile_lpart = (answer[:32].decode(), answer[132:142].decode(), answer[142:148].decode(), answer[32:132].decode().strip())
 				list_answers.extend((answer[32:132].decode().strip(),md5_lfile_lpart))
 
 			list_answers.extend(("Abort",None))
@@ -113,10 +113,10 @@ class RF(Thread):
 
 				lenfile = int(md5[1])
 				lenpart = int(md5[2])
+				infoFile = md5[3] # Mi tengo solo il nome del file
 				md5 = md5[0]
 				nBit = int(math.ceil(lenfile/lenpart))
-				infoFile = md5[3] # Mi tengo solo il nome del file
-
+				Util.printLog(str(len(infoFile)))
 			else:
 
 				Util.printLog("Download aborted...")
