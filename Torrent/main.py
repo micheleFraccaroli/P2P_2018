@@ -107,11 +107,15 @@ class optionsLogged:
 
         exit()
 
-Util.ffff = True
-
 # Demone grafico
 
 t = Graphics()
+t.daemon = True
+t.start()
+
+# Demone Upload
+
+t = Upload()
 t.daemon = True
 t.start()
 

@@ -29,7 +29,9 @@ class Worker(Thread):
 		Util.w.itemconfig(self.idRect, fill='#0000ff', width=1)
 		
 		jobDone = False
-		for peer in self.listPeers:
+		for peers in self.listPeers:
+
+			peer = Util.ip_deformatting(peers[:55],peers[55:])
 
 			c = Conn(peer[0], peer[1], peer[2]) # ipv4 ipv6 port
 
@@ -183,8 +185,6 @@ class D(Thread):
 			
 			if newStatus == 'stop':
 				
-				print('Interrotto...')
-
 				flag = True;
 				while flag:	# Attendo che i thread abbiano terminato il download
 
@@ -198,17 +198,15 @@ class D(Thread):
 				exit()
 
 			elif newStatus == 'pause':
-				
-				print('pausa...')
+
 				self.cond.acquire()
 				self.cond.wait()
 				self.cond.release()
-				print('Riprendo')
 
 			else:
 
 				Util.dSem.acquire()
-				
+				print(self.status[self.pun][0] + self.firstId);sleep(4)
 				t = Worker(self.status[self.pun][0] + self.firstId, self.status[self.pun][0] + 1, data, self.fileName, f, self.lenPart, self.status[self.pun][1], missingParts, self.md5, self.tag, wLock, fLock) # Istanza di download. Aggiungo 1 perchè gli id di tkinter partono da 1
 				t.start()
 
@@ -239,7 +237,7 @@ class D(Thread):
 		fLock = Lock()
 		missingParts = [] # Lista delle parti mancanti in caso di errori in download
 
-		f = open('Files/copia-' + self.fileName, "wb") # Apro il file, pronto per scrivere
+		f = open(self.fileName, "wb") # Apro il file, pronto per scrivere
 		
 		self.spawnWorker(data, f, missingParts, wLock, fLock)
 

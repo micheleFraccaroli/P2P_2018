@@ -26,7 +26,7 @@ class Conn:
             self.ipp2p = self.ipv4
 
         try:
-            print('CULOCULO',self.ipp2p)        
+       
             self.infoS = socket.getaddrinfo(self.ipp2p, self.pp2p)
             self.s = socket.socket(*self.infoS[0][:3])
             self.s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)

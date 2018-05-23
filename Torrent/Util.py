@@ -121,21 +121,21 @@ def printError(desc):
     f.close()
 
 def menuInput(stdscr, desc):
-    
+
     echo()
     stdscr.timeout(-1)
 
     stdscr.clear()
-    stdscr.addstr(desc)
+    stdscr.addstr('\n' + desc)
     inp = stdscr.getstr(20)
 
     while len(inp) == 0:
         
         stdscr.clear()
-        stdscr.addstr(desc)
+        stdscr.addstr('\n' + desc)
         inp = stdscr.getstr(20)
     
-    return string
+    return inp.decode()
 
 def menu(stdscr, listMenu, titleMenu, flag = None):
 
@@ -232,7 +232,7 @@ def menu(stdscr, listMenu, titleMenu, flag = None):
         elif c == 10:
 
             if type(listMenu[option + 1]) != list: # L'elemento non è una lista quindi è quello che cerco
-                if current_thread() == main_thread():
+
                     return listMenu[option + 1]
 
             else:                                  # L'elemento è una lista, quindi prevedo un altro livello di menu

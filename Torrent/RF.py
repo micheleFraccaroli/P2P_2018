@@ -221,7 +221,7 @@ class RF(Thread):
 
 			if not c.connection():
 
-				print('Errore di connessione')
+				Util.printLog('Connection Error...')
 
 			else:
 
@@ -256,7 +256,7 @@ class RF(Thread):
 						infoPeer += c.s.recv(toReadB - readB)
 						readB = len(infoPeer)
 
-					listPeers.append(infoPeer[:60])			# Peer
+					listPeers.append(infoPeer[:60].decode())			# Peer
 					listStatus.append(list(infoPeer[60:]))	# Stato
 
 				c.deconnection()
@@ -292,7 +292,7 @@ class RF(Thread):
 
 					Util.printLog('DOWNLOAD ATTIVATO')
 					controllerIsAlive = True
-
+					print(statusParts);sleep(20)
 					idPartOne = idRec - (nBit - 1) # Id del primo rettagolo
 					t = D(statusParts, queue, descriptor, idPartOne, infoFile, lenpart, md5, dCond, b, b2)
 					t.start()

@@ -23,7 +23,7 @@ class Add:
         self.con = Conn(self.t_ipv4, self.t_ipv6, self.t_port)
 
     def add_file(self, file):
-
+        print('Files/'+file)
         self.check_file = Path('Files/'+file)
 
         if (self.check_file.is_file()):
