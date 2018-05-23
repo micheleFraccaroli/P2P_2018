@@ -27,9 +27,12 @@ class t_fchu(th.Thread):
 
 		# retrieving from database
 		hitpeer = db.getHitpeer(recv_packet[16:].decode(), recv_packet[:16].decode())
+		Util.printLog("\n→ HITPEER " + str(hitpeer))
 		interested_sid = db.getInterestedPeers(recv_packet[16:].decode())
+		Util.printLog("\n→ INTERESTED SID " + str(interested_sid))
 		
 		for isid in interested_sid:
+			Util.printLog("ISID → " + str(isid[0]))
 			peer = db.getPeerBySid(isid[0])
 			addr = peer[0] + peer[1]
 			interested_peer[isid[0]] = addr
@@ -43,7 +46,7 @@ class t_fchu(th.Thread):
 
 		packet_resp = "AFCH" + str(hitpeer).zfill(3)
 		self.other_peersocket.send(packet_resp.encode())
-		Util.printLog(str(interested_peer))
+		Util.printLog("fchun → " + str(interested_peer))
 		for sid in interested_peer.keys():
 			if(sid != recv_packet[:16].decode()):
 				resp_list.append(interested_peer[sid])

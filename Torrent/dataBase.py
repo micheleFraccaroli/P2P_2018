@@ -212,9 +212,9 @@ class dataBase:
 		res = c.fetchall()
 
 		#part = partNum//8
-		print("part database -->" + str(part))
+		#print("part database -->" + str(part))
 		toUpdate = res[part][0]
-		print("toUpdate database ---> " + str(toUpdate))
+		#print("toUpdate database ---> " + str(toUpdate))
 		c.execute('UPDATE bitmapping SET bits = ? WHERE md5 = ? AND sid = ? LIMIT 1 OFFSET ?', (updated, md5, sid, part))
 
 		con.commit()
@@ -222,14 +222,14 @@ class dataBase:
 
 		#return str(npart).zfill(8)
 
-	def search_files(self, string):
+	def search_files(self, string, sid):
 		con = s3.connect('TorrentDB.db')
 		c = con.cursor()
 
-		c.execute('SELECT count(DISTINCT md5) FROM file WHERE name LIKE ?', ('%'+string.strip()+'%',))
+		c.execute('SELECT count(DISTINCT md5) FROM file WHERE name LIKE ? AND sessionid <> ?', ('%'+string.strip()+'%',sid))
 		nmd5 = c.fetchone()
 
-		c.execute('SELECT md5, name, lenfile, lenpart FROM file WHERE name LIKE ? ORDER BY md5', ('%'+string.strip()+'%',))
+		c.execute('SELECT md5, name, lenfile, lenpart FROM file WHERE name LIKE ? AND sessionid <> ? ORDER BY md5', ('%'+string.strip()+'%',sid))
 		file = c.fetchall()
 
 		con.close()
@@ -281,17 +281,17 @@ class dataBase:
 			if(res):
 				#print(res)
 				for md5 in res:
-					#print("md5 --> " + str(md5))
+					Util.printLog("md5 --> " + str(md5))
 					c.execute('SELECT bits FROM bitmapping WHERE md5 = ? AND sid = ?', (md5[0], sid))
 					my = c.fetchall()
 					my_l = []
 					for m in my:
 						my_l.append(m[0])
-					#print("mio --> " + str(my_l))
+					Util.printLog("mio --> " + str(my_l))
 
 					c.execute('SELECT sid FROM f_in WHERE md5 = "' + md5[0] + '" AND sid <> "' + sid + '"')
 					res2 = c.fetchall()
-					#print("sid interessati --> " + str(res2))
+					Util.printLog("sid interessati --> " + str(res2))
 					list_matching = []
 					for sidf in res2:
 						c.execute('SELECT bits FROM bitmapping WHERE md5 = ? AND sid = ?', (md5[0], sidf[0]))
@@ -301,31 +301,33 @@ class dataBase:
 					k = 0
 					buffer = []
 					buffer_in = []
-					#print("\nlist_matching ---> " + str(list_matching))
+					Util.printLog("\nlist_matching ---> " + str(list_matching))
 					if(list_matching):
 						for r in list_matching[0]:
 							for lm in range(len(list_matching)):
 								buffer_in.append(list_matching[lm][i][0])
-							#print("buffer_in ---> " + str(buffer_in))
+							Util.printLog("buffer_in ---> " + str(buffer_in))
 							i = i + 1
 							buffer.append(buffer_in)
 							buffer_in = []
 
 					j = 0
 					buf_res_list = []
-					#print("buffer ---> " + str(buffer))
+					Util.printLog("buffer ---> " + str(buffer))
 					for buf in buffer:
 						buf_res = 0
 						for b in range(len(buf)):
-							#print("b " + str(b))
-							#print("buf[b] ---> " + str(buf[b]))
+							Util.printLog("b " + str(b))
+							Util.printLog("buf[b] ---> " + str(buf[b]))
 							buf_res = buf_res | buf[b]
-							#print("buf_res " + str(buf_res))
+							Util.printLog("buf_res " + str(buf_res))
 							partdown = bin(buf_res)[2:].count('1')
-						partdown_final = partdown_final + partdown
-						#print("partdown_final ---> " + str(partdown_final))
+
+						partdown_final = partdown_final + partdown		
+						Util.printLog("partdown_final ---> " + str(partdown_final))
+
 						buf_res_list.append(buf_res)
-						#print("buf_res_list ---> " + str(buf_res_list))
+						Util.printLog("buf_res_list ---> " + str(buf_res_list))
 						j = j + 1
 
 				if(my_l != buf_res_list):

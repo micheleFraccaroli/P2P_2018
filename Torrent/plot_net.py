@@ -10,8 +10,8 @@ import threading as th
 class plot_net:
     G = nx.Graph()
     pos = nx.spring_layout(G)
-    fig, ax = plt.subplots(figsize=(10,6))
-    t = 'T'
+    fig, ax = plt.subplots(figsize=(9,6))
+    t = 'Tracker'
     G.add_node(t)
     edges = []
 
