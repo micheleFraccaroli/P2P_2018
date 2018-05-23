@@ -26,6 +26,8 @@ class Add:
         print('Files/'+file)
         self.check_file = Path('Files/'+file)
 
+        db = dataBase()
+
         if (self.check_file.is_file()):
             self.f = open('Files/'+file, 'rb')
             self.contenuto = self.f.read()
@@ -51,7 +53,7 @@ class Add:
                     self.ack_aadr += self.con.s.recv(12 - self.bytes_read)
                     self.bytes_read = len(self.ack_aadr)
                 if(self.ack_aadr[0:4].decode() == "AADR"):
-                    npart = db.insert_file(self.sessionid, self.md5, self.filename, self.lenfile, self.lenpart)
+                    npart = db.insert_file(self.sid, self.FileHash.hexdigest(), self.filename, int(self.size), int(self.lenpart))
 
                 self.con.deconnection()
             else:
