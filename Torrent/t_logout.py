@@ -14,9 +14,9 @@ class t_logout(th.Thread):
 
    def run(self):
       db = dataBase()
-      statusLogout, partdown = db.checkLogout(self.packet)
+      self.statusLogout, partdown = db.checkLogout(self.packet)
 
-      packet = statusLogout + str(partdown).zfill(10)
+      packet = self.statusLogout + str(partdown).zfill(10)
 
       self.other_peersocket.send(packet.encode())
       self.other_peersocket.close()

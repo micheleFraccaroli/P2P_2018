@@ -22,18 +22,20 @@ class t_look(th.Thread):
                 self.bytes_read = len(self.look_pkt)
 
         self.search = self.look_pkt[16:].decode().strip()
-        print(self.search)
+        Util.printLog(self.search)
         db = dataBase()
         #db.create()
-        nmd5, res = db.search_files(self.search)
+        nmd5, res = db.search_files(self.search, self.look_pkt[:16].decode())
 
         self.aloo_pkt = "ALOO"+str(nmd5).zfill(3)
         self.socket.send(self.aloo_pkt.encode())
-
+        Util.printLog(str(nmd5))
         if(nmd5 > 0):
             for file in res:
-                self.file_md5 = file[0]+file[1].ljust(100, ' ')+str(file[2]).zfill(10)+str(file[3]).zfill(6)
-                self.socket.send(self.file_md5.encode())
+                Util.printLog(str(file))
+                file_md5 = file[0]+file[1].ljust(100, ' ')+str(file[2]).zfill(10)+str(file[3]).zfill(6)
+                Util.printLog(str(file_md5))
+                self.socket.send(file_md5.encode())
 
         self.socket.close()
 

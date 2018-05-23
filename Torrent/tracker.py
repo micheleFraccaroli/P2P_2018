@@ -30,6 +30,7 @@ class tracker:
 		peersocket = open_conn.initializeSocket()
 		db = dataBase()
 		c = ['black']
+		db.create("tracker")
 
 		# check logged
 		pN = plot_net()
@@ -42,7 +43,6 @@ class tracker:
 				pause(0.5)
 
 		while True:
-			
 			Util.printLog("###### IN ATTESA DI UNA RICHIESTA #######")
 			other_peersocket, addr = peersocket.accept()
 			if addr[0][:2] == "::":
@@ -59,6 +59,7 @@ class tracker:
 				while (self.bytes_read < 4):
 					recv_type += other_peersocket.recv(4 - self.bytes_read)
 					self.bytes_read = len(recv_type)
+				Util.printLog("RICHIESTA IN ENTRATA AL TRACKER → " + str(recv_type.decode()))
 
 				# LOGIN ---
 				if(recv_type.decode() == "LOGI"):
@@ -85,22 +86,25 @@ class tracker:
 						self.bytes_read = len(recv_packet)
 
 					addr = db.getPeerBySid(recv_packet.decode())
-					ip = Util.ip_deformatting(addr[0], addr[1])
+					if(addr):
+						ip = Util.ip_deformatting(addr[0], addr[1])
 
-					t_LOGOUT = t_logout(other_peersocket, recv_packet.decode())
-					t_LOGOUT.start()
-
-					pN.removePeer(ip[0], c)
-					pause(1)
+						t_LOGOUT = t_logout(other_peersocket, recv_packet.decode())
+						t_LOGOUT.start()
+						t_LOGOUT.join()
+						Util.printLog(t_LOGOUT.statusLogout)
+						if(t_LOGOUT.statusLogout == "ALOG"):
+							pN.removePeer(ip[0], c)
+							pause(1)
 					
 				# LOOK ---
 				if(recv_type.decode() == "LOOK"):
 					t_LOOK = t_look(other_peersocket)
 					t_LOOK.start()
-					print('LOOK')
 
 				# FCHU ---
 				if(recv_type.decode() == "FCHU"):
+					Util.printLog("\n→ ARRIVO FCHU ←\n")
 					th_FCHU = t_fchu(other_peersocket)
 					th_FCHU.start()
 
@@ -111,6 +115,7 @@ class tracker:
 
 				# RPAD ---
 				if(recv_type.decode() == "RPAD"):
+					Util.printLog("RPAD ARRIVATO")
 					th_RPAD = t_rpad(other_peersocket)
 					th_RPAD.start()
 
@@ -122,6 +127,8 @@ if __name__ == "__main__":
 	print(bcolors.OKBLUE  + " |    |   /       \|    |       \    \_\  \/   --   \ " + bcolors.ENDC)
 	print(bcolors.CYAN    + " |____|   \_______ \____|        \______  /\______  / " + bcolors.ENDC)
 	print(bcolors.CYAN    + "                  \/                    \/        \/  " + bcolors.ENDC)
+
+	print(bcolors.MAGENTA + "→ tracker online" + bcolors.ENDC)
 
 	t = tracker()
 	t.body()
