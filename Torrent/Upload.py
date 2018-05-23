@@ -82,7 +82,7 @@ class Upload(Thread):
 		Thread.__init__(self)
 		self.ipv4 = ipv4
 		self.ipv6 = ipv6
-		self.port = port
+		self.port = int(port)
 
 	def run(self):
 

@@ -10,6 +10,7 @@ from tqdm import tqdm
 from Conn import Conn
 from Add import Add
 from RF import RF
+from Upload import Upload
 from curses import *
 from login import login
 from logout import logout
@@ -46,9 +47,9 @@ class optionsNormal:
 
     def exit(self):
 
-        print('\nBye\n')
+        print('\nByie\n')
         time.sleep(1)
-
+        print(current_thread(),enumerate())
         exit()
 
 class optionsLogged:
@@ -113,12 +114,6 @@ t = Graphics()
 t.daemon = True
 t.start()
 
-# Demone Upload
-
-t = Upload()
-t.daemon = True
-t.start()
-
 menuMode = {'normal': optionsNormal,'logged': optionsLogged} # Associazione tra modalità di utilizzo e classe associata per il menu
 
 Util.initializeFiles() # Inizializzo i file di log ed errors
@@ -146,6 +141,13 @@ else:
 	time.sleep(2)
 
 Util.mode = dbMode
+
+# Demone Upload
+config = db.retrieveConfig(('selfV4','selfV6','selfP'))
+
+t2 = Upload(config.selfV4, config.selfV6, config.selfP)
+t2.daemon = True
+t2.start()
 
 while True: # Menu principale
 
