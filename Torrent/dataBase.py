@@ -250,16 +250,16 @@ class dataBase:
 		c = con.cursor()
 
 		if sid != None:
-			
+
 			c.execute('DELETE FROM login WHERE idSession = ?', (sid,))
 			c.execute('DELETE FROM f_in WHERE sid = ?', (sid,))
 			c.execute('DELETE FROM bitmapping WHERE sid = ?', (sid,))
 			c.execute('DELETE FROM file WHERE sessionid = ?', (sid,))
-		
+
 		else:
 
-			.execute('DELETE FROM login; DELETE FROM f_in; DELETE FROM bitmapping; DELETE FROM file')
-		
+			c.execute('DELETE FROM login; DELETE FROM f_in; DELETE FROM bitmapping; DELETE FROM file')
+
 		con.commit()
 
 		con.close()
