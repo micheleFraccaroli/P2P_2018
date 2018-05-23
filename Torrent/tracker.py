@@ -99,23 +99,25 @@ class tracker:
 					
 				# LOOK ---
 				if(recv_type.decode() == "LOOK"):
+					Util.printLog("\n→ ARRIVO LOOK ←\n")
 					t_LOOK = t_look(other_peersocket)
 					t_LOOK.start()
 
 				# FCHU ---
 				if(recv_type.decode() == "FCHU"):
-					Util.printLog("\n→ ARRIVO FCHU ←\n")
+					#Util.printLog("\n→ ARRIVO FCHU ←\n")
 					th_FCHU = t_fchu(other_peersocket)
 					th_FCHU.start()
 
 				# ADDR ---
 				if(recv_type.decode() == "ADDR"):
+					Util.printLog("\n→ ARRIVO ADDR ←\n")
 					th_ADDR = t_addr(other_peersocket)
 					th_ADDR.start()
 
 				# RPAD ---
 				if(recv_type.decode() == "RPAD"):
-					Util.printLog("RPAD ARRIVATO")
+					#Util.printLog("\n→ ARRIVO RPAD ←\n")
 					th_RPAD = t_rpad(other_peersocket)
 					th_RPAD.start()
 

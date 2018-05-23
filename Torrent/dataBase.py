@@ -81,17 +81,22 @@ class dataBase:
 		con.commit()
 		con.close()
 
-	def login(self, ip, port, sid):
+	def login(self, ip, port):
 		con = s3.connect('TorrentDB.db')
 		c = con.cursor()
 
 		try:
+			sid = Util.ip_packet16() # generazione sid
 			res = c.execute('INSERT INTO login VALUES (?,?,?)', (ip, port, sid))
 		except:
-			Util.printLog("Just logged!")
+			Util.printLog(str(ip) + " just logged!")
+			c.execute("SELECT sid FROM login where ip = ? AND port = ?", (ip, port))
+			res = c.fetchone()
+			sid = res[0]
 
 		con.commit()
 		con.close()
+		return sid
 
 	def getHitpeer(self, md5, my_sid):
 		con = s3.connect('TorrentDB.db')

@@ -23,17 +23,17 @@ class t_rpad(th.Thread):
 		
 		flag = True
 		check = db.getInterestedPeers(recv_packet[16:48].decode())
-		Util.printLog("CHECK → " + str(check))
+		#Util.printLog("CHECK → " + str(check))
 		for c in check:
-			Util.printLog("c → " + str(c[0]))
+			#Util.printLog("c → " + str(c[0]))
 			if(c[0] == recv_packet[:16].decode()):
 				flag = False
 
 		if(flag):
 			db.insertInterested(recv_packet[:16].decode(), recv_packet[16:48].decode())
-			Util.printLog("INSERITO IN F_IN")
-		else:
-			Util.printLog("NON INSERITO IN F_IN")
+			#Util.printLog("INSERITO IN F_IN")
+		#else:
+			#Util.printLog("NON INSERITO IN F_IN")
 			
 		# retrieving part for update
 		part_recv = recv_packet[48:].decode()
@@ -43,9 +43,9 @@ class t_rpad(th.Thread):
 		if(specificBit == 0):
 			specificBit = 8
 		
-		Util.printLog("part --> " + str(part))
-		Util.printLog("toUpdateBits --> " + str(toUpdateBits))
-		Util.printLog("specific bit --> " + str(specificBit))
+		#Util.printLog("part --> " + str(part))
+		#Util.printLog("toUpdateBits --> " + str(toUpdateBits))
+		#Util.printLog("specific bit --> " + str(specificBit))
 
 		up = uB.updateBits(toUpdateBits, specificBit)
 		

@@ -14,22 +14,12 @@ class t_login(th.Thread):
 
 	def run(self):
 		db = dataBase()
-		sid = Util.ip_packet16() # generazione sid
-		'''
-		recv_packet = self.other_peersocket.recv(60)
-		self.bytes_read = len(recv_packet)
-		while(self.bytes_read < 60):
-			recv_packet += other_peersocket.recv(60 - self.bytes_read)
-			self.bytes_read = len(recv_packet)
-		'''
-
-		packet = "ALGI" + str(sid)
-
-		self.other_peersocket.send(packet.encode())
 
 		ip = self.packet[:55]
 		port = self.packet[55:]
+		
+		sid = db.login(ip, port)
 
-		db.login(ip, port, sid)
-
+		packet = "ALGI" + str(sid)
+		self.other_peersocket.send(packet.encode())
 		self.other_peersocket.close()

@@ -10,7 +10,7 @@ import threading as th
 class plot_net:
     G = nx.Graph()
     pos = nx.spring_layout(G)
-    fig, ax = plt.subplots(figsize=(9,6))
+    fig, ax = plt.subplots(figsize=(7,5))
     t = 'Tracker'
     G.add_node(t)
     edges = []
@@ -22,10 +22,10 @@ class plot_net:
         self.G.add_edge(self.t, node, color='black')
         edges = self.G.edges()
         colors = [self.G[u][v]['color'] for u,v in edges]
-        nx.draw(self.G, with_labels=True, node_color = c, node_shape="s", alpha=0.5, font_size=10, font_color='black')
+        nx.draw(self.G, with_labels=True, node_color = c, node_shape="s", alpha=0.5, font_size=7, font_color='black')
 
-        custom_lines = [Line2D([0], [0], marker ='o',color='black',alpha=0.5, markersize=10, lw=0),
-                    Line2D([0], [0], marker ='o',color='green', alpha=0.5, markersize=10, lw=0)]
+        custom_lines = [Line2D([0], [0], marker ='o',color='black',alpha=0.5, markersize=8, lw=0),
+                    Line2D([0], [0], marker ='o',color='green', alpha=0.5, markersize=8, lw=0)]
 
         plt.title('Tracker')
         plt.legend(custom_lines, ['Tracker', 'peer logged'])
@@ -33,10 +33,10 @@ class plot_net:
     def removePeer(self, node, c):
         self.ax.clear()
         self.G.remove_node(node)
-        nx.draw(self.G, with_labels=True, node_color = c, node_shape="s", alpha=0.5,font_size=10, font_color='black')
+        nx.draw(self.G, with_labels=True, node_color = c, node_shape="s", alpha=0.5,font_size=7, font_color='black')
 
-        custom_lines = [Line2D([0], [0], marker ='o',color='black',alpha=0.5, markersize=10, lw=0),
-                    Line2D([0], [0], marker ='o',color='green', alpha=0.5, markersize=10, lw=0)]
+        custom_lines = [Line2D([0], [0], marker ='o',color='black',alpha=0.5, markersize=8, lw=0),
+                    Line2D([0], [0], marker ='o',color='green', alpha=0.5, markersize=8, lw=0)]
 
         plt.title('Tracker')
         plt.legend(custom_lines, ['Tracker', 'peer logged'])
