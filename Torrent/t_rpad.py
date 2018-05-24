@@ -75,3 +75,4 @@ class t_rpad(th.Thread):
 		else:
 			Util.count_dict = 0
 			t_RIFLE = rifleDict()
+			t_RIFLE.start()

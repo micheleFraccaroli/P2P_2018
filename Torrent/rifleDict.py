@@ -8,4 +8,8 @@ class rifleDict(th.Thread):
 
     def run(self):
         Util.globalDict = {}
-        db.updatePart(part, recv_packet[16:48].decode(), recv_packet[:16].decode(), up)
+        rifleList = []
+        for k in self.dict.keys():
+            sid = k[:16]
+            md5 = k[16:]
+            db.updatePart(md5, sid, self.dict[k])

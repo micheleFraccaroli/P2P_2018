@@ -209,18 +209,12 @@ class dataBase:
 		return str(npart).zfill(8)
 
 
-	def updatePart(self, part, md5, sid, updated):
+	def updatePart(self, md5, sid, dict_up):
 		con = s3.connect('TorrentDB.db')
 		c = con.cursor()
 
-		#c.execute('SELECT bits FROM bitmapping WHERE md5 = ? AND sid = ?', (md5, sid))
-		#res = c.fetchall()
-
-		#part = partNum//8
-		#print("part database -->" + str(part))
-		#toUpdate = res[part][0]
-		#print("toUpdate database ---> " + str(toUpdate))
-		c.execute('UPDATE bitmapping SET bits = ? WHERE md5 = ? AND sid = ? LIMIT 1 OFFSET ?', (updated, md5, sid, part))
+		for du in dict_up:
+			c.execute('UPDATE bitmapping SET bits = ? WHERE md5 = ? AND sid = ? LIMIT 1 OFFSET ?', (dict_up[du], md5, sid, du))
 
 		con.commit()
 		con.close()
