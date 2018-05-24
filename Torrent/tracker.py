@@ -120,7 +120,7 @@ class tracker:
 					#Util.printLog("\n→ ARRIVO RPAD ←\n")
 					th_RPAD = t_rpad(other_peersocket)
 					th_RPAD.start()
-
+			print(Util.globalDict)
 if __name__ == "__main__":
 
 	print(bcolors.MAGENTA + "____________________________      ________   ______   " + bcolors.ENDC)

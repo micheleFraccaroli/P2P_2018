@@ -20,11 +20,12 @@ lock = Lock()
 globalLock = Lock()
 loggedOut = Condition()
 waitMenu = Condition()
-globalDict = {} # sid : list of md5
+globalDict = {} #
 activeSearch = 0 # Numero di ricerche attualmente pronte
 searchLock = Lock() # Lock per le ricerche
 menuLock = Lock() # Lock per i menu
 searchIncoming = Condition()
+count_dict = 0
 
 # Grafica
 

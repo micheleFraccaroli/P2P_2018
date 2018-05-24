@@ -3,6 +3,7 @@ import threading as th
 import Util
 import updateBits as uB
 from dataBase import dataBase
+from rifleDict import rifleDict
 
 class t_rpad(th.Thread):
 	def __init__(self, other_peersocket):
@@ -38,7 +39,10 @@ class t_rpad(th.Thread):
 		# retrieving part for update
 		part_recv = recv_packet[48:].decode()
 		part = (int(part_recv)-1)//8
-		toUpdateBits = db.retrieveBits(recv_packet[16:48].decode(), recv_packet[:16].decode(), int(part))
+		#toUpdateBits = db.retrieveBits(recv_packet[16:48].decode(), recv_packet[:16].decode(), int(part))
+
+		toUpdateBits = Util.globalDict[recv_packet[:48].decode()][part]
+
 		specificBit = int(part_recv) % 8
 		if(specificBit == 0):
 			specificBit = 8
@@ -47,18 +51,27 @@ class t_rpad(th.Thread):
 		#Util.printLog("toUpdateBits --> " + str(toUpdateBits))
 		#Util.printLog("specific bit --> " + str(specificBit))
 
-		up = uB.updateBits(toUpdateBits, specificBit)
+		for i in Util.globalDict.keys():
+			for j in Util.globalDict[i].keys():
+				Util.count_dict += bin(Util.globalDict[i][j][2:].count('1'))
 		
-		# updating database
-		db.updatePart(part, recv_packet[16:48].decode(), recv_packet[:16].decode(), up)
+		if(Util.count_dict < 200):
 
-		# return status of md5 for peer
-		statusMd5 = db.getBitmapping(recv_packet[:16].decode(), recv_packet[16:48].decode())
-		
-		for sM in statusMd5:
-			num = num + bin(sM[0])[2:].count('1')
-		
-		packet = "APAD" + str(num).zfill(8)
-		self.other_peersocket.send(packet.encode())
+			up = uB.updateBits(toUpdateBits, specificBit)
+			
+			# updating database
+			Util.globalDict[recv_packet[:48].decode()][part] = up
 
-		self.other_peersocket.close()
+			# return status of md5 for peer
+			statusMd5 = db.getBitmapping(recv_packet[:16].decode(), recv_packet[16:48].decode())
+			
+			for sM in statusMd5:
+				num = num + bin(sM[0])[2:].count('1')
+			
+			packet = "APAD" + str(num).zfill(8)
+			self.other_peersocket.send(packet.encode())
+
+			self.other_peersocket.close()
+		else:
+			Util.count_dict = 0
+			t_RIFLE = rifleDict()

@@ -213,12 +213,12 @@ class dataBase:
 		con = s3.connect('TorrentDB.db')
 		c = con.cursor()
 
-		c.execute('SELECT bits FROM bitmapping WHERE md5 = ? AND sid = ?', (md5, sid))
-		res = c.fetchall()
+		#c.execute('SELECT bits FROM bitmapping WHERE md5 = ? AND sid = ?', (md5, sid))
+		#res = c.fetchall()
 
 		#part = partNum//8
 		#print("part database -->" + str(part))
-		toUpdate = res[part][0]
+		#toUpdate = res[part][0]
 		#print("toUpdate database ---> " + str(toUpdate))
 		c.execute('UPDATE bitmapping SET bits = ? WHERE md5 = ? AND sid = ? LIMIT 1 OFFSET ?', (updated, md5, sid, part))
 
