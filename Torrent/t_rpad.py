@@ -25,17 +25,13 @@ class t_rpad(th.Thread):
 		
 		flag = True
 		check = db.getInterestedPeers(recv_packet[16:48].decode())
-		#Util.printLog("CHECK → " + str(check))
+		
 		for c in check:
-			#Util.printLog("c → " + str(c[0]))
 			if(c[0] == recv_packet[:16].decode()):
 				flag = False
 
 		if(flag):
 			db.insertInterested(recv_packet[:16].decode(), recv_packet[16:48].decode())
-			#Util.printLog("INSERITO IN F_IN")
-		#else:
-			#Util.printLog("NON INSERITO IN F_IN")
 			
 		# retrieving part for update
 		part_recv = recv_packet[48:].decode()
@@ -48,46 +44,29 @@ class t_rpad(th.Thread):
 		if(specificBit == 0):
 			specificBit = 8
 		
-		#Util.printLog("part --> " + str(part))
-		#Util.printLog("toUpdateBits --> " + str(toUpdateBits))
-		#Util.printLog("specific bit --> " + str(specificBit))
 		Util.count_dict += 1
-		'''
-		for i in Util.globalDict.keys():
-			for j in Util.globalDict[i].keys():
-				Util.count_dict += bin(Util.globalDict[i][j]).count('1')
-		'''
-		if(Util.count_dict <= 500):
-			up = uB.updateBits(toUpdateBits, specificBit)
-			
-			# updating database
-			Util.globalDict[recv_packet[:48].decode()][part] = up
-			#ind = list(Util.globalDict.keys()).index(recv_packet[:48].decode())
-			Util.globalDictStatus[recv_packet[:48].decode()] += 1
-			# return status of md5 for peer
-			#statusMd5 = db.getBitmapping(recv_packet[:16].decode(), recv_packet[16:48].decode())
-			
-			#for sM in statusMd5:
-			#	num = num + bin(sM[0])[2:].count('1')
-			
-			#packet = "APAD" + str(num).zfill(8)
-			packet = "APAD" + str(Util.count_dict).zfill(8)
-			Util.printLog("CICLO N: " + str(Util.globalDictStatus[recv_packet[:48].decode()]))
-			Util.printLog("→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→ INVIO APAD ←")
-			self.other_peersocket.send(packet.encode())
 
-			self.other_peersocket.close()
+		up = uB.updateBits(toUpdateBits, specificBit)
+		Util.globalDict[recv_packet[:48].decode()][part] = up
+		Util.globalDictStatus[recv_packet[:48].decode()] += 1
+
+		packet = "APAD" + str(Util.count_dict).zfill(8)
+		self.other_peersocket.send(packet.encode())
+		self.other_peersocket.close()
+
+		if(Util.count_dict < 500):
+			up = uB.updateBits(toUpdateBits, specificBit)
 		
 			lenFile = db.retrieveInfoFile(recv_packet[16:48].decode())
 
-			if lenFile[1] == Util.globalDictStatus[recv_packet[:48].decode()]: # File scaricato
+			if lenFile[0] == Util.globalDictStatus[recv_packet[:48].decode()]: # File scaricato
 
 				Util.globalDictStatus.pop(recv_packet[:48].decode(), None)
 
-				t_RIFLE = rifleDict()
+				t_RIFLE = rifleDict(Util.globalDict.copy(), recv_packet[:48].decode(), True)
 				t_RIFLE.start()
 
 		else:
 			Util.count_dict = 0
-			t_RIFLE = rifleDict()
+			t_RIFLE = rifleDict(Util.globalDict.copy(), recv_packet[:48].decode(), False)
 			t_RIFLE.start()

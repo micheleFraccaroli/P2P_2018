@@ -214,7 +214,10 @@ class dataBase:
 		c = con.cursor()
 
 		for du in dict_up:
-			c.execute('UPDATE bitmapping SET bits = ? WHERE md5 = ? AND sid = ? LIMIT 1 OFFSET ?', (dict_up[du], md5, sid, du))
+			c.execute('SELECT bits FROM bitmapping WHERE md5 = ? AND sid = ? LIMIT 1 OFFSET ?', (md5, sid, du))
+			b = c.fetchone()[0]
+			b |= dict_up[du]
+			c.execute('UPDATE bitmapping SET bits = ? WHERE md5 = ? AND sid = ? LIMIT 1 OFFSET ?', (b, md5, sid, du))
 
 		con.commit()
 		con.close()
@@ -329,6 +332,8 @@ class dataBase:
 						Util.printLog("buf_res_list ---> " + str(buf_res_list))
 						j = j + 1
 
+				Util.printLog("LOGOUT --> " + str(my_l))
+				Util.printLog("LOGOUT --> " + str(buf_res_list))
 				if(my_l != buf_res_list):
 					return "NLOG", partdown_final
 				else:

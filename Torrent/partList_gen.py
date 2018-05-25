@@ -12,11 +12,11 @@ def partList_gen(totalBit, flag): # flag = 255 o 0
 		totalBit -= 8
 	
 	# Blocco incompleto (finale)
-	if(flag == 0):
-		byte.append(0)
-
-	elif totalBit > 0:
-		lastBlock = (1 << totalBit) - 1
-		byte.append(int('{:08b}'.format(lastBlock)[::-1], 2))
+	if totalBit > 0:
+		if(flag == 0):
+			byte.append(0)
+		else:
+			lastBlock = (1 << totalBit) - 1
+			byte.append(int('{:08b}'.format(lastBlock)[::-1], 2))
 
 	return byte

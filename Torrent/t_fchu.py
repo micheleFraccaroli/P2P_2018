@@ -40,10 +40,8 @@ class t_fchu(th.Thread):
 
 		# insert into db all 0 
 		infoFile = db.retrieveInfoFile(recv_packet[16:].decode())
-		
-		#print(infoFile)
 		bits = pL.partList_gen(infoFile[0], 0)
-		db.insertBitmapping(recv_packet[16:].decode(), recv_packet[:16].decode(), bits)
+		db.insertBitmapping(recv_packet[16:].decode(), recv_packet[:16].decode(), (bits))
 
 		packet_resp = "AFCH" + str(hitpeer).zfill(3)
 		self.other_peersocket.send(packet_resp.encode())

@@ -118,12 +118,12 @@ class tracker:
 
 				# RPAD ---
 				if(recv_type.decode() == "RPAD"):
-					Util.printLog("\n→→→→→→→→→→→→→→→→→→→→→→→→→→→→ ARRIVO RPAD ←\n")
+					#Util.printLog("\n→→→→→→→→→→→→→→→→→→→→→→→→→→→→ ARRIVO RPAD ←\n")
 					th_RPAD = t_rpad(other_peersocket)
 					th_RPAD.start()
 					count += 1
 					#print(count)
-			Util.printLog(str(Util.globalDict))
+			#Util.printLog(str(Util.globalDict))
 if __name__ == "__main__":
 
 	print(bcolors.MAGENTA + "____________________________      ________   ______   " + bcolors.ENDC)

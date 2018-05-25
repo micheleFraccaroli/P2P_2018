@@ -1,17 +1,28 @@
 import threading as th
 import Util
+import math
 from dataBase import dataBase
 
 class rifleDict(th.Thread):
-    def __init__(self):
+    def __init__(self,globalDict,key,flag):
         th.Thread.__init__(self)
-        self.dict = Util.globalDict.copy()
+        self.globalDict = globalDict
+        self.key = key
+        self.flag = flag
 
     def run(self):
         db = dataBase()
-        Util.globalDict = {}
+        infoFile = db.retrieveInfoFile(self.key[16:])
+        if(self.flag):
+            Util.globalDict.pop(self.key, None)
+        else:
+            Util.globalDict[self.key] = {}
+            for i in range(math.ceil(infoFile[0]/8)):
+                Util.globalDict[self.key][i] = 0
+
         rifleList = []
-        for k in self.dict.keys():
+        for k in self.globalDict.keys():
             sid = k[:16]
             md5 = k[16:]
-            db.updatePart(md5, sid, self.dict[k])
+            Util.printLog("SID E MD5 --------------------------------------> " + str(sid) + " --- " + str(md5))
+            db.updatePart(md5, sid, self.globalDict[k])
