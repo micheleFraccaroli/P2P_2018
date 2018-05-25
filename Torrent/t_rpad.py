@@ -2,6 +2,7 @@ import socket
 import threading as th
 import Util
 import updateBits as uB
+import time
 from dataBase import dataBase
 from rifleDict import rifleDict
 
@@ -50,13 +51,13 @@ class t_rpad(th.Thread):
 		#Util.printLog("part --> " + str(part))
 		#Util.printLog("toUpdateBits --> " + str(toUpdateBits))
 		#Util.printLog("specific bit --> " + str(specificBit))
-
+		Util.count_dict += 1
+		'''
 		for i in Util.globalDict.keys():
 			for j in Util.globalDict[i].keys():
-				Util.count_dict += bin(Util.globalDict[i][j][2:].count('1'))
-		
-		if(Util.count_dict < 200):
-
+				Util.count_dict += bin(Util.globalDict[i][j]).count('1')
+		'''
+		if(Util.count_dict <= 4005):
 			up = uB.updateBits(toUpdateBits, specificBit)
 			
 			# updating database
@@ -68,11 +69,16 @@ class t_rpad(th.Thread):
 			for sM in statusMd5:
 				num = num + bin(sM[0])[2:].count('1')
 			
-			packet = "APAD" + str(num).zfill(8)
+			#packet = "APAD" + str(num).zfill(8)
+			packet = "APAD" + str(Util.count_dict).zfill(8)
+			Util.printLog("CICLO N: " + str(Util.count_dict))
+			Util.printLog("→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→ INVIO APAD ←")
 			self.other_peersocket.send(packet.encode())
 
 			self.other_peersocket.close()
-		else:
-			Util.count_dict = 0
-			t_RIFLE = rifleDict()
-			t_RIFLE.start()
+		
+			if(Util.count_dict == 4005):
+				Util.count_dict = 0
+				t_RIFLE = rifleDict()
+				t_RIFLE.start()
+		

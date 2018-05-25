@@ -31,6 +31,7 @@ class tracker:
 		db = dataBase()
 		c = ['black']
 		db.create("tracker")
+		count = 0
 
 		# check logged
 		pN = plot_net()
@@ -59,7 +60,7 @@ class tracker:
 				while (self.bytes_read < 4):
 					recv_type += other_peersocket.recv(4 - self.bytes_read)
 					self.bytes_read = len(recv_type)
-				Util.printLog("RICHIESTA IN ENTRATA AL TRACKER → " + str(recv_type.decode()))
+				#Util.printLog("RICHIESTA IN ENTRATA AL TRACKER → " + str(recv_type.decode()))
 
 				# LOGIN ---
 				if(recv_type.decode() == "LOGI"):
@@ -117,10 +118,12 @@ class tracker:
 
 				# RPAD ---
 				if(recv_type.decode() == "RPAD"):
-					#Util.printLog("\n→ ARRIVO RPAD ←\n")
+					Util.printLog("\n→→→→→→→→→→→→→→→→→→→→→→→→→→→→ ARRIVO RPAD ←\n")
 					th_RPAD = t_rpad(other_peersocket)
 					th_RPAD.start()
-			print(Util.globalDict)
+					count += 1
+					#print(count)
+			Util.printLog(str(Util.globalDict))
 if __name__ == "__main__":
 
 	print(bcolors.MAGENTA + "____________________________      ________   ______   " + bcolors.ENDC)

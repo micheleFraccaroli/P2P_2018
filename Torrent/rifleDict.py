@@ -1,5 +1,6 @@
 import threading as th
 import Util
+from dataBase import dataBase
 
 class rifleDict(th.Thread):
     def __init__(self):
@@ -7,6 +8,7 @@ class rifleDict(th.Thread):
         self.dict = Util.globalDict.copy()
 
     def run(self):
+        db = dataBase()
         Util.globalDict = {}
         rifleList = []
         for k in self.dict.keys():
