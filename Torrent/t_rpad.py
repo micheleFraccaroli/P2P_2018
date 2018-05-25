@@ -15,7 +15,7 @@ class t_rpad(th.Thread):
 	def run(self):
 		db = dataBase()
 		statusMd5 = []
-		num = 0
+		#num = 0
 
 		recv_packet = self.other_peersocket.recv(56)
 		self.bytes_read = len(recv_packet)
@@ -57,28 +57,37 @@ class t_rpad(th.Thread):
 			for j in Util.globalDict[i].keys():
 				Util.count_dict += bin(Util.globalDict[i][j]).count('1')
 		'''
-		if(Util.count_dict <= 4005):
+		if(Util.count_dict <= 500):
 			up = uB.updateBits(toUpdateBits, specificBit)
 			
 			# updating database
 			Util.globalDict[recv_packet[:48].decode()][part] = up
-
+			#ind = list(Util.globalDict.keys()).index(recv_packet[:48].decode())
+			Util.globalDictStatus[recv_packet[:48].decode()] += 1
 			# return status of md5 for peer
-			statusMd5 = db.getBitmapping(recv_packet[:16].decode(), recv_packet[16:48].decode())
+			#statusMd5 = db.getBitmapping(recv_packet[:16].decode(), recv_packet[16:48].decode())
 			
-			for sM in statusMd5:
-				num = num + bin(sM[0])[2:].count('1')
+			#for sM in statusMd5:
+			#	num = num + bin(sM[0])[2:].count('1')
 			
 			#packet = "APAD" + str(num).zfill(8)
 			packet = "APAD" + str(Util.count_dict).zfill(8)
-			Util.printLog("CICLO N: " + str(Util.count_dict))
+			Util.printLog("CICLO N: " + str(Util.globalDictStatus[recv_packet[:48].decode()]))
 			Util.printLog("→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→ INVIO APAD ←")
 			self.other_peersocket.send(packet.encode())
 
 			self.other_peersocket.close()
 		
-			if(Util.count_dict == 4005):
-				Util.count_dict = 0
+			lenFile = db.retrieveInfoFile(recv_packet[16:48].decode())
+
+			if lenFile[1] == Util.globalDictStatus[recv_packet[:48].decode()]: # File scaricato
+
+				Util.globalDictStatus.pop(recv_packet[:48].decode(), None)
+
 				t_RIFLE = rifleDict()
 				t_RIFLE.start()
-		
+
+		else:
+			Util.count_dict = 0
+			t_RIFLE = rifleDict()
+			t_RIFLE.start()

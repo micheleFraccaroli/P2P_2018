@@ -64,6 +64,8 @@ class t_fchu(th.Thread):
 		if(not recv_packet.decode() in Util.globalDict.keys()):
 			# se non c'è creo il dizionario d'appoggio per bufferizzare l'rpad
 			Util.globalDict[recv_packet.decode()] = {}
+			Util.globalDictStatus[recv_packet.decode()] = 0
+			
 			for i in range(math.ceil(infoFile[0]/8)):
 				Util.globalDict[recv_packet.decode()][i] = 0
 			
