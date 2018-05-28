@@ -122,6 +122,7 @@ class dataBase:
 				query = query + '"' + md5 + '","' + sid + '",' + str(b) + '),('
 
 			query = query[:len(query)-2]
+			Util.printLog(query)
 			c.execute(query)
 
 			con.commit()
