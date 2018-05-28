@@ -19,20 +19,12 @@ def test(b):
 	Util.w.delete(4)
 
 def fill(ar,nparts):
-	m = compress(len(ar),nparts)
+	m = nparts/len(ar)
 	for i in range(nparts):
 		p = int(i//m)
 		ar[p] += 1
 
-def compress(a,b):
-	
-	return b/a
-
-def init(l):
-
-	return [0]*l
-
-arr = init(400)
+arr = [0]*400
 fill(arr,1000)
 
 #nThread = 2

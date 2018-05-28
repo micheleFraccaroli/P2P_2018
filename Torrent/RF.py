@@ -39,7 +39,7 @@ def stop(cond, queue):
 	cond.release()
 
 class RF(Thread):
-	
+
 	def __init__(self, config, search):
 
 		Thread.__init__(self)
@@ -244,6 +244,7 @@ class RF(Thread):
 				nPeers = int(hitPeers[4:7].decode())
 				toReadB = 60 + nBlock # Ip + stato
 
+				Util.printLog('Ricezione da traker')
 				if nPeers == 0:
 
 					Util.printLog('No peer found...')
@@ -258,7 +259,7 @@ class RF(Thread):
 						infoPeer += c.s.recv(toReadB - readB)
 						readB = len(infoPeer)
 
-					listPeers.append(infoPeer[:60].decode())			# Peer
+					listPeers.append(infoPeer[:60].decode()) # Peer
 					listStatus.append(list(infoPeer[60:]))	# Stato
 
 				c.deconnection()
