@@ -156,11 +156,8 @@ class D(Thread):
 	def removeGraphic(self):
 
 		Util.lockGraphics.acquire()
-		print('                  ',self.tag)
+		
 		index = Util.rows.index(self.tag)
-
-		#Util.rows.append(self.tag)
-		#Util.rows.remove(self.tag)
 
 		Util.w.delete(self.tag)
 		self.b1.destroy()
@@ -184,6 +181,7 @@ class D(Thread):
 
 		Util.buttonsList.remove(Util.buttonsList[index])
 		Util.rows.remove(self.tag)
+		
 		Util.lockGraphics.release()
 
 	def spawnWorker(self, data, missingParts, wLock):

@@ -39,7 +39,9 @@ def stop(cond, queue):
 	cond.release()
 
 class RF(Thread):
+	
 	def __init__(self, config, search):
+
 		Thread.__init__(self)
 		self.t_ipv4 = config.trackerV4
 		self.t_ipv6 = config.trackerV6
