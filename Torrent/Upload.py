@@ -34,7 +34,7 @@ class Worker(Thread):
 		lenFile = lenPart[1]
 		lenPart = lenPart[2] 	# Lunghezza della parte
 
-		seekPosition = lenPart * (part - 1) # Posiziono la testina sulla parte interessata
+		seekPosition = lenPart * (part) # Posiziono la testina sulla parte interessata
 
 		if lenPart > 1024:
 

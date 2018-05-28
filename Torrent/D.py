@@ -55,7 +55,7 @@ class Worker(Thread):
 				# Elaborazione dei chunk
 				fileDescriptor = open('Files/' + self.fileName, 'r+b')
 
-				fileDescriptor.seek(self.lenPart * (self.part - 1)) # Sposto il puntatore nell'area corretta
+				fileDescriptor.seek(self.lenPart * (self.part)) # Sposto il puntatore nell'area corretta
 				
 				for _ in range(nChunk):
 
@@ -104,7 +104,7 @@ class Worker(Thread):
 				if c.connection():
 
 					c.s.send(('RPAD' + track.sessionId + self.md5 + str(self.part).zfill(8)).encode())
-
+					Util.printLog('Invio tracker')
 					apad = c.s.recv(8)
 
 					readB = len(apad)
@@ -112,6 +112,7 @@ class Worker(Thread):
 					while(readB < 8):
 						apad += c.s.recv(8 - readB)
 						readB = len(apad)
+					break
 
 				else:
 
@@ -127,7 +128,7 @@ class Worker(Thread):
 			Util.w.itemconfig(self.idRect, fill='#ff0000', width=1)
 			
 			self.wLock.acquire()
-			self.missingParts.append(self.part - 1)
+			self.missingParts.append(self.part)
 			Util.printLog('job failed for : ' + str(current_thread()))
 			self.wLock.release()
 
@@ -156,11 +157,8 @@ class D(Thread):
 	def removeGraphic(self):
 
 		Util.lockGraphics.acquire()
-		print('                  ',self.tag)
+		
 		index = Util.rows.index(self.tag)
-
-		#Util.rows.append(self.tag)
-		#Util.rows.remove(self.tag)
 
 		Util.w.delete(self.tag)
 		self.b1.destroy()
@@ -184,6 +182,7 @@ class D(Thread):
 
 		Util.buttonsList.remove(Util.buttonsList[index])
 		Util.rows.remove(self.tag)
+		
 		Util.lockGraphics.release()
 
 	def spawnWorker(self, data, missingParts, wLock):
@@ -230,7 +229,7 @@ class D(Thread):
 
 				Util.dSem.acquire()
 
-				t = Worker(self.status[self.pun][0] + self.firstId, self.status[self.pun][0] + 1, data, self.fileName, self.lenPart, self.status[self.pun][1], missingParts, self.md5, self.tag, wLock) # Istanza di download. Aggiungo 1 perchè gli id di tkinter partono da 1
+				t = Worker(self.status[self.pun][0] + self.firstId, self.status[self.pun][0], data, self.fileName, self.lenPart, self.status[self.pun][1], missingParts, self.md5, self.tag, wLock) # Istanza di download. Aggiungo 1 perchè gli id di tkinter partono da 1
 				t.start()
 
 				self.pun += 1 # Incremento puntatore al prossimo download

@@ -16,6 +16,7 @@ from login import login
 from logout import logout
 from threading import *
 from Graphics import Graphics
+from os import listdir
 
 class bcolors:
     HEADER = '\033[95m'
@@ -71,7 +72,7 @@ class optionsLogged:
         config = db.retrieveConfig(('trackerV4','trackerV6','trackerP'))
 
         del db
-        
+
         search = wrapper(Util.menuInput, 'Search >> ')
 
         searchRF = RF(config, search)
@@ -85,7 +86,10 @@ class optionsLogged:
 
         del db
 
-        nameFile = wrapper(Util.menuInput, 'Insert name file for add operation >> ')
+        listFiles = listdir('Files')
+        listFiles = sorted(listFiles + listFiles, key=str.casefold)
+
+        nameFile = wrapper(Util.menu, listFiles, ['Select a file to upload:'])
 
         add = Add(config, Util.sessionId)
 
