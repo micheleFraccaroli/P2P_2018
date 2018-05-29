@@ -27,6 +27,7 @@ searchLock = Lock() # Lock per le ricerche
 menuLock = Lock() # Lock per i menu
 searchIncoming = Condition()
 count_dict = 0
+lockD = Lock()
 
 # Grafica
 
