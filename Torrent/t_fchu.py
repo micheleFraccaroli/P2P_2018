@@ -49,14 +49,14 @@ class t_fchu(th.Thread):
 		for sid in interested_peer.keys():
 			if(sid != recv_packet[:16].decode()):
 				resp_list.append(interested_peer[sid])
-				Util.printLog("interessato inviato ---> " + str(interested_peer[sid]))
+				#Util.printLog("interessato inviato ---> " + str(interested_peer[sid]))
 
 				bits = db.getBitmapping(sid, recv_packet[16:].decode())
 				if(bits):
 					self.other_peersocket.send(interested_peer[sid].encode())
-					Util.printLog("bit dell'interessato ---> " + str(bits))
+					#Util.printLog("bit dell'interessato ---> " + str(bits))
 				for b in bits:
-					Util.printLog(str(bytes([b[0]])))
+					#Util.printLog(str(bytes([b[0]])))
 					self.other_peersocket.send(bytes([b[0]]))
 
 		if(not recv_packet.decode() in Util.globalDict.keys()):
