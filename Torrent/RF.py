@@ -119,6 +119,7 @@ class RF(Thread):
 				md5 = md5[0]
 				
 				nBit = db.insert_file(sessionid, md5, infoFile, lenfile, lenpart)
+				nBit = int(nBit)
 			else:
 
 				Util.printLog("Download aborted...")
