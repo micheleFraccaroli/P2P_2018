@@ -3,6 +3,7 @@ from queue import *
 import Util
 from time import sleep
 from random import uniform
+from random import shuffle
 from Conn import Conn
 from curses import wrapper
 from dataBase import dataBase
@@ -26,12 +27,12 @@ class Worker(Thread):
 	def run(self):
 
 		Util.w.itemconfig(self.idRect, fill='#0000ff', width=1)
-		
+		shuffle(self.listPeers)
 		jobDone = False
 		for peers in self.listPeers:
 
 			peer = Util.ip_deformatting(peers[:55],peers[55:])
-			Util.printLog(str(peer))
+			Util.printLog(str(peer)+" "+str(self.part))
 			c = Conn(peer[0], peer[1], peer[2]) # ipv4 ipv6 port
 
 			if c.connection():
@@ -56,7 +57,7 @@ class Worker(Thread):
 				fileDescriptor = open('Files/' + self.fileName, 'r+b')
 
 				fileDescriptor.seek(self.lenPart * (self.part)) # Sposto il puntatore nell'area corretta
-				
+
 				for _ in range(nChunk):
 
 					# Estrazione lunghezza chunk
@@ -67,7 +68,7 @@ class Worker(Thread):
 					while (readB < 5):
 						lenChunk += c.s.recv(5 - readB)
 						readB = len(lenChunk)
-
+					#Util.printLog(lenChunk.decode())
 					lenChunk = int(lenChunk.decode())
 
 					# Estrazione dati chunk
@@ -76,7 +77,7 @@ class Worker(Thread):
 
 					readB = len(dataChunk)
 					while (readB < lenChunk):
-						
+
 						dataChunk += c.s.recv(lenChunk - readB)
 						readB = len(dataChunk)
 					fileDescriptor.write(dataChunk) # Scrivo il chunk su file
@@ -126,7 +127,7 @@ class Worker(Thread):
 		else: # Fallita connessione al peer per scaricare la parte
 
 			Util.w.itemconfig(self.idRect, fill='#ff0000', width=1)
-			
+
 			self.wLock.acquire()
 			self.missingParts.append(self.part)
 			Util.printLog('job failed for : ' + str(current_thread()))
@@ -136,7 +137,7 @@ class Worker(Thread):
 		self.data['workers'] -= 1
 		self.wLock.release()
 		Util.dSem.release()
-		
+
 class D(Thread):
 
 	def __init__(self, status, queue, tag, firstId, fileName, lenPart, md5, dCond, b1, b2):
@@ -157,7 +158,7 @@ class D(Thread):
 	def removeGraphic(self):
 
 		Util.lockGraphics.acquire()
-		
+
 		index = Util.rows.index(self.tag)
 
 		Util.w.delete(self.tag)
@@ -169,20 +170,20 @@ class D(Thread):
 		for el in Util.rows[index + 1:]:
 
 			Util.w.move(el, 0,- Util.heightRow)
-			
+
 			b1, b2 = Util.buttonsList[ind]
-			
+
 			infoB1 = b1.place_info()
 			infoB2 = b1.place_info()
 
 			b1.place(y=int(infoB1['y']) - Util.heightRow)
 			b2.place(y=int(infoB2['y']) - Util.heightRow)
-			
+
 			ind += 1
 
 		Util.buttonsList.remove(Util.buttonsList[index])
 		Util.rows.remove(self.tag)
-		
+
 		Util.lockGraphics.release()
 
 	def spawnWorker(self, data, missingParts, wLock):
@@ -192,21 +193,21 @@ class D(Thread):
 			# Controllo aggiornamento status
 			newStatus = None
 			try:
-			
-				newStatus = self.queue.get(False) # Prelevo elemento dalla coda senza bloccarmi 
+
+				newStatus = self.queue.get(False) # Prelevo elemento dalla coda senza bloccarmi
 
 				if type(newStatus) != str:
 
 					toDelete = self.status[:self.pun] # Parti già scaricate
 
 					self.status = toDelete + [part for part in newStatus if part not in toDelete] # Elimino le parti già scaricate dallo stato e gliele pre concateno
-					
+
 			except Empty:
 
 				pass # Mantengo stato attuale
-			
+
 			if newStatus == 'stop':
-				
+
 				flag = True;
 				while flag:	# Attendo che i thread abbiano terminato il download
 
@@ -216,7 +217,7 @@ class D(Thread):
 					wLock.release()
 
 				self.removeGraphic()
-				
+
 				exit()
 
 			elif newStatus == 'pause':
@@ -233,13 +234,13 @@ class D(Thread):
 				t.start()
 
 				self.pun += 1 # Incremento puntatore al prossimo download
-				
+
 				wLock.acquire()
 				data['workers'] += 1
 				wLock.release()
-		
+
 		# Download terminato, attendo che i worker abbiano finito
-		
+
 		flag = True;
 		while flag:	# Attendo che i thread abbiano terminato il download
 
@@ -249,7 +250,7 @@ class D(Thread):
 			wLock.release()
 
 	def run(self):
-		
+
 		data={}
 		data['workers'] = 0 					# Numero di workers attivi
 		data['totalParts'] = len(self.status)	# Numero totali di parti
@@ -267,7 +268,7 @@ class D(Thread):
 		# tento di riscaricarle
 
 		while len(missingParts) != 0:
-			
+
 			self.status = [part for part in self.status if part not in missingParts] + missingParts # Riordino l stato mettendo le parti mancanti alla fine
 			self.pun = len(self.status) - len(missingParts) # Indice del lla prima parte mancante
 			missingParts = [] 	# Risetto la lista delle parte mancanti per il prossimo ciclo

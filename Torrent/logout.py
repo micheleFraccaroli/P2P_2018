@@ -34,4 +34,4 @@ class logout:
                 Util.printLog("Logout failed: "+self.ack_log.decode())
             self.con.deconnection()
         else:
-            Util.printlog("Connection refused...")
+            Util.printLog("Connection refused...")

@@ -30,7 +30,7 @@ class Worker(Thread):
 
 		lenPart = db.retrieveInfoFile(md5)
 
-		nameFile = lenPart[3] 	# Nome del file 
+		nameFile = lenPart[3] 	# Nome del file
 		lenFile = lenPart[1]
 		lenPart = lenPart[2] 	# Lunghezza della parte
 
@@ -49,7 +49,7 @@ class Worker(Thread):
 		else:
 			lenChunk = ceil(lenPart/4) # Prevedo 4 chunk per parte
 			nChunk = 4
-			
+
 		nparts = ceil(lenFile/lenPart)
 
 		# Preparo ed invio il pacchetto
@@ -66,12 +66,12 @@ class Worker(Thread):
 			self.sock.send(str(len(r)).zfill(5).encode() + r)
 
 		remainder = lenPart % lenChunk
-		
+
 		if remainder == 0: # Se non ho resto significa che l'ultimo chunk è completamente pieno
 			remainder = lenChunk
 
 		r = f.read(remainder)
-		
+
 		self.sock.send(str(len(r)).zfill(5).encode() + r)
 
 		self.sock.close()
@@ -93,6 +93,6 @@ class Upload(Thread):
 		while True: # Ciclo di connessioni
 
 			other_peer, addr = peer.accept()
-
+			Util.printLog("Upload to "+str(addr))
 			t = Worker(other_peer)
 			t.start()

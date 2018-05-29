@@ -132,11 +132,11 @@ def menuInput(stdscr, desc):
     inp = stdscr.getstr(20)
 
     while len(inp) == 0:
-        
+
         stdscr.clear()
         stdscr.addstr('\n' + desc)
         inp = stdscr.getstr(20)
-    
+
     return inp.decode()
 
 def menu(stdscr, listMenu, titleMenu, flag = None):
@@ -164,7 +164,7 @@ def menu(stdscr, listMenu, titleMenu, flag = None):
     attr['system'] = color_pair(3)
 
     noecho()
-    stdscr.timeout(1000)
+    stdscr.timeout(10000)
 
     #stdscr.bkgd(' ',color_pair(1)) # Colore background
     depthMenu = [] # Lista di tutti i menu incontrati
@@ -277,14 +277,14 @@ def menu(stdscr, listMenu, titleMenu, flag = None):
                 option = 0
 
         else:
-            
-             if activeSearch > 0 and current_thread() == main_thread(): # Ho delle ricerche    
+
+             if activeSearch > 0 and current_thread() == main_thread(): # Ho delle ricerche
 
                 return None
 
 def analyzeFile(nameFile, lenPart):  # Analizzo il file per terminare il download dopo un crash
 
-    
+
     f = open('Files/' + nameFile, 'rb')
 
     if lenPart > 1024:
@@ -304,14 +304,14 @@ def analyzeFile(nameFile, lenPart):  # Analizzo il file per terminare il downloa
     indexPart = 0
     while True:
         for _ in range(nChunk - 1):
-            
+
             r = f.read(lenChunk)
 
             if r == b'':
 
                 f.close()
                 return missingParts # Ho finito, ritorno le parti mancanti
-        
+
             else:
                 statusPart.append(int.from_bytes(r,'big')) # Accumulo il valore dei chunk
 
@@ -321,20 +321,20 @@ def analyzeFile(nameFile, lenPart):  # Analizzo il file per terminare il downloa
 
         if remainder == 0: # Chunk completamente pieno
             remainder = lenChunk
-        
+
         r = f.read(remainder)
 
         if r == b'':
 
             f.close()
             return missingParts # Ho finito, ritorno le parti mancanti
-        
+
         statusPart.append(int.from_bytes(r,'big'))
 
         if sum(statusPart) == 0: # Tutti i chunk sono nulli: parte mancante
 
             missingParts.append(indexPart)
-        
+
         statusPart = [] # Reset degli stati
         indexPart += 1
 

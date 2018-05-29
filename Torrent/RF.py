@@ -141,10 +141,10 @@ class RF(Thread):
 			exit()
 
 		Util.menuLock.release()
-		
+
 		Util.searchLock.acquire()
 		Util.activeSearch -= 1
-		
+
 		if Util.activeSearch == 0:
 
 			Util.searchIncoming.acquire()
@@ -281,7 +281,7 @@ class RF(Thread):
 
 							maxBit = 7 - int(log(bit8,2)) # Indice del più alto bit impostato ad 1
 							offset = 8 * block
-
+							Util.printLog("Maxbit "+str(maxBit)+" offset: "+str(offset))
 							statusParts[maxBit + offset][1] += 1					# Aumento il peso
 							statusParts[maxBit + offset][2].append(listPeers[peer])	# Inserisco l'ip
 
