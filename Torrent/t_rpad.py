@@ -38,17 +38,21 @@ class t_rpad(th.Thread):
 		part = (int(part_recv))//8
 		#toUpdateBits = db.retrieveBits(recv_packet[16:48].decode(), recv_packet[:16].decode(), int(part))
 
+		Util.lockD.acquire()
 		toUpdateBits = Util.globalDict[recv_packet[:48].decode()][part]
 
-		specificBit = int(part_recv) % 8
-		if(specificBit == 0):
-			specificBit = 8
+		specificBit = (int(part_recv)) % 8
+		#if(specificBit == 0 and int(part_recv) != 0):
+		#	specificBit = 8
 		
 		Util.count_dict += 1
 
 		up = uB.updateBits(toUpdateBits, specificBit)
+
 		Util.globalDict[recv_packet[:48].decode()][part] = up
 		Util.globalDictStatus[recv_packet[:48].decode()] += 1
+
+		Util.lockD.release()
 
 		packet = "APAD" + str(Util.globalDictStatus[recv_packet[:48].decode()]).zfill(8)
 		Util.printLog(str(packet))
@@ -59,10 +63,12 @@ class t_rpad(th.Thread):
 			up = uB.updateBits(toUpdateBits, specificBit)
 		
 			lenFile = db.retrieveInfoFile(recv_packet[16:48].decode())
+			Util.printLog("DIZIONARIO DICT STATUS ----------------------------> " + str(Util.globalDictStatus))
+			Util.printLog("LENFILE -----------------------------------> " + str(lenFile))
 
 			if lenFile[0] == Util.globalDictStatus[recv_packet[:48].decode()]: # File scaricato
 
-				Util.globalDictStatus.pop(recv_packet[:48].decode(), None)
+				#Util.globalDictStatus.pop(recv_packet[:48].decode(), None)
 
 				t_RIFLE = rifleDict(Util.globalDict.copy(), recv_packet[:48].decode(), True)
 				t_RIFLE.start()

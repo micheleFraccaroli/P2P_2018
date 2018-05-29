@@ -90,7 +90,7 @@ class dataBase:
 			res = c.execute('INSERT INTO login VALUES (?,?,?)', (ip, port, sid))
 		except:
 			Util.printLog(str(ip) + " just logged!")
-			c.execute("SELECT sid FROM login where ip = ? AND port = ?", (ip, port))
+			c.execute("SELECT idSession FROM login where ip = ? AND port = ?", (ip, port))
 			res = c.fetchone()
 			sid = res[0]
 
@@ -122,7 +122,7 @@ class dataBase:
 				query = query + '"' + md5 + '","' + sid + '",' + str(b) + '),('
 
 			query = query[:len(query)-2]
-			Util.printLog(query)
+			#Util.printLog(query)
 			c.execute(query)
 
 			con.commit()
