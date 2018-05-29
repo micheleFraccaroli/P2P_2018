@@ -275,7 +275,7 @@ class D(Thread):
 			missingParts = [] 	# Risetto la lista delle parte mancanti per il prossimo ciclo
 			sleep(4) 			# Attendo 10 seondi prima di ricominciare il download
 			self.spawnWorker(data, missingParts, wLock)
-
+			Util.printLog("Missin part "+str(missingParts))
 		print('Terminato!')
 		f.close()
 		exit()
