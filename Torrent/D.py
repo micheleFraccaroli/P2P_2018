@@ -6,6 +6,7 @@ from random import uniform
 from Conn import Conn
 from curses import wrapper
 from dataBase import dataBase
+from random import shuffle
 
 class Worker(Thread):
 
@@ -28,6 +29,7 @@ class Worker(Thread):
 		Util.w.itemconfig(self.idRect, fill='#0000ff', width=1)
 		
 		jobDone = False
+		shuffle(self.listPeers)
 		for peers in self.listPeers:
 
 			peer = Util.ip_deformatting(peers[:55],peers[55:])
@@ -189,22 +191,23 @@ class D(Thread):
 	def spawnWorker(self, data, missingParts, wLock):
 
 		while self.pun < len(self.status):
-
+			Util.printLog("STATO STATO STATO --------> " + str(len(self.status)))
 			# Controllo aggiornamento status
 			newStatus = None
 			try:
-			
-				newStatus = self.queue.get(False) # Prelevo elemento dalla coda senza bloccarmi 
-
+				
+				newStatus = self.queue.get(False) # Prelevo elemento dalla coda senza bloccarmi
+				Util.printLog("VECCHIO STATO ---> " + str(len(self.status))) 
+				Util.printLog("NUOVO STATO ---> " + str(len(newStatus)))
 				if type(newStatus) != str:
-
+	
 					toDelete = self.status[:self.pun] # Parti già scaricate
 
-					self.status = toDelete + [part for part in newStatus if part not in toDelete] # Elimino le parti già scaricate dallo stato e gliele pre concateno
-					
+					self.status = toDelete + [part for part in newStatus if part[0] not in [index[0] for index in toDelete]] # Elimino le parti già scaricate dallo stato e gliele pre concateno
+					Util.printLog("STATUS FINALE ---> "+ str(len(self.status)))
 			except Empty:
 
-				pass # Mantengo stato attuale
+				pass
 			
 			if newStatus == 'stop':
 				
@@ -234,7 +237,7 @@ class D(Thread):
 				t.start()
 
 				self.pun += 1 # Incremento puntatore al prossimo download
-				
+				Util.printLog("PUN ===============> " + str(self.pun))	
 				wLock.acquire()
 				data['workers'] += 1
 				wLock.release()
@@ -266,13 +269,14 @@ class D(Thread):
 
 		# Se al termine del download ci sono parti che non ho potuto scaricare
 		# tento di riscaricarle
-
+		Util.printLog("PARTI MANCANTI ==========> " + str(missingParts))
 		while len(missingParts) != 0:
 			
 			self.status = [part for part in self.status if part not in missingParts] + missingParts # Riordino l stato mettendo le parti mancanti alla fine
 			self.pun = len(self.status) - len(missingParts) # Indice del lla prima parte mancante
 			missingParts = [] 	# Risetto la lista delle parte mancanti per il prossimo ciclo
 			sleep(4) 			# Attendo 10 seondi prima di ricominciare il download
+			Util.printLog(str(missingPats))
 			self.spawnWorker(data, missingParts, wLock)
 
 		print('Terminato!')
