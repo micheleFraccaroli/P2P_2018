@@ -105,6 +105,7 @@ class Worker(Thread):
 				if c.connection():
 
 					c.s.send(('RPAD' + track.sessionId + self.md5 + str(self.part).zfill(8)).encode())
+					Util.printLog('RPAD: '+str(self.part).zfill(8))
 					Util.printLog('Invio tracker')
 					apad = c.s.recv(8)
 
@@ -227,7 +228,7 @@ class D(Thread):
 				self.cond.release()
 
 			else:
-
+				#Util.printLog(str(self.status)+ '  '+str(self.pun))
 				Util.dSem.acquire()
 
 				t = Worker(self.status[self.pun][0] + self.firstId, self.status[self.pun][0], data, self.fileName, self.lenPart, self.status[self.pun][1], missingParts, self.md5, self.tag, wLock) # Istanza di download. Aggiungo 1 perchè gli id di tkinter partono da 1
