@@ -115,10 +115,10 @@ class RF(Thread):
 
 				lenfile = int(md5[1])
 				lenpart = int(md5[2])
-				infoFile = md5[3] # Mi tengo solo il nome del file
+				infoFile = md5[3]
 				md5 = md5[0]
-				nBit = int(math.ceil(lenfile/lenpart))
-				Util.printLog(str(len(infoFile)))
+				
+				nBit = db.insert_file(sessionid, md5, infoFile, lenfile, lenpart)
 			else:
 
 				Util.printLog("Download aborted...")

@@ -93,6 +93,6 @@ class Upload(Thread):
 		while True: # Ciclo di connessioni
 
 			other_peer, addr = peer.accept()
-
+			Util.printLog('Upload: '+str(addr))
 			t = Worker(other_peer)
 			t.start()
