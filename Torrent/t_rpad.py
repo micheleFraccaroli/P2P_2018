@@ -35,7 +35,7 @@ class t_rpad(th.Thread):
 			
 		# retrieving part for update
 		part_recv = recv_packet[48:].decode()
-		part = (int(part_recv)-1)//8
+		part = (int(part_recv))//8
 		#toUpdateBits = db.retrieveBits(recv_packet[16:48].decode(), recv_packet[:16].decode(), int(part))
 
 		toUpdateBits = Util.globalDict[recv_packet[:48].decode()][part]
@@ -50,7 +50,8 @@ class t_rpad(th.Thread):
 		Util.globalDict[recv_packet[:48].decode()][part] = up
 		Util.globalDictStatus[recv_packet[:48].decode()] += 1
 
-		packet = "APAD" + str(Util.count_dict).zfill(8)
+		packet = "APAD" + str(Util.globalDictStatus[recv_packet[:48].decode()]).zfill(8)
+		Util.printLog(str(packet))
 		self.other_peersocket.send(packet.encode())
 		self.other_peersocket.close()
 

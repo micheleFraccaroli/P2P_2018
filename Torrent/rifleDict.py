@@ -24,5 +24,4 @@ class rifleDict(th.Thread):
         for k in self.globalDict.keys():
             sid = k[:16]
             md5 = k[16:]
-            Util.printLog("SID E MD5 --------------------------------------> " + str(sid) + " --- " + str(md5))
             db.updatePart(md5, sid, self.globalDict[k])
