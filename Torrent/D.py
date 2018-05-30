@@ -8,6 +8,7 @@ from Conn import Conn
 from curses import wrapper
 from dataBase import dataBase
 from random import shuffle
+from tracker import bcolors
 
 class Worker(Thread):
 
@@ -34,7 +35,7 @@ class Worker(Thread):
 		for peers in self.listPeers:
 
 			peer = Util.ip_deformatting(peers[:55],peers[55:])
-			Util.printLog(str(peer)+" "+str(self.part))
+			Util.printLog(bcolors.OKBLUE+"DOWNLOADED PART "+str(self.part)+" FROM "+str(peer)+bcolors.ENDC)
 			c = Conn(peer[0], peer[1], peer[2]) # ipv4 ipv6 port
 
 			if c.connection():

@@ -227,7 +227,6 @@ class RF(Thread):
 				Util.printLog('Connection Error...')
 
 			else:
-
 				c.s.send(pkt_fchu.encode())
 
 
@@ -240,7 +239,6 @@ class RF(Thread):
 				while(readB < 7):
 					hitPeers += c.s.recv(7 - readB)
 					readB = len(hitPeers)
-
 				nBlock = math.ceil(nBit/8)
 				nPeers = int(hitPeers[4:7].decode())
 				toReadB = 60 + nBlock # Ip + stato
@@ -279,10 +277,8 @@ class RF(Thread):
 						bit8 = listStatus[peer][block] # Isolo il blocco
 
 						while bit8 > 0:
-
 							maxBit = 7 - int(log(bit8,2)) # Indice del più alto bit impostato ad 1
 							offset = 8 * block
-							Util.printLog("Maxbit "+str(maxBit)+" offset: "+str(offset))
 							statusParts[maxBit + offset][1] += 1					# Aumento il peso
 							statusParts[maxBit + offset][2].append(listPeers[peer])	# Inserisco l'ip
 
@@ -309,6 +305,6 @@ class RF(Thread):
 
 					else:
 
-						print('Terminato')
+						Util.printLog('DOWNLOAD TERMINATO')
 						exit()
 			sleep(60)
