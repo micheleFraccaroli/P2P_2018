@@ -172,7 +172,10 @@ class dataBase:
 		c = con.cursor()
 		npart = math.ceil((lenfile/lenpart))
 
-		c.execute('INSERT INTO file VALUES(?,?,?,?,?,?)', (sessionid, md5, name, lenfile, lenpart, npart))
+		try:
+			c.execute('INSERT INTO file VALUES(?,?,?,?,?,?)', (sessionid, md5, name, lenfile, lenpart, npart))
+		except:
+			pass
 
 		con.commit()
 		con.close()
@@ -265,7 +268,7 @@ class dataBase:
 			c.execute('DELETE FROM f_in')
 			c.execute('DELETE FROM bitmapping')
 			c.execute('DELETE FROM file')
-		
+
 		con.commit()
 
 		con.close()
