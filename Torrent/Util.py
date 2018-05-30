@@ -28,6 +28,7 @@ menuLock = Lock() # Lock per i menu
 searchIncoming = Condition()
 count_dict = 0
 lockD = Lock()
+lockBitmapping = Lock()
 
 # Grafica
 
