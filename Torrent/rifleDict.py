@@ -14,8 +14,8 @@ class rifleDict(th.Thread):
         db = dataBase()
         infoFile = db.retrieveInfoFile(self.key[16:])
         if(self.flag):
-            Util.printLog("SONO DENTRO A RIFLE DICT --------------------------> " + str(Util.globalDict))
-            #Util.globalDict.pop(self.key, None)
+            #Util.printLog("SONO DENTRO A RIFLE DICT --------------------------> " + str(Util.globalDict))
+            del Util.globalDict[self.key]
         else:
             Util.globalDict[self.key] = {}
             for i in range(math.ceil(infoFile[0]/8)):

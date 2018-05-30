@@ -101,9 +101,10 @@ class dataBase:
 	def getHitpeer(self, md5, my_sid):
 		con = s3.connect('TorrentDB.db')
 		c = con.cursor()
-
-		hitpeer = c.execute('SELECT count(DISTINCT sid) FROM bitmapping WHERE md5 = ? and sid <> ?', (md5,my_sid))
+		#Util.lockBitmapping.acquire()
+		hitpeer = c.execute('SELECT count(DISTINCT sid) FROM f_in WHERE md5 = ? and sid <> ?', (md5,my_sid))
 		hitpeer = c.fetchone()
+		#Util.lockBitmapping.release()
 
 		con.close()
 
@@ -112,7 +113,7 @@ class dataBase:
 	def insertBitmapping(self, md5, sid, bits):
 		con = s3.connect('TorrentDB.db')
 		c = con.cursor()
-
+		#Util.lockBitmapping.acquire()
 		c.execute('SELECT COUNT(*) FROM bitmapping WHERE md5 = ? AND sid = ?',(md5,sid))
 		cc = c.fetchone()
 
@@ -126,13 +127,18 @@ class dataBase:
 			c.execute(query)
 
 			con.commit()
+
+			#Util.lockBitmapping.release()
 			con.close()
 
 	def retrieveBits(self, md5, sid, part):
 		con = s3.connect('TorrentDB.db')
 		c = con.cursor()
+
+		#Util.lockBitmapping.acquire()
 		c.execute('SELECT bits FROM bitmapping WHERE md5 = ? AND sid = ? LIMIT 1 OFFSET ?', (md5, sid, part))
 		res = c.fetchone()
+		#Util.lockBitmapping.release()
 
 		con.close()
 		return res[0]
@@ -141,8 +147,10 @@ class dataBase:
 		con = s3.connect('TorrentDB.db')
 		c = con.cursor()
 
+		#Util.lockBitmapping.acquire()
 		c.execute('SELECT bits FROM bitmapping WHERE md5 = ? AND sid = ? ORDER BY sid', (md5, sid))
 		res = c.fetchall()
+		#Util.lockBitmapping.release()
 		#print("Ritorno della query dei bits ---> " + str(res))
 		con.close()
 		return res
@@ -172,8 +180,10 @@ class dataBase:
 		c = con.cursor()
 		npart = math.ceil((lenfile/lenpart))
 
-		c.execute('INSERT INTO file VALUES(?,?,?,?,?,?)', (sessionid, md5, name, lenfile, lenpart, npart))
-
+		try:
+			c.execute('INSERT INTO file VALUES(?,?,?,?,?,?)', (sessionid, md5, name, lenfile, lenpart, npart))
+		except:
+			pass
 		con.commit()
 		con.close()
 		return str(npart).zfill(8)
@@ -214,6 +224,7 @@ class dataBase:
 		con = s3.connect('TorrentDB.db')
 		c = con.cursor()
 
+		#Util.lockBitmapping.acquire()
 		for du in dict_up:
 			c.execute('SELECT bits FROM bitmapping WHERE md5 = ? AND sid = ? LIMIT 1 OFFSET ?', (md5, sid, du))
 			b = c.fetchone()[0]
@@ -221,6 +232,8 @@ class dataBase:
 			c.execute('UPDATE bitmapping SET bits = ? WHERE md5 = ? AND sid = ? LIMIT 1 OFFSET ?', (b, md5, sid, du))
 
 		con.commit()
+
+		#Util.lockBitmapping.release()
 		con.close()
 
 		#return str(npart).zfill(8)
@@ -282,7 +295,7 @@ class dataBase:
 			partdown_final = 0
 
 			if(res):
-				#print(res)
+				#Util.lockBitmapping.acquire()
 				for md5 in res:
 					Util.printLog("md5 --> " + str(md5))
 					c.execute('SELECT bits FROM bitmapping WHERE md5 = ? AND sid = ?', (md5[0], sid))
@@ -333,6 +346,7 @@ class dataBase:
 						Util.printLog("buf_res_list ---> " + str(buf_res_list))
 						j = j + 1
 
+				#Util.lockBitmapping.release()
 				Util.printLog("LOGOUT --> " + str(my_l))
 				Util.printLog("LOGOUT --> " + str(buf_res_list))
 				if(my_l != buf_res_list):

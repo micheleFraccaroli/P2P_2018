@@ -26,6 +26,7 @@ class t_fchu(th.Thread):
 			recv_packet += other_peersocket.recv(48 - self.bytes_read)
 			self.bytes_read = len(recv_packet)
 
+		Util.lockBitmapping.acquire()
 		# retrieving from database
 		hitpeer = db.getHitpeer(recv_packet[16:].decode(), recv_packet[:16].decode())
 		#Util.printLog("\n→ HITPEER " + str(hitpeer))
@@ -49,14 +50,14 @@ class t_fchu(th.Thread):
 		for sid in interested_peer.keys():
 			if(sid != recv_packet[:16].decode()):
 				resp_list.append(interested_peer[sid])
-				#Util.printLog("interessato inviato ---> " + str(interested_peer[sid]))
+				Util.printLog("interessato inviato ---> " + str(interested_peer[sid]))
 
 				bits = db.getBitmapping(sid, recv_packet[16:].decode())
 				if(bits):
 					self.other_peersocket.send(interested_peer[sid].encode())
-					#Util.printLog("bit dell'interessato ---> " + str(bits))
+					Util.printLog("bit dell'interessato ---> " + str(bits))
 				for b in bits:
-					#Util.printLog(str(bytes([b[0]])))
+					Util.printLog("bits vuoto -----------> " + str(bytes([b[0]])))
 					self.other_peersocket.send(bytes([b[0]]))
 
 		if(not recv_packet.decode() in Util.globalDict.keys()):
@@ -66,5 +67,5 @@ class t_fchu(th.Thread):
 			
 			for i in range(math.ceil(infoFile[0]/8)):
 				Util.globalDict[recv_packet.decode()][i] = 0
-		
+		Util.lockBitmapping.release()
 		self.other_peersocket.close()

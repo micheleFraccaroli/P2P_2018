@@ -30,8 +30,10 @@ class t_rpad(th.Thread):
 			if(c[0] == recv_packet[:16].decode()):
 				flag = False
 
+		lenFile = db.retrieveInfoFile(recv_packet[16:48].decode())
 		if(flag):
 			db.insertInterested(recv_packet[:16].decode(), recv_packet[16:48].decode())
+			db.insert_file(recv_packet[:16].decode(), recv_packet[16:48].decode(), lenFile[3], lenFile[1], lenFile[2])
 			
 		# retrieving part for update
 		part_recv = recv_packet[48:].decode()
@@ -62,13 +64,13 @@ class t_rpad(th.Thread):
 		if(Util.count_dict < 500):
 			up = uB.updateBits(toUpdateBits, specificBit)
 		
-			lenFile = db.retrieveInfoFile(recv_packet[16:48].decode())
+			#lenFile = db.retrieveInfoFile(recv_packet[16:48].decode())
 			Util.printLog("DIZIONARIO DICT STATUS ----------------------------> " + str(Util.globalDictStatus))
 			Util.printLog("LENFILE -----------------------------------> " + str(lenFile))
 
 			if lenFile[0] == Util.globalDictStatus[recv_packet[:48].decode()]: # File scaricato
 
-				#Util.globalDictStatus.pop(recv_packet[:48].decode(), None)
+				Util.globalDictStatus.pop(recv_packet[:48].decode(), None)
 
 				t_RIFLE = rifleDict(Util.globalDict.copy(), recv_packet[:48].decode(), True)
 				t_RIFLE.start()
